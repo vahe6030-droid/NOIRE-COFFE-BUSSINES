@@ -2265,13 +2265,7 @@ function openSchedule(id=null){
         new FormData(ev.target)
       );
 
-      const d=await api(
-        id?`/api/admin/shifts/${id}`:'/api/admin/shifts',
-        {
-          method:id?'PATCH':'POST',
-          body:JSON.stringify(body)
-        }
-      );
+      const d=await api('/api/admin/shifts',{method:'POST',body:JSON.stringify(body)});
 
       closeModal();
 
