@@ -1205,10 +1205,11 @@ function openNewBooking(){
         <input name="phone" required>
       </label>
 
-      <label>Дата
-        <input name="date" type="date" value="${dateNow()}" required>
-      </label>
-
+     <label class="noire-date-field">Дата
+<input id="scheduleDateDisplay" type="text" placeholder="ДД.ММ.ГГГГ" maxlength="10" autocomplete="off" required>
+<input id="scheduleDate" name="date" type="hidden" value="${date}">
+</label>
+     
       <label>Время
         <input name="time" data-noire-time inputmode="numeric" placeholder="19:30" required>
       </label>
@@ -2195,6 +2196,9 @@ function openSchedule(id=null){
     $('#scheduleDate')?.value||
     dateNow();
 
+     const displayDate = date ? date.split('-').reverse().join('.') : '';
+
+
   const people=
     state.scheduleEmployees?.length
       ?state.scheduleEmployees
@@ -2208,9 +2212,10 @@ function openSchedule(id=null){
     </h2>
 
     <form id="scheduleForm" class="menu-form">
-      <label>Дата
-        <input name="date" type="date" value="${date}" required>
-      </label>
+      <label class="noire-date-field">Дата
+  <input id="scheduleDateDisplay" type="text" placeholder="ДД.ММ.ГГГГ" maxlength="10" autocomplete="off" required>
+  <input id="scheduleDate" name="date" type="hidden" value="${date}">
+</label>
 
       <label>Сотрудник
         <select name="employeeId" required>
