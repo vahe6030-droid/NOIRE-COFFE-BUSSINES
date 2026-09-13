@@ -321,7 +321,7 @@ function renderOrders(){
   if(completedWrap)completedWrap.hidden=false;
 
   /* ИЗМЕНЕНИЕ: СТРОКА 69 — box заменён на существующий #ordersAllCards */
-  const panel=$('#ordersAllCards')?.parentElement;
+const panel=allWrap?.parentElement;
 
   if(panel)panel.classList.toggle('worker-orders',worker);
 
