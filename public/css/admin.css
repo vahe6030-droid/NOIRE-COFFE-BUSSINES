@@ -192,7 +192,7 @@ input[type="file"]{max-width:100%;padding:.65rem .75rem}
   font-size: 11px;
   letter-spacing: .18em;
   text-transform: uppercase;
-  color: rgba(255,255,255,.55);
+  color: rgba(209, 127, 3, 0.55);
 }
 
 .noire-date-card {
@@ -208,8 +208,8 @@ input[type="file"]{max-width:100%;padding:.65rem .75rem}
   background:
     linear-gradient(
       145deg,
-      rgba(255,255,255,.075),
-      rgba(255,255,255,.025)
+      rgba(0, 0, 0, 0.075),
+      rgba(245, 242, 242, 0.025)
     );
 
   border: 1px solid rgba(255,255,255,.14);
@@ -226,16 +226,16 @@ input[type="file"]{max-width:100%;padding:.65rem .75rem}
 }
 
 .noire-date-card:hover {
-  border-color: rgba(255,255,255,.28);
+  border-color: rgba(196, 119, 4, 0.28);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.08),
     0 14px 36px rgba(0,0,0,.35);
 }
 
 .noire-date-card:focus-within {
-  border-color: rgba(255,255,255,.45);
+  border-color: rgba(153, 103, 9, 0.45);
   box-shadow:
-    0 0 0 3px rgba(255,255,255,.06),
+    0 0 0 3px rgba(187, 33, 33, 0.06),
     0 14px 36px rgba(0,0,0,.35);
 }
 
@@ -247,13 +247,13 @@ input[type="file"]{max-width:100%;padding:.65rem .75rem}
   align-items: center;
   justify-content: center;
 
-  border: 1px solid rgba(255,255,255,.12);
+  border: 1px solid rgba(165, 123, 9, 0.12);
   border-radius: 10px;
 
   color: #fff;
   font-size: 20px;
 
-  background: rgba(255,255,255,.04);
+  background: rgba(0, 0, 0, 0.425)
 }
 
 .noire-date-content {
@@ -277,7 +277,7 @@ input[type="file"]{max-width:100%;padding:.65rem .75rem}
 
   background: transparent;
 
-  color: #fff;
+  color: #af7904;
   font-family: inherit;
   font-size: 16px;
   font-weight: 500;
@@ -285,9 +285,63 @@ input[type="file"]{max-width:100%;padding:.65rem .75rem}
 }
 
 #scheduleDateDisplay::placeholder {
-  color: rgba(255,255,255,.28);
+  color: #af7904;
 }
 
 #scheduleDateDisplay:focus {
   outline: none;
+}
+
+.schedule-delete-controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:18px;
+  padding:18px;
+  background:#111;
+  border:1px solid rgba(212,201,181,.22);
+}
+
+.schedule-delete-controls select{
+  min-width:280px;
+  padding:13px 15px;
+  background:#0b0b0b;
+  color:#f4f0e8;
+  border:1px solid rgba(212,201,181,.35);
+  border-radius:0;
+  font:inherit;
+}
+
+.noire-danger-btn{
+  padding:13px 18px;
+  background:#111;
+  color:#f4f0e8;
+  border:1px solid rgba(212,201,181,.5);
+  border-radius:0;
+  font:inherit;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+
+.noire-danger-btn:hover:not(:disabled){
+  background:#f4f0e8;
+  color:#111;
+}
+
+.noire-danger-btn:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+}
+
+#deleteAllSchedulesBtn{
+  border-color:rgba(180,70,70,.65);
+}
+
+#deleteAllSchedulesBtn:hover{
+  background:#8b3030;
+  color:#f4f0e8;
+  border-color:#8b3030;
 }

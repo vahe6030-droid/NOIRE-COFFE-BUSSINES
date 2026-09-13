@@ -2287,6 +2287,91 @@ function openSchedule(id=null){
     }
   }
 }
+async function deleteSelectedSchedule(){
+  const select=$('#scheduleDeleteSelect');
+  const id=select?.value;
+
+  if(!id){
+    toast('Сначала выберите смену');
+    return;
+  }
+
+  if(!confirm('Удалить выбранную смену?'))return;
+
+  try{
+    await api(`/api/admin/shifts/${id}`,{method:'DELETE'});
+
+    state.shifts=(state.shifts||[]).filter(
+      x=>Number(x.id)!==Number(id)
+    );
+
+    renderSchedule();
+    renderScheduleDeleteControls();
+
+    toast('Смена удалена');
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+
+async function deleteAllSchedules(){
+  if(!(state.shifts||[]).length){
+    toast('Смен для удаления нет');
+    return;
+  }
+
+  if(!confirm('Удалить ВСЕ смены? Это действие нельзя отменить.'))return;
+
+  try{
+    await api('/api/admin/shifts',{method:'DELETE'});
+
+    state.shifts=[];
+    renderSchedule();
+    renderScheduleDeleteControls();
+
+    toast('Все смены удалены');
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+
+function renderScheduleDeleteControls(){
+  const select=$('#scheduleDeleteSelect');
+  const selected=select?.value||'';
+
+  if(!select)return;
+
+  const people=
+    state.scheduleEmployees?.length
+      ?state.scheduleEmployees
+      :state.employees;
+
+  select.innerHTML=
+    '<option value="">Выберите смену…</option>'+
+    (state.shifts||[]).map(x=>{
+      const e=(people||[]).find(
+        p=>Number(p.id)===Number(x.employeeId)
+      );
+
+      return `<option value="${x.id}">
+        ${esc(e?.name||'Сотрудник')} ·
+        ${esc(x.date)} ·
+        ${esc(x.start)}–${esc(x.end)}
+      </option>`;
+    }).join('');
+
+  if(selected){
+    select.value=selected;
+  }
+
+  const btn=$('#deleteSelectedScheduleBtn');
+
+  if(btn){
+    btn.disabled=!select.value;
+  }
+}
 
 async function deleteSchedule(id){
   if(!confirm('Отменить/удалить плановую смену?'))return;
@@ -2308,6 +2393,7 @@ async function deleteSchedule(id){
     toast(e.message)
   }
 }
+
 
 function applyRole(){
   const allowed=state.permissions||[];
@@ -2505,6 +2591,21 @@ document.addEventListener('DOMContentLoaded',()=>{
   'click',
   ()=>openSchedule()
 );
+$('#scheduleDeleteSelect')?.addEventListener(
+  'change',
+  renderScheduleDeleteControls
+);
+
+$('#deleteSelectedScheduleBtn')?.addEventListener(
+  'click',
+  deleteSelectedSchedule
+);
+
+$('#deleteAllSchedulesBtn')?.addEventListener(
+  'click',
+  deleteAllSchedules
+);
+
 
   $('#addBookingBtn')?.addEventListener(
     'click',
