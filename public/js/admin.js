@@ -1739,11 +1739,7 @@ async function removeEmployee(id){
 
 async function shift(id,action){
   try{
-    const d=await api(
-      `/api/admin/employees/${id}/shift/${action}`,
-      {method:'POST'}
-    );
-
+  const d=await api(id?`/api/admin/shifts/${id}`:'/api/admin/shifts',{method:id?'PATCH':'POST',body:JSON.stringify(body)});
     const name=d.employee?.name||'Сотрудник';
 
     toast(
@@ -2270,8 +2266,7 @@ function openSchedule(id=null){
         new FormData(ev.target)
       );
 
-      const d=await api('/api/admin/shifts',{method:'POST',body:JSON.stringify(body)});
-
+      const d=await api(id?`/api/admin/shifts/${id}`:'/api/admin/shifts',{method:id?'PATCH':'POST',body:JSON.stringify(body)});
       closeModal();
 
       const sh=await api('/api/admin/shifts');
@@ -2507,9 +2502,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   );
 
   $('#addScheduleBtn')?.addEventListener(
-    'click',
-    openSchedule
-  );
+  'click',
+  ()=>openSchedule()
+);
 
   $('#addBookingBtn')?.addEventListener(
     'click',
