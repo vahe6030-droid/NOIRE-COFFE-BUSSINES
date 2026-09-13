@@ -1,0 +1,1244 @@
+[
+  {
+    "id": 1,
+    "name": "Espresso",
+    "category": "coffee",
+    "description": "Насыщенный классический эспрессо",
+    "price": 1200,
+    "image": "https://images.unsplash.com/photo-1510707577719-ae7c14805e64?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 2,
+    "name": "Double Espresso",
+    "category": "coffee",
+    "description": "Двойная порция насыщенного эспрессо",
+    "price": 1600,
+    "image": "https://images.unsplash.com/photo-1551030173-122aabc4489c?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 3,
+    "name": "Americano",
+    "category": "coffee",
+    "description": "Эспрессо с горячей водой",
+    "price": 1400,
+    "image": "https://images.unsplash.com/photo-1521302080334-4bebac2763a6?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 4,
+    "name": "Cappuccino",
+    "category": "coffee",
+    "description": "Эспрессо, молоко и воздушная пенка",
+    "price": 1800,
+    "image": "https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 5,
+    "name": "Flat White",
+    "category": "coffee",
+    "description": "Двойной эспрессо и бархатистое молоко",
+    "price": 2000,
+    "image": "https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 6,
+    "name": "Vanilla Latte",
+    "category": "coffee",
+    "description": "Латте с натуральной ванилью",
+    "price": 2100,
+    "image": "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 7,
+    "name": "Caramel Latte",
+    "category": "coffee",
+    "description": "Латте с карамельным сиропом",
+    "price": 2200,
+    "image": "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 8,
+    "name": "Mocha",
+    "category": "coffee",
+    "description": "Шоколад, эспрессо и молоко",
+    "price": 2300,
+    "image": "https://images.unsplash.com/photo-1578374173705-1f8c6d0f1a56?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 9,
+    "name": "Pistachio Raf",
+    "category": "coffee",
+    "description": "Нежный раф с фисташкой",
+    "price": 2500,
+    "image": "https://images.unsplash.com/photo-1461988091159-192b6df7054f?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 10,
+    "name": "Spanish Latte",
+    "category": "coffee",
+    "description": "Кофе с молоком и сгущённым молоком",
+    "price": 2300,
+    "image": "https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 48,
+    "name": "Latte",
+    "category": "coffee",
+    "description": "Latte — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2200,
+    "image": "https://images.unsplash.com/photo-1521302080334-4bebac2763a6?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 49,
+    "name": "Raf Vanilla",
+    "category": "coffee",
+    "description": "Raf Vanilla — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2300,
+    "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 50,
+    "name": "Raf Pistachio",
+    "category": "coffee",
+    "description": "Raf Pistachio — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2400,
+    "image": "https://images.unsplash.com/photo-1510707577719-ae7c14805e64?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 51,
+    "name": "Caramel Macchiato",
+    "category": "coffee",
+    "description": "Caramel Macchiato — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2500,
+    "image": "https://images.unsplash.com/photo-1551030173-122aabc4489c?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 52,
+    "name": "Cold Brew",
+    "category": "coffee",
+    "description": "Cold Brew — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2600,
+    "image": "https://images.unsplash.com/photo-1521302080334-4bebac2763a6?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 11,
+    "name": "Earl Grey",
+    "category": "tea",
+    "description": "Чёрный чай с бергамотом",
+    "price": 1400,
+    "image": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 12,
+    "name": "Jasmine Tea",
+    "category": "tea",
+    "description": "Ароматный зелёный чай с жасмином",
+    "price": 1500,
+    "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 13,
+    "name": "Berry Tea",
+    "category": "tea",
+    "description": "Горячий ягодный чай",
+    "price": 1900,
+    "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 14,
+    "name": "Ginger & Lemon",
+    "category": "tea",
+    "description": "Имбирь, лимон и мёд",
+    "price": 1800,
+    "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 57,
+    "name": "English Breakfast",
+    "category": "tea",
+    "description": "English Breakfast — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1200,
+    "image": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 58,
+    "name": "Green Tea",
+    "category": "tea",
+    "description": "Green Tea — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1200,
+    "image": "https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 59,
+    "name": "Chamomile",
+    "category": "tea",
+    "description": "Chamomile — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1300,
+    "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 60,
+    "name": "Mint Tea",
+    "category": "tea",
+    "description": "Mint Tea — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1400,
+    "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 61,
+    "name": "Ginger Lemon",
+    "category": "tea",
+    "description": "Ginger Lemon — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1400,
+    "image": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 62,
+    "name": "Masala Chai",
+    "category": "tea",
+    "description": "Masala Chai — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1500,
+    "image": "https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 63,
+    "name": "Oolong",
+    "category": "tea",
+    "description": "Oolong — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1500,
+    "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 64,
+    "name": "Hibiscus",
+    "category": "tea",
+    "description": "Hibiscus — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1600,
+    "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 65,
+    "name": "Peach Iced Tea",
+    "category": "tea",
+    "description": "Peach Iced Tea — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1700,
+    "image": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 66,
+    "name": "Rose Tea",
+    "category": "tea",
+    "description": "Rose Tea — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1700,
+    "image": "https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 67,
+    "name": "Buckwheat Tea",
+    "category": "tea",
+    "description": "Buckwheat Tea — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1800,
+    "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 15,
+    "name": "NOIRÉ Breakfast",
+    "category": "breakfast",
+    "description": "Яйца, авокадо, хлеб, бекон и салат",
+    "price": 4200,
+    "image": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 16,
+    "name": "Eggs Benedict",
+    "category": "breakfast",
+    "description": "Яйца пашот, лосось и голландский соус",
+    "price": 4500,
+    "image": "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 17,
+    "name": "Avocado Toast",
+    "category": "breakfast",
+    "description": "Авокадо, яйцо пашот и зелень",
+    "price": 3500,
+    "image": "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 18,
+    "name": "Shakshuka",
+    "category": "breakfast",
+    "description": "Яйца в пряном томатном соусе",
+    "price": 3700,
+    "image": "https://images.unsplash.com/photo-1590412200988-a436970781fa?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 19,
+    "name": "French Toast",
+    "category": "breakfast",
+    "description": "Бриошь, ягоды, крем и кленовый сироп",
+    "price": 3300,
+    "image": "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 20,
+    "name": "Pancakes",
+    "category": "breakfast",
+    "description": "Панкейки с ягодами и кремом",
+    "price": 3200,
+    "image": "https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 69,
+    "name": "Croissant & Eggs",
+    "category": "breakfast",
+    "description": "Croissant & Eggs — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3300,
+    "image": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 70,
+    "name": "Granola Bowl",
+    "category": "breakfast",
+    "description": "Granola Bowl — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3500,
+    "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 71,
+    "name": "Omelette",
+    "category": "breakfast",
+    "description": "Omelette — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3700,
+    "image": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 72,
+    "name": "Scrambled Eggs",
+    "category": "breakfast",
+    "description": "Scrambled Eggs — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3900,
+    "image": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 73,
+    "name": "Cheese Pancakes",
+    "category": "breakfast",
+    "description": "Cheese Pancakes — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 4100,
+    "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 74,
+    "name": "Salmon Toast",
+    "category": "breakfast",
+    "description": "Salmon Toast — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 4200,
+    "image": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 75,
+    "name": "Breakfast Brioche",
+    "category": "breakfast",
+    "description": "Breakfast Brioche — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 4400,
+    "image": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 76,
+    "name": "Yogurt & Berries",
+    "category": "breakfast",
+    "description": "Yogurt & Berries — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 4600,
+    "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 77,
+    "name": "Croissant Breakfast",
+    "category": "breakfast",
+    "description": "Croissant Breakfast — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 4800,
+    "image": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 21,
+    "name": "Burrata",
+    "category": "snacks",
+    "description": "Буррата, томаты, базилик и оливковое масло",
+    "price": 4800,
+    "image": "https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 22,
+    "name": "Bruschetta",
+    "category": "snacks",
+    "description": "Хрустящий хлеб, томаты и базилик",
+    "price": 2800,
+    "image": "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 23,
+    "name": "Chicken Wings",
+    "category": "snacks",
+    "description": "Куриные крылышки с фирменным соусом",
+    "price": 3900,
+    "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 24,
+    "name": "Cheese Plate",
+    "category": "snacks",
+    "description": "Ассорти европейских сыров",
+    "price": 5200,
+    "image": "https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 78,
+    "name": "Hummus & Pita",
+    "category": "snacks",
+    "description": "Hummus & Pita — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2500,
+    "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 79,
+    "name": "Mozzarella Sticks",
+    "category": "snacks",
+    "description": "Mozzarella Sticks — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2700,
+    "image": "https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 80,
+    "name": "Truffle Fries",
+    "category": "snacks",
+    "description": "Truffle Fries — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2800,
+    "image": "https://images.unsplash.com/photo-1541014741259-de529411b96a?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 81,
+    "name": "Nachos",
+    "category": "snacks",
+    "description": "Nachos — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3000,
+    "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 82,
+    "name": "Olives Mix",
+    "category": "snacks",
+    "description": "Olives Mix — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3200,
+    "image": "https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 83,
+    "name": "Garlic Bread",
+    "category": "snacks",
+    "description": "Garlic Bread — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3300,
+    "image": "https://images.unsplash.com/photo-1541014741259-de529411b96a?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 84,
+    "name": "Shrimp Toast",
+    "category": "snacks",
+    "description": "Shrimp Toast — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3500,
+    "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 85,
+    "name": "Mini Quesadilla",
+    "category": "snacks",
+    "description": "Mini Quesadilla — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3700,
+    "image": "https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 86,
+    "name": "Chicken Strips",
+    "category": "snacks",
+    "description": "Chicken Strips — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3900,
+    "image": "https://images.unsplash.com/photo-1541014741259-de529411b96a?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 87,
+    "name": "Veggie Sticks",
+    "category": "snacks",
+    "description": "Veggie Sticks — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 4000,
+    "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 88,
+    "name": "Tuna Tartare Toast",
+    "category": "snacks",
+    "description": "Tuna Tartare Toast — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 4200,
+    "image": "https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 25,
+    "name": "Caesar Salad",
+    "category": "food",
+    "description": "Курица, романо, пармезан и соус цезарь",
+    "price": 4300,
+    "image": "https://images.unsplash.com/photo-1546793665-c74683f339c1?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 26,
+    "name": "Greek Salad",
+    "category": "food",
+    "description": "Овощи, фета, маслины и орегано",
+    "price": 3600,
+    "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 27,
+    "name": "Truffle Pasta",
+    "category": "food",
+    "description": "Паста с трюфельным соусом и пармезаном",
+    "price": 5900,
+    "image": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 28,
+    "name": "Carbonara",
+    "category": "food",
+    "description": "Паста, гуанчале, яйцо и пармезан",
+    "price": 4800,
+    "image": "https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 29,
+    "name": "Salmon Steak",
+    "category": "food",
+    "description": "Лосось, овощи и лимонный соус",
+    "price": 6800,
+    "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 30,
+    "name": "Mushroom Risotto",
+    "category": "food",
+    "description": "Рис арборио, грибы и пармезан",
+    "price": 5100,
+    "image": "https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 31,
+    "name": "NOIRÉ Burger",
+    "category": "food",
+    "description": "Говядина, cheddar, карамелизированный лук",
+    "price": 5400,
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 32,
+    "name": "Margherita Pizza",
+    "category": "food",
+    "description": "Томаты, mozzarella и свежий базилик",
+    "price": 4500,
+    "image": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 90,
+    "name": "Chicken Alfredo",
+    "category": "food",
+    "description": "Chicken Alfredo — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 6400,
+    "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 91,
+    "name": "Beef Steak",
+    "category": "food",
+    "description": "Beef Steak — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 6700,
+    "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 92,
+    "name": "Chicken Steak",
+    "category": "food",
+    "description": "Chicken Steak — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 7100,
+    "image": "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 93,
+    "name": "Chicken Burger",
+    "category": "food",
+    "description": "Chicken Burger — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 7400,
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 94,
+    "name": "Beef Burger",
+    "category": "food",
+    "description": "Beef Burger — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 7800,
+    "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 95,
+    "name": "Ramen NOIRÉ",
+    "category": "food",
+    "description": "Ramen NOIRÉ — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 8100,
+    "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 96,
+    "name": "Beef Bowl",
+    "category": "food",
+    "description": "Beef Bowl — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 8500,
+    "image": "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 33,
+    "name": "Tiramisu",
+    "category": "desserts",
+    "description": "Классический итальянский тирамису",
+    "price": 2900,
+    "image": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 34,
+    "name": "Cheesecake",
+    "category": "desserts",
+    "description": "Нежный чизкейк с ягодным соусом",
+    "price": 3000,
+    "image": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 35,
+    "name": "Chocolate Fondant",
+    "category": "desserts",
+    "description": "Тёплый шоколадный фондан",
+    "price": 3200,
+    "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 36,
+    "name": "Panna Cotta",
+    "category": "desserts",
+    "description": "Ванильная панна-котта с ягодами",
+    "price": 2800,
+    "image": "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 37,
+    "name": "Pistachio Cake",
+    "category": "desserts",
+    "description": "Фисташковый торт с кремом",
+    "price": 3100,
+    "image": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 99,
+    "name": "Carrot Cake",
+    "category": "desserts",
+    "description": "Carrot Cake — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2200,
+    "image": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 100,
+    "name": "Napoleon",
+    "category": "desserts",
+    "description": "Napoleon — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2300,
+    "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 101,
+    "name": "Brownie",
+    "category": "desserts",
+    "description": "Brownie — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2400,
+    "image": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 102,
+    "name": "Berry Tart",
+    "category": "desserts",
+    "description": "Berry Tart — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2500,
+    "image": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 103,
+    "name": "Lemon Tart",
+    "category": "desserts",
+    "description": "Lemon Tart — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2600,
+    "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 104,
+    "name": "Creme Brulee",
+    "category": "desserts",
+    "description": "Creme Brulee — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2700,
+    "image": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 105,
+    "name": "Chocolate Mousse",
+    "category": "desserts",
+    "description": "Chocolate Mousse — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2900,
+    "image": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 106,
+    "name": "Macaron Set",
+    "category": "desserts",
+    "description": "Macaron Set — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3000,
+    "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 107,
+    "name": "Cinnamon Roll",
+    "category": "desserts",
+    "description": "Cinnamon Roll — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3100,
+    "image": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 108,
+    "name": "Ice Cream Trio",
+    "category": "desserts",
+    "description": "Ice Cream Trio — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 3200,
+    "image": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 38,
+    "name": "Fresh Orange",
+    "category": "drinks",
+    "description": "Свежевыжатый апельсиновый сок",
+    "price": 2200,
+    "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 39,
+    "name": "Berry Lemonade",
+    "category": "drinks",
+    "description": "Домашний лимонад с лесными ягодами",
+    "price": 2300,
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 40,
+    "name": "Mango Smoothie",
+    "category": "drinks",
+    "description": "Манго, йогурт и лёд",
+    "price": 2600,
+    "image": "https://images.unsplash.com/photo-1505252585461-04db1eb84625?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 109,
+    "name": "Fresh Grapefruit",
+    "category": "drinks",
+    "description": "Fresh Grapefruit — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1300,
+    "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 110,
+    "name": "Lemonade",
+    "category": "drinks",
+    "description": "Lemonade — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1400,
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 111,
+    "name": "Mojito 0%",
+    "category": "drinks",
+    "description": "Mojito 0% — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1600,
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 112,
+    "name": "Ginger Ale",
+    "category": "drinks",
+    "description": "Ginger Ale — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1700,
+    "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 113,
+    "name": "Tonic Citrus",
+    "category": "drinks",
+    "description": "Tonic Citrus — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1800,
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 114,
+    "name": "Iced Matcha",
+    "category": "drinks",
+    "description": "Iced Matcha — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2000,
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 115,
+    "name": "Peach Iced Tea",
+    "category": "drinks",
+    "description": "Peach Iced Tea — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2100,
+    "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 116,
+    "name": "Cola",
+    "category": "drinks",
+    "description": "Cola — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2300,
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 117,
+    "name": "Mineral Water",
+    "category": "drinks",
+    "description": "Mineral Water — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2400,
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 118,
+    "name": "Sparkling Water",
+    "category": "drinks",
+    "description": "Sparkling Water — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2500,
+    "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 119,
+    "name": "Apple Juice",
+    "category": "drinks",
+    "description": "Apple Juice — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2700,
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 120,
+    "name": "Berry Smoothie",
+    "category": "drinks",
+    "description": "Berry Smoothie — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2800,
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 41,
+    "name": "Classic Lager",
+    "category": "beer",
+    "description": "Лёгкий золотистый лагер",
+    "price": 2500,
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 42,
+    "name": "IPA",
+    "category": "beer",
+    "description": "Ароматный IPA с хмелевой горчинкой",
+    "price": 2900,
+    "image": "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=900&q=85",
+    "popular": true
+  },
+  {
+    "id": 43,
+    "name": "Wheat Beer",
+    "category": "beer",
+    "description": "Мягкое пшеничное пиво",
+    "price": 2800,
+    "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 121,
+    "name": "Heineken",
+    "category": "beer",
+    "description": "Heineken — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1700,
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 122,
+    "name": "Corona Extra",
+    "category": "beer",
+    "description": "Corona Extra — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1700,
+    "image": "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 123,
+    "name": "Budweiser",
+    "category": "beer",
+    "description": "Budweiser — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1800,
+    "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 124,
+    "name": "Stella Artois",
+    "category": "beer",
+    "description": "Stella Artois — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1900,
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 125,
+    "name": "Guinness",
+    "category": "beer",
+    "description": "Guinness — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2000,
+    "image": "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 126,
+    "name": "Hoegaarden",
+    "category": "beer",
+    "description": "Hoegaarden — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2100,
+    "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 127,
+    "name": "Paulaner",
+    "category": "beer",
+    "description": "Paulaner — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2200,
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 128,
+    "name": "Krombacher",
+    "category": "beer",
+    "description": "Krombacher — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2300,
+    "image": "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 129,
+    "name": "Erdinger",
+    "category": "beer",
+    "description": "Erdinger — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2300,
+    "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 130,
+    "name": "Craft Lager",
+    "category": "beer",
+    "description": "Craft Lager — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2400,
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 131,
+    "name": "IPA NOIRÉ",
+    "category": "beer",
+    "description": "IPA NOIRÉ — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2500,
+    "image": "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 132,
+    "name": "Wheat Ale",
+    "category": "beer",
+    "description": "Wheat Ale — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 2600,
+    "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 44,
+    "name": "Truffle Sauce",
+    "category": "sauces",
+    "description": "Фирменный трюфельный соус",
+    "price": 900,
+    "image": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 45,
+    "name": "Garlic Sauce",
+    "category": "sauces",
+    "description": "Нежный чесночный соус",
+    "price": 700,
+    "image": "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 46,
+    "name": "BBQ Sauce",
+    "category": "sauces",
+    "description": "Классический дымный BBQ",
+    "price": 700,
+    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 47,
+    "name": "Pesto",
+    "category": "sauces",
+    "description": "Соус песто с базиликом и пармезаном",
+    "price": 900,
+    "image": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 136,
+    "name": "Garlic Aioli",
+    "category": "sauces",
+    "description": "Garlic Aioli — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 700,
+    "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 137,
+    "name": "Sweet Chili",
+    "category": "sauces",
+    "description": "Sweet Chili — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 700,
+    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 138,
+    "name": "Cheese Sauce",
+    "category": "sauces",
+    "description": "Cheese Sauce — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 800,
+    "image": "https://images.unsplash.com/photo-1472476442910-44a59e1c1722?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 139,
+    "name": "Tomato Salsa",
+    "category": "sauces",
+    "description": "Tomato Salsa — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 800,
+    "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 140,
+    "name": "Honey Mustard",
+    "category": "sauces",
+    "description": "Honey Mustard — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 800,
+    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 141,
+    "name": "Spicy Mayo",
+    "category": "sauces",
+    "description": "Spicy Mayo — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 900,
+    "image": "https://images.unsplash.com/photo-1472476442910-44a59e1c1722?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 142,
+    "name": "Teriyaki",
+    "category": "sauces",
+    "description": "Teriyaki — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 900,
+    "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 143,
+    "name": "Tartar Sauce",
+    "category": "sauces",
+    "description": "Tartar Sauce — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1000,
+    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 144,
+    "name": "Pepper Sauce",
+    "category": "sauces",
+    "description": "Pepper Sauce — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1000,
+    "image": "https://images.unsplash.com/photo-1472476442910-44a59e1c1722?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 145,
+    "name": "Basil Oil",
+    "category": "sauces",
+    "description": "Basil Oil — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1100,
+    "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 146,
+    "name": "Ranch",
+    "category": "sauces",
+    "description": "Ranch — фирменная позиция NOIRÉ с аккуратной подачей и свежими ингредиентами.",
+    "price": 1100,
+    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=85",
+    "popular": false
+  },
+  {
+    "id": 147,
+    "name": "forbidden-director",
+    "category": "coffee",
+    "description": "",
+    "price": 100,
+    "image": "",
+    "popular": false
+  },
+  {
+    "id": 148,
+    "name": "forbidden-administrator",
+    "category": "coffee",
+    "description": "",
+    "price": 100,
+    "image": "",
+    "popular": false
+  },
+  {
+    "id": 149,
+    "name": "forbidden-manager",
+    "category": "coffee",
+    "description": "",
+    "price": 100,
+    "image": "",
+    "popular": false
+  }
+]

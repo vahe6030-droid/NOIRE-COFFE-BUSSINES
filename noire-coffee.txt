@@ -1,0 +1,4 @@
+NOIRÉ Coffee & Kitchen
+Production configuration is provided through environment variables.
+Required: DATABASE_URL, NOIRE_SESSION_SECRET (32+ chars), NOIRE_ADMIN_USER, NOIRE_ADMIN_PASSWORD.
+Do not store production credentials in source control.

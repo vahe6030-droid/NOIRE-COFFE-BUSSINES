@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "title": "The Main Hall",
+    "category": "Interior",
+    "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=88"
+  },
+  {
+    "id": 2,
+    "title": "Evening Light",
+    "category": "Atmosphere",
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1600&q=88"
+  },
+  {
+    "id": 3,
+    "title": "Window Seats",
+    "category": "Seating",
+    "image": "https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1600&q=88"
+  },
+  {
+    "id": 4,
+    "title": "The Lounge",
+    "category": "Interior",
+    "image": "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1600&q=88"
+  },
+  {
+    "id": 5,
+    "title": "Noiré Details",
+    "category": "Details",
+    "image": "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=88"
+  },
+  {
+    "id": 6,
+    "title": "After Dark",
+    "category": "Atmosphere",
+    "image": "https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1600&q=88"
+  }
+]
