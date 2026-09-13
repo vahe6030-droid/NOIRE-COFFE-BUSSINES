@@ -57,7 +57,7 @@ function renderOrders(){
   else{all=rows.filter(active);completed=rows.filter(o=>!active(o));}
   const set=(id,items,empty)=>{const b=$('#'+id);if(b)b.innerHTML=items.map(card).join('')||`<div class="empty-admin-state"><h3>${empty}</h3></div>`};
   set('ordersAllCards',all,'Доступных заказов нет');set('ordersMineCards',mine,worker?'Вы пока не приняли заказов':'');set('ordersCompletedCards',completed,worker?'У вас нет завершённых заказов':'Выполненных заказов нет');
-  const mineWrap=$('#ordersMineWrap'),allWrap=$('#ordersAllWrap'),completedWrap=$('#ordersCompletedWrap');if(mineWrap)mineWrap.hidden=!worker;if(allWrap)allWrap.hidden=false;if(completedWrap)completedWrap.hidden=false;const panel=box?.parentElement;if(panel)panel.classList.toggle('worker-orders',worker);const add=$('#addWaiterOrderBtn');if(add)add.hidden=role!=='waiter';
+  const mineWrap=$('#ordersMineWrap'),allWrap=$('#ordersAllWrap'),completedWrap=$('#ordersCompletedWrap');if(mineWrap)mineWrap.hidden=!worker;if(allWrap)allWrap.hidden=false;if(completedWrap)completedWrap.hidden=false;const panel=$('#ordersAllCards')?.parentElement;if(panel)panel.classList.toggle('worker-orders',worker);const add=$('#addWaiterOrderBtn');if(add)add.hidden=role!=='waiter';
 }
 async function claimOrder(id){try{await api(`/api/admin/orders/${id}/claim`,{method:'POST'});toast('Заказ принят');await load()}catch(e){toast(e.message)}}
 async function completeMyOrder(id){try{await api(`/api/admin/orders/${id}`,{method:'PATCH',body:JSON.stringify({status:'completed'})});toast('Заказ завершён');await load()}catch(e){toast(e.message)}}
