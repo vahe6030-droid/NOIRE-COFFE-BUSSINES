@@ -345,3 +345,96 @@ input[type="file"]{max-width:100%;padding:.65rem .75rem}
   color:#f4f0e8;
   border-color:#8b3030;
 }
+/* Shift schedule controls */
+.schedule-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex:1 1 100%;
+  flex-wrap:wrap;
+  margin-top:2px;
+}
+
+.schedule-selection-count{
+  display:inline-flex;
+  align-items:center;
+  min-height:36px;
+  padding:0 10px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:9px;
+  color:rgba(255,255,255,.55);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.schedule-actions .small-btn{
+  min-height:36px;
+}
+
+.schedule-actions .small-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.schedule-mini{
+  padding-right:28px;
+}
+
+.schedule-mini.is-selected{
+  outline:1px solid rgba(255,255,255,.32);
+  background:rgba(255,255,255,.09);
+}
+
+.schedule-shift-select{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  cursor:pointer;
+}
+
+.schedule-shift-select input{
+  width:14px;
+  height:14px;
+  margin:0;
+  flex:0 0 auto;
+  cursor:pointer;
+}
+
+.schedule-shift-select span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+@media(max-width:700px){
+  .schedule-actions{
+    justify-content:stretch;
+  }
+
+  .schedule-actions .small-btn{
+    flex:1 1 180px;
+  }
+
+  .schedule-selection-count{
+    flex:1 1 100%;
+  }
+}
+
+@media(max-width:540px){
+  .schedule-actions{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  .schedule-actions .small-btn{
+    width:100%;
+  }
+
+  .schedule-selection-count{
+    width:100%;
+    justify-content:center;
+  }
+}

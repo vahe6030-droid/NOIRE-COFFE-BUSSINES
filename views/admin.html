@@ -74,7 +74,93 @@
 
 <section data-section="gallery" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">SPACE ONLY</span><h2>Галерея</h2><p>Интерьер, атмосфера, столики и само пространство NOIRÉ. Фото можно загрузить прямо с устройства.</p></div><button id="addGalleryBtn" class="admin-primary">+ Добавить фото</button></div><div id="galleryAdminGrid" class="gallery-admin-grid"></div></div></section>
 
-<section data-section="schedule" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">SHIFT SCHEDULE</span><h2>График смен</h2><p>Плановые смены отдельно от фактического времени работы.</p></div><button id="addScheduleBtn" class="admin-primary">+ Добавить смену</button></div><div class="schedule-toolbar"><div class="schedule-month-nav"><button type="button" class="small-btn" id="schedulePrevMonth">‹</button><button type="button" class="small-btn" id="scheduleTodayMonth">Сегодня</button><button type="button" class="small-btn" id="scheduleNextMonth">›</button></div><label>Дата<input id="scheduleDate" type="date"></label><label>Сотрудник<select id="scheduleEmployee"><option value="all">Все сотрудники</option></select></label><label>Роль<select id="scheduleRole"><option value="all">Все роли</option><option value="manager">Manager</option><option value="waiter">Waiter</option><option value="cook">Повар</option><option value="delivery">Courier</option><option value="administrator">Administrator</option><option value="director">Director</option></select></label></div><div id="scheduleCalendar" class="schedule-calendar"></div></div></section>
+<section data-section="schedule" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">SHIFT SCHEDULE</span><h2>График смен</h2><p>Плановые смены отдельно от фактического времени работы.</p></div><button id="addScheduleBtn" class="admin-primary">+ Добавить смену</button></div><div class="schedule-toolbar">
+
+  <div class="schedule-month-nav">
+    <button
+      type="button"
+      class="small-btn"
+      id="schedulePrevMonth"
+    >
+      ‹
+    </button>
+
+    <button
+      type="button"
+      class="small-btn"
+      id="scheduleTodayMonth"
+    >
+      Сегодня
+    </button>
+
+    <button
+      type="button"
+      class="small-btn"
+      id="scheduleNextMonth"
+    >
+      ›
+    </button>
+  </div>
+
+  <label>
+    Дата
+    <input
+      id="scheduleDate"
+      type="date"
+    >
+  </label>
+
+  <label>
+    Сотрудник
+    <select id="scheduleEmployee">
+      <option value="all">
+        Все сотрудники
+      </option>
+    </select>
+  </label>
+
+  <label>
+    Роль
+    <select id="scheduleRole">
+      <option value="all">Все роли</option>
+      <option value="manager">Manager</option>
+      <option value="waiter">Waiter</option>
+      <option value="cook">Повар</option>
+      <option value="delivery">Courier</option>
+      <option value="administrator">Administrator</option>
+      <option value="director">Director</option>
+    </select>
+  </label>
+
+  <div class="schedule-actions">
+
+    <span
+      id="selectedShiftsCount"
+      class="schedule-selection-count"
+    >
+      Выбрано: 0
+    </span>
+
+    <button
+      type="button"
+      id="deleteSelectedShifts"
+      class="small-btn danger"
+      disabled
+    >
+      Удалить выбранные
+    </button>
+
+    <button
+      type="button"
+      id="deleteAllShifts"
+      class="small-btn danger"
+    >
+      Удалить все смены
+    </button>
+
+  </div>
+
+</div><div id="scheduleCalendar" class="schedule-calendar"></div></div></section>
 
 <section data-section="employees" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">NOIRÉ TEAM</span><h2>Сотрудники</h2><p>Смены, роли, доступы, выручка и рабочие показатели каждого человека.</p></div><button id="addEmployeeBtn" class="admin-primary">+ Добавить сотрудника</button></div><div id="employeesGrid" class="employees-grid"></div></div></section>
 
