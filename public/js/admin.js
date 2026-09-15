@@ -138,27 +138,10 @@ async function deleteAllCustomers(){
 function openCustomer(id){const c=state.customers.find(x=>Number(x.id)===Number(id));if(!c)return;const orders=state.orders.filter(o=>Number(o.customerId)===Number(c.id)||(!o.customerId&&o.customer?.phone===c.phone));const bookings=state.reservations.filter(r=>Number(r.customerId)===Number(c.id)||(!r.customerId&&r.phone===c.phone));openModal(`<span class="admin-eyebrow">CLIENT PROFILE</span><h2>${esc(c.name||'Клиент')}</h2><div class="detail-grid"><div><small>Телефон</small><b>${esc(c.phone||'—')}</b></div><div><small>Email</small><b>${esc(c.email||'—')}</b></div><div><small>Регистрация</small><b>${c.registered===false?'Гостевой контакт':'Зарегистрирован'}</b></div><div><small>Заказов</small><b>${orders.length}</b></div><div><small>Бронирований</small><b>${bookings.length}</b></div></div><h3>Заказы клиента</h3><div class="history-detail-list">${orders.map(o=>`<button class="client-detail-row" onclick="openOrder(${o.id})"><span><b>#${o.number}</b> · ${esc(statusLabel(o.status))}</span><strong>${money(o.total)}</strong></button>`).join('')||'<p>Заказов нет.</p>'}</div><h3>Бронирования клиента</h3><div class="history-detail-list">${bookings.map(r=>`<div class="mini-row"><span><b>#${r.number}</b> · ${esc(window.noireFormatDate?noireFormatDate(r.date):r.date)} ${esc(r.time)}</span><span>${esc(statusLabel(r.status))}</span></div><div class="client-comment">${esc(r.comment||'Без комментария')}</div>`).join('')||'<p>Бронирований нет.</p>'}</div>`)}
 function renderAnalytics(){const days=state.analytics?.days||[];const max=Math.max(...days.map(x=>x.revenue),1);$('#salesBars').innerHTML=days.map(x=>`<div class="bar" style="height:${Math.max(8,x.revenue/max*210)}px"><b>${x.revenue?money(x.revenue).replace(' ֏',''):0}</b><span>${x.label}</span></div>`).join('')||'<p>Нет данных по продажам.</p>';$('#customersList').innerHTML=state.customers.slice(0,8).map(c=>`<div class="mini-row"><span>${esc(c.name||'Гость')}</span><small>${esc(c.phone||c.email||'')}</small></div>`).join('')||'<p>Нет клиентов.</p>';$('#analyticsTop').innerHTML=(state.analytics?.topItems||[]).slice(0,8).map((x,i)=>`<div class="rank-row"><span><b>${i+1}.</b> ${esc(x.name)}</span><small>${x.quantity} шт.</small></div>`).join('')||'<p>Нет данных.</p>';$('#categoryList').innerHTML=(state.analytics?.topCategories||[]).slice(0,8).map(x=>`<div class="mini-row"><span>${esc(x.category)}</span><small>${x.quantity} шт.</small></div>`).join('')||'<p>Нет данных.</p>';}
 function openModal(html){$('#modalContent').innerHTML=html;$('#modal').hidden=false;if(window.noireInitTimeInputs)noireInitTimeInputs($('#modalContent'));}function closeModal(){$('#modal').hidden=true;$('#modalContent').innerHTML=''}
-async function readImageFile(file){
-  if(!file || !String(file.type||'').toLowerCase().startsWith('image/')) throw new Error('Выберите файл изображения');
-  if(file.size>12*1024*1024) throw new Error('Фото слишком большое. Максимум 12 МБ.');
-  const raw=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('Не удалось прочитать фото'));r.readAsDataURL(file)});
-  try{
-    const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Формат фото не поддерживается браузером'));im.src=raw});
-    const max=1600, scale=Math.min(1,max/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
-    const canvas=document.createElement('canvas'); canvas.width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale)); canvas.height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
-    const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,canvas.width,canvas.height);
-    let quality=.84, out=canvas.toDataURL('image/jpeg',quality);
-    while(out.length>Math.floor(2.2*1024*1024*4/3) && quality>.55){quality-=.07;out=canvas.toDataURL('image/jpeg',quality)}
-    return out;
-  }catch(err){
-    if(/^data:image\/(jpeg|jpg|png|webp|gif|avif);base64,/i.test(String(raw))) return raw;
-    throw err;
-  }
-}
-async function imageFieldData(form,name='image',fileName='imageFile'){
-  const file=form.querySelector(`input[name="${fileName}"]`)?.files?.[0];
-  if(file) return await readImageFile(file);
-  return String(form.querySelector(`input[name="${name}"]`)?.value||'').trim();
+function imageFieldData(form, name = 'image'){
+  return String(
+    form.querySelector(`[name="${name}"]`)?.value || ''
+  ).trim();
 }
 function photoFieldMarkup(value = '', name = 'image') {
     return `
@@ -224,7 +207,198 @@ function renderEmployees(){const box=$('#employeesGrid');if(!box)return;const ca
 
 function shiftMonth(delta){const el=$('#scheduleDate');const base=new Date((el?.value||dateNow())+'T12:00:00');base.setMonth(base.getMonth()+delta,1);if(el)el.value=`${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-01`;renderSchedule();}
 function shiftToday(){const el=$('#scheduleDate');if(el)el.value=dateNow();renderSchedule();}
-function renderSchedule(){const box=$('#scheduleCalendar');if(!box)return;const selected=$('#scheduleDate')?.value||dateNow();const base=new Date(selected+'T12:00:00');const year=base.getFullYear(),month=base.getMonth();const emp=$('#scheduleEmployee')?.value||'all',role=$('#scheduleRole')?.value||'all';const people=state.scheduleEmployees?.length?state.scheduleEmployees:state.employees;if($('#scheduleEmployee'))$('#scheduleEmployee').innerHTML='<option value="all">Все сотрудники</option>'+(people||[]).map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('');if($('#scheduleEmployee'))$('#scheduleEmployee').value=emp;const daysInMonth=new Date(year,month+1,0).getDate();const first=(new Date(year,month,1).getDay()||7)-1;const cells=[];for(let i=0;i<first;i++)cells.push('<div class="schedule-day empty"></div>');for(let d=1;d<=daysInMonth;d++){const key=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;let rows=(state.shifts||[]).filter(x=>x.date===key);if(emp!=='all')rows=rows.filter(x=>Number(x.employeeId)===Number(emp));if(role!=='all')rows=rows.filter(x=>(people||[]).find(e=>Number(e.id)===Number(x.employeeId))?.role===role);rows.sort((a,b)=>a.start.localeCompare(b.start));cells.push(`<div class="schedule-day ${key===selected?'selected':''}" data-day="${key}"><b>${d}</b>${rows.slice(0,4).map(x=>{const e=(people||[]).find(z=>Number(z.id)===Number(x.employeeId));return `<div class="schedule-mini"><span>${esc(e?.name||'Сотрудник')}</span><small>${esc(x.start)}–${esc(x.end)}</small>${['owner','director','administrator','manager'].includes(state.staff?.role)?`<button type="button" onclick="event.stopPropagation();openSchedule(${x.id})">✎</button>`:''}</div>`}).join('')}${rows.length>4?`<em>+${rows.length-4}</em>`:''}</div>`)}const monthLabel=new Intl.DateTimeFormat(document.documentElement.lang||'ru',{month:'long',year:'numeric'}).format(base);box.innerHTML=`<div class="schedule-calendar-head"><strong>${esc(monthLabel)}</strong><span>${year}</span></div><div class="schedule-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div><div class="schedule-month-grid">${cells.join('')}</div>`;box.querySelectorAll('[data-day]').forEach(el=>el.onclick=()=>{if($('#scheduleDate'))$('#scheduleDate').value=el.dataset.day;renderSchedule()});}
+function renderSchedule(){
+  const box = $('#scheduleCalendar');
+  if(!box) return;
+
+  const date = $('#scheduleDate')?.value || dateNow();
+  const employeeId = $('#scheduleEmployee')?.value || '';
+  const role = $('#scheduleRole')?.value || '';
+
+  const employees = state.scheduleEmployees || state.employees || [];
+
+  const filtered = (state.shifts || []).filter(x => {
+  if(x.date !== date) return false;
+
+  if(
+    employeeId &&
+    employeeId !== 'all' &&
+    String(x.employeeId) !== String(employeeId)
+  ){
+    return false;
+  }
+
+  if(role && role !== 'all'){
+    const employee = employees.find(
+      e => String(e.id) === String(x.employeeId)
+    );
+
+    if(String(employee?.role || '') !== String(role)){
+      return false;
+    }
+  }
+
+  return true;
+});
+
+
+
+  const canManage = [
+    'owner',
+    'director',
+    'administrator',
+    'manager'
+  ].includes(state.staff?.role);
+
+  if(!filtered.length){
+    box.innerHTML = `
+      <div class="empty-state">
+        На выбранную дату смен нет.
+      </div>
+    `;
+
+    updateShiftSelection();
+    return;
+  }
+
+  box.innerHTML = filtered.map(x => {
+    const employee = employees.find(
+      e => String(e.id) === String(x.employeeId)
+    );
+
+    return `
+      <div class="schedule-mini">
+        <label class="schedule-shift-select">
+          <input
+            type="checkbox"
+            class="schedule-select"
+            value="${x.id}"
+            onclick="event.stopPropagation();updateShiftSelection()"
+          >
+          <span>
+            ${esc(employee?.name || 'Сотрудник')}
+          </span>
+        </label>
+
+        <small>
+          ${esc(x.start || '')}–${esc(x.end || '')}
+        </small>
+
+        ${
+          canManage
+            ? `
+              <button
+                type="button"
+                class="small-btn"
+                onclick="event.stopPropagation();openSchedule(${x.id})"
+                aria-label="Редактировать смену"
+              >
+                ✎
+              </button>
+            `
+            : ''
+        }
+      </div>
+    `;
+  }).join('');
+
+  updateShiftSelection();
+}
+function getSelectedShiftIds(){
+  return Array.from(
+    document.querySelectorAll('.schedule-select:checked')
+  )
+    .map(input => Number(input.value))
+    .filter(Number.isFinite);
+}
+function updateShiftSelection(){
+  const ids = getSelectedShiftIds();
+
+  const count = $('#selectedShiftsCount');
+
+  if(count){
+    count.textContent = `Выбрано: ${ids.length}`;
+  }
+
+  const selectedButton = $('#deleteSelectedShifts');
+
+  if(selectedButton){
+    selectedButton.disabled = ids.length === 0;
+  }
+
+  document
+    .querySelectorAll('.schedule-mini')
+    .forEach(card => {
+      const checkbox = card.querySelector('.schedule-select');
+
+      card.classList.toggle(
+        'is-selected',
+        Boolean(checkbox?.checked)
+      );
+    });
+}
+async function deleteSelectedShifts(){
+  const ids = getSelectedShiftIds();
+
+  if(!ids.length){
+    toast('Выберите хотя бы одну смену');
+    return;
+  }
+
+  if(!confirm(`Удалить выбранные смены (${ids.length})?`)){
+    return;
+  }
+
+  try{
+    await Promise.all(
+      ids.map(id =>
+        api(`/api/admin/shifts/${id}`, {
+          method: 'DELETE'
+        })
+      )
+    );
+
+    state.shifts = (state.shifts || []).filter(
+      shift => !ids.includes(Number(shift.id))
+    );
+
+    renderSchedule();
+    toast(`Удалено смен: ${ids.length}`);
+  }catch(e){
+    toast(e.message);
+  }
+}
+async function deleteAllShifts(){
+  const shifts = state.shifts || [];
+
+  if(!shifts.length){
+    toast('Смен для удаления нет');
+    return;
+  }
+
+  if(!confirm(
+    `Удалить ВСЕ смены (${shifts.length})? Это действие нельзя отменить.`
+  )){
+    return;
+  }
+
+  try{
+    await Promise.all(
+      shifts.map(shift =>
+        api(`/api/admin/shifts/${shift.id}`, {
+          method: 'DELETE'
+        })
+      )
+    );
+
+    state.shifts = [];
+
+    renderSchedule();
+    toast(`Удалено смен: ${shifts.length}`);
+  }catch(e){
+    toast(e.message);
+  }
+}
 function openSchedule(id = null) {
     const existing = id
         ? (state.shifts || []).find(x => Number(x.id) === Number(id))
