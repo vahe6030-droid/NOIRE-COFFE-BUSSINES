@@ -1692,8 +1692,37 @@ textarea.form-control {
 .noire-language-switcher select option{background:#111;color:#f4efe5}
 .noire-language-switcher small{display:none;color:rgba(244,239,229,.55);font-size:9px;letter-spacing:.08em;text-transform:uppercase}
 @media(max-width:850px){.noire-language-switcher{margin-right:4px;padding:5px 8px}.noire-language-switcher select{max-width:100px;font-size:11px}}
-@media(max-width:560px){.noire-language-switcher{position:fixed;right:12px;top:12px;margin:0;box-shadow:0 8px 28px rgba(0,0,0,.28)}.noire-language-switcher select{max-width:112px}.noire-language-mark{display:none}.noire-language-switcher small{display:block}.noire-auth .noire-language-switcher{top:14px;right:14px}}
+@media(max-width:560px){
+    .noire-language-switcher{
+        position:relative;
+        top:auto;
+        right:auto;
+        left:auto;
+        bottom:auto;
+        margin:0;
+        max-width:100%;
+        flex:0 1 auto;
+        box-shadow:none;
+    }
 
+    .noire-language-switcher select{
+        max-width:112px;
+    }
+
+    .noire-language-mark{
+        display:none;
+    }
+
+    .noire-language-switcher small{
+        display:block;
+    }
+
+    .noire-auth .noire-language-switcher{
+        position:relative;
+        top:auto;
+        right:auto;
+    }
+}
 .account-initials{font-size:12px;font-weight:700;letter-spacing:.5px;color:var(--gold-light)!important;text-decoration:none}
 
 /* NOIRÉ — cross-platform responsive adaptation

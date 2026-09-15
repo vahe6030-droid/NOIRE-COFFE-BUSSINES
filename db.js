@@ -344,6 +344,24 @@ async function claimIdempotent(scope, key) {
   if(row && row.response && row.response.pending===true && new Date(row.created_at).getTime() < Date.now()-5*60*1000){ await sql`DELETE FROM noire_idempotency WHERE scope=${String(scope)} AND idempotency_key=${String(key)}`; return claimIdempotent(scope,key); }
   return {claimed:false,response:row?.response||null};
 }
+async function clearIdempotent(scope, key) {
+    if (!key) return;
+
+    const k = `${scope}:${key}`;
+
+    if (localMode || !process.env.DATABASE_URL) {
+        localIdempotency.delete(k);
+        return;
+    }
+
+    const sql = neon(process.env.DATABASE_URL);
+
+    await sql`
+        DELETE FROM noire_idempotency
+        WHERE scope=${String(scope)}
+          AND idempotency_key=${String(key)}
+    `;
+}
 async function getIdempotent(scope, key) {
   if (!key) return null; const k=`${scope}:${key}`;
   if (localMode || !process.env.DATABASE_URL) { const row=localIdempotency.get(k); return row && row.createdAt>Date.now()-24*60*60*1000 ? row.response : null; }

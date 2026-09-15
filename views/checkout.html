@@ -443,41 +443,71 @@ document.querySelector(
             budget: Number(data.budget || 0)
         };
 
+        
         let response;
-        try { response = await fetch(
-                "/api/orders",
-                {
-                    method: "POST",
+let result;
 
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Idempotency-Key": idempotencyKey,
-                        
-                    },
-
-                    body:
-                        JSON.stringify({
-                            customer,
-                            items: cart,
-                            orderType: 'delivery',
-                            total: cartTotal(),
-                            budget: Number(data.budget || 0)
-                        })
-                }
-            );
-        } catch (err) { if(submitButton){submitButton.disabled=false;submitButton.textContent=submitButton.dataset.originalText||'Оформить заказ';} showToast('Не удалось отправить заказ. Проверьте интернет и повторите.'); return; }
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            showToast(
-                result.message ||
-                "Ошибка заказа"
-            );
-
-            if(submitButton){submitButton.disabled=false;submitButton.textContent=submitButton.dataset.originalText||'Оформить заказ';}
-            return;
+try {
+    response = await fetch(
+        "/api/orders",
+        {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Idempotency-Key": idempotencyKey
+            },
+            body: JSON.stringify({
+                customer,
+                items: cart,
+                orderType: "delivery",
+                total: cartTotal(),
+                budget: Number(data.budget || 0)
+            })
         }
+    );
+
+    const contentType = response.headers.get("content-type") || "";
+
+    if (!contentType.includes("application/json")) {
+        throw new Error(
+            response.ok
+                ? "Сервер вернул некорректный ответ."
+                : `Ошибка сервера (${response.status}).`
+        );
+    }
+
+    result = await response.json();
+
+} catch (err) {
+    if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent =
+            submitButton.dataset.originalText || "Оформить заказ";
+    }
+
+    showToast(
+        err?.message ||
+        "Не удалось оформить заказ. Проверьте соединение и повторите попытку."
+    );
+
+    return;
+}
+
+if (!response.ok || !result?.success) {
+    showToast(
+        result?.message ||
+        `Не удалось оформить заказ${response?.status ? ` (${response.status})` : ""}.`
+    );
+
+    if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent =
+            submitButton.dataset.originalText || "Оформить заказ";
+    }
+
+    return;
+}
 
         localStorage.setItem(
             "noireLastOrder",
