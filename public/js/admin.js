@@ -1,155 +1,739 @@
-let token=null;
-let state={orders:[],reservations:[],customers:[],menu:[],gallery:[],tables:[],stats:{},popularItems:[],analytics:{},employees:[],staff:null,permissions:[],history:[],shifts:[],scheduleEmployees:[],settings:{},timezone:'Asia/Yerevan'};
-let businessTimezone='Asia/Yerevan';
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-const money=n=>new Intl.NumberFormat('ru-RU').format(Number(n)||0)+' ֏';
-const dateNow=()=>new Intl.DateTimeFormat('en-CA',{timeZone:businessTimezone}).format(new Date());
-const SITE_LANGUAGES=[
-['ru','Русский'],['en','English'],['hy','Հայերեն'],['fr','Français'],['de','Deutsch'],['es','Español'],['it','Italiano'],['pt','Português'],['tr','Türkçe'],['ar','العربية'],['fa','فارسی'],['he','עברית'],['zh-CN','简体中文'],['zh-TW','繁體中文'],['ja','日本語'],['ko','한국어'],['hi','हिन्दी'],['bn','বাংলা'],['ur','اردو'],['id','Bahasa Indonesia'],['ms','Bahasa Melayu'],['th','ไทย'],['vi','Tiếng Việt'],['nl','Nederlands'],['pl','Polski'],['uk','Українська'],['cs','Čeština'],['sk','Slovenčina'],['ro','Română'],['hu','Magyar'],['el','Ελληνικά'],['bg','Български'],['sr','Српски'],['hr','Hrvatski'],['sl','Slovenščina'],['sv','Svenska'],['da','Dansk'],['no','Norsk'],['fi','Suomi'],['et','Eesti'],['lv','Latviešu'],['lt','Lietuvių'],['is','Íslenska'],['ga','Gaeilge'],['cy','Cymraeg'],['mt','Malti'],['sq','Shqip'],['mk','Македонски'],['bs','Bosanski'],['ca','Català'],['eu','Euskara'],['gl','Galego'],['af','Afrikaans'],['sw','Kiswahili'],['am','አማርኛ'],['az','Azərbaycan'],['be','Беларуская'],['ka','ქართული'],['kk','Қазақша'],['ky','Кыргызча'],['lo','ລາວ'],['mn','Монгол'],['my','မြန်မာ'],['ne','नेपाली'],['ps','پښتو'],['pa','ਪੰਜਾਬੀ'],['ta','தமிழ்'],['te','తెలుగు'],['mr','मराठी'],['gu','ગુજરાતી'],['kn','ಕನ್ನಡ'],['ml','മലയാളം'],['si','සිංහල'],['km','ខ្មែរ'],['ceb','Cebuano'],['tl','Filipino'],['jv','Basa Jawa'],['su','Basa Sunda'],['zu','isiZulu'],['xh','isiXhosa'],['yo','Yorùbá'],['ig','Igbo'],['ha','Hausa']
+let token = null;
+let state = {
+  orders: [],
+  reservations: [],
+  customers: [],
+  menu: [],
+  gallery: [],
+  tables: [],
+  stats: {},
+  popularItems: [],
+  analytics: {},
+  employees: [],
+  staff: null,
+  permissions: [],
+  history: [],
+  shifts: [],
+  scheduleEmployees: [],
+  settings: {},
+  timezone: "Asia/Yerevan",
+};
+let businessTimezone = "Asia/Yerevan";
+const $ = (s) => document.querySelector(s);
+const esc = (s) =>
+  String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      })[c],
+  );
+const money = (n) =>
+  new Intl.NumberFormat("ru-RU").format(Number(n) || 0) + " ֏";
+const dateNow = () =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: businessTimezone }).format(
+    new Date(),
+  );
+const SITE_LANGUAGES = [
+  ["ru", "Русский"],
+  ["en", "English"],
+  ["hy", "Հայերեն"],
+  ["fr", "Français"],
+  ["de", "Deutsch"],
+  ["es", "Español"],
+  ["it", "Italiano"],
+  ["pt", "Português"],
+  ["tr", "Türkçe"],
+  ["ar", "العربية"],
+  ["fa", "فارسی"],
+  ["he", "עברית"],
+  ["zh-CN", "简体中文"],
+  ["zh-TW", "繁體中文"],
+  ["ja", "日本語"],
+  ["ko", "한국어"],
+  ["hi", "हिन्दी"],
+  ["bn", "বাংলা"],
+  ["ur", "اردو"],
+  ["id", "Bahasa Indonesia"],
+  ["ms", "Bahasa Melayu"],
+  ["th", "ไทย"],
+  ["vi", "Tiếng Việt"],
+  ["nl", "Nederlands"],
+  ["pl", "Polski"],
+  ["uk", "Українська"],
+  ["cs", "Čeština"],
+  ["sk", "Slovenčina"],
+  ["ro", "Română"],
+  ["hu", "Magyar"],
+  ["el", "Ελληνικά"],
+  ["bg", "Български"],
+  ["sr", "Српски"],
+  ["hr", "Hrvatski"],
+  ["sl", "Slovenščina"],
+  ["sv", "Svenska"],
+  ["da", "Dansk"],
+  ["no", "Norsk"],
+  ["fi", "Suomi"],
+  ["et", "Eesti"],
+  ["lv", "Latviešu"],
+  ["lt", "Lietuvių"],
+  ["is", "Íslenska"],
+  ["ga", "Gaeilge"],
+  ["cy", "Cymraeg"],
+  ["mt", "Malti"],
+  ["sq", "Shqip"],
+  ["mk", "Македонски"],
+  ["bs", "Bosanski"],
+  ["ca", "Català"],
+  ["eu", "Euskara"],
+  ["gl", "Galego"],
+  ["af", "Afrikaans"],
+  ["sw", "Kiswahili"],
+  ["am", "አማርኛ"],
+  ["az", "Azərbaycan"],
+  ["be", "Беларуская"],
+  ["ka", "ქართული"],
+  ["kk", "Қазақша"],
+  ["ky", "Кыргызча"],
+  ["lo", "ລາວ"],
+  ["mn", "Монгол"],
+  ["my", "မြန်မာ"],
+  ["ne", "नेपाली"],
+  ["ps", "پښتو"],
+  ["pa", "ਪੰਜਾਬੀ"],
+  ["ta", "தமிழ்"],
+  ["te", "తెలుగు"],
+  ["mr", "मराठी"],
+  ["gu", "ગુજરાતી"],
+  ["kn", "ಕನ್ನಡ"],
+  ["ml", "മലയാളം"],
+  ["si", "සිංහල"],
+  ["km", "ខ្មែរ"],
+  ["ceb", "Cebuano"],
+  ["tl", "Filipino"],
+  ["jv", "Basa Jawa"],
+  ["su", "Basa Sunda"],
+  ["zu", "isiZulu"],
+  ["xh", "isiXhosa"],
+  ["yo", "Yorùbá"],
+  ["ig", "Igbo"],
+  ["ha", "Hausa"],
 ];
-function fillLanguageSelect(){const el=$('#siteLanguage');if(!el)return;el.innerHTML=SITE_LANGUAGES.map(([code,name])=>`<option value="${code}">${name}</option>`).join('');el.value=state.settings?.language||'ru'}
+function fillLanguageSelect() {
+  const el = $("#siteLanguage");
+  if (!el) return;
+  el.innerHTML = SITE_LANGUAGES.map(
+    ([code, name]) => `<option value="${code}">${name}</option>`,
+  ).join("");
+  el.value = state.settings?.language || "ru";
+}
 
-function toast(msg){const t=$('#adminToast');t.textContent=msg;t.classList.add('show');clearTimeout(window._t);window._t=setTimeout(()=>t.classList.remove('show'),2600)}
-async function api(url,opt={}){opt.headers={...(opt.headers||{}),'Content-Type':'application/json'};const r=await fetch(url,opt);const d=await r.json().catch(()=>({message:'Ошибка сервера'}));if(r.status===401){token=null;showLogin();throw new Error('Сессия завершена')}if(!r.ok)throw new Error(d.message||'Ошибка');return d}
-function showLogin(){$('#adminLogin').hidden=false;$('#adminDashboard').hidden=true;document.body.classList.add('login-only')}
-function showApp(){$('#adminLogin').hidden=true;$('#adminDashboard').hidden=false;document.body.classList.remove('login-only');renderAll()}
-async function login(e){e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const f=new FormData(e.target);const d=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(f))});const r=await d.json();if(!d.ok)throw new Error(r.message);token='cookie';try{await api('/api/admin');showApp()}catch(err){token=null;throw err}}catch(err){$('#loginError').textContent=err.message}finally{button.disabled=false}}
-async function load(){try{state=await api('/api/admin'); businessTimezone=state.timezone||'Asia/Yerevan'; if((state.permissions||[]).includes('schedule')|| (state.permissions||[]).includes('all')){try{const sh=await api('/api/admin/shifts');state.shifts=sh.shifts||[];state.scheduleEmployees=sh.employees||[]}catch{state.shifts=[];state.scheduleEmployees=[]}} renderAll()}catch(e){throw e}}
-function periodText(x){return `${x?.orders||0} заказов · средний чек ${money(x?.avgCheck)}`}
-function renderAll(){
- const s=state.stats||{};
- if(state.settings){if($('#siteName'))$('#siteName').value=state.settings.siteName||'';if($('#siteSubtitle'))$('#siteSubtitle').value=state.settings.siteSubtitle||'';fillLanguageSelect();}
- ['day','week','month','year'].forEach(k=>{const x=s.periods?.[k]||{};const r=$(`#p${k[0].toUpperCase()+k.slice(1)}Revenue`);const m=$(`#p${k[0].toUpperCase()+k.slice(1)}Meta`);if(r)r.textContent=money(x.revenue);if(m)m.textContent=periodText(x)});
- $('#mRevenue').textContent=money(s.revenue);$('#mOrders').textContent=s.orders||0;$('#mBookings').textContent=s.reservations||0;$('#mGuests').textContent=s.customers||0;$('#mAvg').textContent=money(s.avgCheck);$('#mToday').textContent=s.todayOrders||0;
- const mine=state.staff?.id&&state.staff.id!=='owner'?state.employees.find(e=>Number(e.id)===Number(state.staff.id)):null;
- if(mine){const st=mine.stats||{};[['day','myDayRevenue','myDayOrders'],['week','myWeekRevenue','myWeekOrders'],['month','myMonthRevenue','myMonthOrders'],['year','myYearRevenue','myYearOrders']].forEach(([k,rev,ord])=>{if($('#'+rev))$('#'+rev).textContent=money(st[k]?.revenue);if($('#'+ord))$('#'+ord).textContent=`${st[k]?.orders||0} выполненных заказов`});if($('#myShift'))$('#myShift').textContent=mine.shiftActive?'Смена открыта':'Смена закрыта';}
- $('#dashboardOrders').innerHTML=state.orders.slice(0,5).map(o=>`<div class="mini-row"><div><b>#${o.number}</b> · ${esc(o.customer?.name)}</div><div>${money(o.total)} <small>${esc(statusLabel(o.status))}</small></div></div>`).join('')||'<p>Заказов пока нет.</p>';
- $('#topItems').innerHTML=state.popularItems.map((x,i)=>`<div class="rank-row"><span><b>${i+1}.</b> ${esc(x.name)}</span><small>${x.quantity} шт.</small></div>`).join('')||'<p>Недостаточно данных.</p>';
- renderMenu();renderOrders();renderBookings();renderTables();renderGallery();renderCustomers();renderAnalytics();renderHistory();renderEmployees();renderSchedule();applyRole();
+function toast(msg) {
+  const t = $("#adminToast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window._t);
+  window._t = setTimeout(() => t.classList.remove("show"), 2600);
 }
-const orderStatuses=['new','confirmed','preparing','ready','in_transit','completed','cancelled'];
-const bookingStatuses=['new','confirmed','arrived','completed','cancelled'];
-function statusLabel(s){return {new:'Новый',confirmed:'Подтверждён',preparing:'Готовится',ready:'Готов',in_transit:'В пути',arrived:'Гость пришёл',completed:'Завершён',delivered:'Доставлен',cancelled:'Отменён'}[String(s).toLowerCase()]||s||'—'}
-function renderOrders(){
-  const q=($('#orderSearch')?.value||'').toLowerCase(); const role=state.staff?.role;
-  let rows=state.orders.filter(o=>`${o.number} ${o.customer?.name||''} ${o.customer?.phone||''} ${o.customer?.comment||o.comment||''}`.toLowerCase().includes(q));
-  const type=o=>String(o.orderType||'delivery').toLowerCase();
-  if(role==='delivery')rows=rows.filter(o=>type(o)==='delivery');
-  if(role==='waiter')rows=rows.filter(o=>type(o)==='waiter');
-  if(role==='cook')rows=rows.filter(o=>['delivery','waiter'].includes(type(o)));
-  const worker=['waiter','delivery','cook'].includes(role);
-  const active=o=>!['completed','cancelled'].includes(String(o.status).toLowerCase());
-  const assignedIdFor=(o,r)=>r==='waiter'?o.waiterId:r==='delivery'?o.deliveryId:r==='cook'?o.kitchenId:(o.waiterId||o.deliveryId||o.kitchenId||o.employeeId||o.staffId);
-  const managementAssignee=(o)=>o.orderType==='waiter'?o.waiterId:o.orderType==='delivery'?o.deliveryId:(o.kitchenId||o.employeeId||o.staffId);
-  const card=o=>{
-    const comment=o.customer?.comment||o.comment||'Комментария нет';
-    const items=(o.items||[]).map(i=>`${esc(i.name)} ×${i.quantity}`).join(' · ');
-    const assignedId=assignedIdFor(o,role); const staff=state.employees.find(e=>Number(e.id)===Number(assignedId)); const isMine=staff&&Number(staff.id)===Number(state.staff?.id);
-    const canClaim=worker&&active(o)&&!assignedId;
-    const staffOptions=state.employees.filter(e=>{
-      const er=e.role; return o.orderType==='waiter'?er==='waiter':o.orderType==='delivery'?er==='delivery':['cook','manager','administrator','director','owner'].includes(er);
+async function api(url, opt = {}) {
+  opt.headers = { ...(opt.headers || {}), "Content-Type": "application/json" };
+  const r = await fetch(url, opt);
+  const d = await r.json().catch(() => ({ message: "Ошибка сервера" }));
+  if (r.status === 401) {
+    token = null;
+    showLogin();
+    throw new Error("Сессия завершена");
+  }
+  if (!r.ok) throw new Error(d.message || "Ошибка");
+  return d;
+}
+function showLogin() {
+  $("#adminLogin").hidden = false;
+  $("#adminDashboard").hidden = true;
+  document.body.classList.add("login-only");
+}
+function showApp() {
+  $("#adminLogin").hidden = true;
+  $("#adminDashboard").hidden = false;
+  document.body.classList.remove("login-only");
+  renderAll();
+}
+async function login(e) {
+  e.preventDefault();
+  const button = e.target.querySelector("button");
+  button.disabled = true;
+  try {
+    const f = new FormData(e.target);
+    const d = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(Object.fromEntries(f)),
     });
-    return `<article class="order-admin-card" onclick="openOrder(${o.id})"><div class="order-card-top"><div><span class="admin-eyebrow">${esc(type(o).toUpperCase())}</span><h3>#${o.number}</h3><small>${(window.noireFormatDateTime?noireFormatDateTime(o.createdAt):new Date(o.createdAt).toLocaleString())}</small></div><span class="order-status-badge">${esc(statusLabel(o.status))}</span></div><div class="order-card-client"><b>${esc(o.customer?.name||'Гость')}</b><span>${esc(o.customer?.phone||'')}</span></div><div class="order-card-items">${items||'Нет позиций'}</div><div class="order-card-bottom"><strong>${money(o.total)}</strong><span>${staff?`Ответственный: ${esc(staff.name)}`:'Не принят'}</span></div><div class="order-card-comment"><small>Комментарий</small><p>${esc(comment)}</p></div><div class="order-card-actions" onclick="event.stopPropagation()">${canClaim?`<button class="small-btn" onclick="claimOrder(${o.id})">Принять заказ</button>`:''}${worker&&isMine&&active(o)?`<button class="small-btn" onclick="completeMyOrder(${o.id})">Заказ завершён</button><button class="small-btn danger" onclick="cancelMyOrder(${o.id})">Отменить</button>`:''}${!worker?`<select class="status-select" onchange="updateOrder(${o.id},this.value)">${orderStatuses.map(st=>`<option value="${st}" ${st===String(o.status).toLowerCase()?'selected':''}>${statusLabel(st)}</option>`).join('')}</select><select class="status-select staff-select" onchange="assignOrder(${o.id},this.value)"><option value="">Сотрудник…</option>${staffOptions.map(e=>`<option value="${e.id}" ${Number(managementAssignee(o))===Number(e.id)?'selected':''}>${esc(e.name)} · ${esc((window.noireRoleLabel?noireRoleLabel(e.role):e.role))}</option>`).join('')}</select>`:''}</div></article>`;
-  };
-  let all=[],mine=[],completed=[];
-  if(worker){const assigned=o=>assignedIdFor(o,role); all=role==='cook'?rows.filter(active):rows.filter(o=>active(o)&&!assigned(o)); mine=rows.filter(o=>Number(assigned(o))===Number(state.staff?.id)&&active(o)); completed=rows.filter(o=>Number(assigned(o))===Number(state.staff?.id)&&!active(o));}
-  else{all=rows.filter(active);completed=rows.filter(o=>!active(o));}
-  const set=(id,items,empty)=>{const b=$('#'+id);if(b)b.innerHTML=items.map(card).join('')||`<div class="empty-admin-state"><h3>${empty}</h3></div>`};
-  set('ordersAllCards',all,'Доступных заказов нет');set('ordersMineCards',mine,worker?'Вы пока не приняли заказов':'');set('ordersCompletedCards',completed,worker?'У вас нет завершённых заказов':'Выполненных заказов нет');
-  const mineWrap=$('#ordersMineWrap'),allWrap=$('#ordersAllWrap'),completedWrap=$('#ordersCompletedWrap');if(mineWrap)mineWrap.hidden=!worker;if(allWrap)allWrap.hidden=false;if(completedWrap)completedWrap.hidden=false;const panel=allWrap?.parentElement;if(panel)panel.classList.toggle('worker-orders',worker);const add=$('#addWaiterOrderBtn');if(add)add.hidden=role!=='waiter';
+    const r = await d.json();
+    if (!d.ok) throw new Error(r.message);
+    token = "cookie";
+    try {
+      await api("/api/admin");
+      showApp();
+    } catch (err) {
+      token = null;
+      throw err;
+    }
+  } catch (err) {
+    $("#loginError").textContent = err.message;
+  } finally {
+    button.disabled = false;
+  }
 }
-async function claimOrder(id){try{await api(`/api/admin/orders/${id}/claim`,{method:'POST'});toast('Заказ принят');await load()}catch(e){toast(e.message)}}
-async function completeMyOrder(id){try{await api(`/api/admin/orders/${id}`,{method:'PATCH',body:JSON.stringify({status:'completed'})});toast('Заказ завершён');await load()}catch(e){toast(e.message)}}
-async function cancelMyOrder(id){if(!confirm('Отменить заказ?'))return;try{await api(`/api/admin/orders/${id}`,{method:'PATCH',body:JSON.stringify({status:'cancelled'})});toast('Заказ отменён');await load()}catch(e){toast(e.message)}}
-function openOrder(id){const o=state.orders.find(x=>Number(x.id)===Number(id));if(!o)return;const assignedId=o.orderType==='waiter'?o.waiterId:o.orderType==='delivery'?o.deliveryId:(o.kitchenId||o.employeeId||o.staffId); const staff=state.employees.find(e=>Number(e.id)===Number(assignedId));const items=(o.items||[]).map(i=>`<div class="mini-row"><span><b>${esc(i.name)}</b> ×${i.quantity}</span><strong>${money(Number(i.price)*Number(i.quantity))}</strong></div>`).join('');openModal(`<span class="admin-eyebrow">ORDER #${o.number}</span><h2>${esc(o.customer?.name||'Гость')}</h2><div class="detail-grid"><div><small>Телефон</small><b>${esc(o.customer?.phone||'—')}</b></div><div><small>Тип</small><b>${esc(String(o.orderType||'delivery').toUpperCase())}</b></div><div><small>Статус</small><b>${esc(statusLabel(o.status))}</b></div><div><small>Дата и время</small><b>${(window.noireFormatDateTime?noireFormatDateTime(o.createdAt):new Date(o.createdAt).toLocaleString())}</b></div><div><small>Ответственный</small><b>${esc(staff?.name||'Не назначен')}</b></div><div><small>Адрес</small><b>${esc(o.customer?.address||'—')}</b></div><div><small>Время доставки</small><b>${esc(o.customer?.deliveryTime||o.deliveryTime||'—')}</b></div><div><small>Оплата</small><b>${esc(o.customer?.payment||o.payment||'—')}</b></div><div><small>Стол</small><b>${o.tableId?`T${String(o.tableId).padStart(2,'0')}`:'—'}</b></div><div class="full"><small>Комментарий клиента</small><b>${esc(o.customer?.comment||o.comment||'—')}</b></div></div><h3>Состав заказа</h3><div class="history-detail-list">${items||'<p>Нет позиций.</p>'}</div><div class="order-total-line"><span>Итого</span><strong>${money(o.total)}</strong></div>`)}
-function renderBookings(){const q=($('#bookingSearch')?.value||'').toLowerCase();const rows=state.reservations.filter(r=>`${r.number} ${r.name} ${r.phone} ${r.occasion||''}`.toLowerCase().includes(q));$('#bookingsBody').innerHTML=rows.map(r=>{const rel=r.relatedOrders||[];const linked=r.orderId?rel.find(o=>Number(o.id)===Number(r.orderId)):null;return `<tr><td><b>#${r.number}</b><br><small>${(window.noireFormatDateTime?noireFormatDateTime(r.createdAt):new Date(r.createdAt).toLocaleString())}</small></td><td><b>${esc(r.name)}</b><br><small>${esc(r.phone)}</small></td><td>${esc(window.noireFormatDate?noireFormatDate(r.date):r.date)}</td><td>${esc(r.time)}</td><td>${r.guests}</td><td>${r.tableId?`T${String(r.tableId).padStart(2,'0')}`:'—'}</td><td>${r.budget?money(r.budget):'—'}</td><td>${esc(r.occasion||'—')}<br><small>${esc(r.comment||'')}</small></td><td><select class="status-select" onchange="updateBooking(${r.id},this.value)">${bookingStatuses.map(s=>`<option value="${s}" ${s===String(r.status).toLowerCase()?'selected':''}>${statusLabel(s)}</option>`).join('')}</select></td><td><button class="small-btn" onclick="openBooking(${r.id})">Детали</button>${linked?`<div class="linked-order">Заказ #${linked.number}</div>`:''}</td></tr>`}).join('')||'<tr><td colspan="10">Ничего не найдено.</td></tr>'}
-function renderMenu(){const cats={coffee:'Кофе',tea:'Чай',breakfast:'Завтраки',snacks:'Закуски',food:'Основные',desserts:'Десерты',drinks:'Напитки',beer:'Пиво',sauces:'Соусы'};$('#menuAdminGrid').innerHTML=state.menu.map(i=>`<article class="admin-product"><img src="${esc(i.image||'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80')}" alt="${esc(i.name)}"><div class="admin-product-body"><h3>${esc(i.name)}</h3><p>${esc(i.description)}</p><div class="admin-product-meta"><span>${money(i.price)}</span><small>${cats[i.category]||i.category}${i.popular?' · ★':''}</small></div><div class="admin-product-actions"><button class="small-btn" onclick="openMenu(${i.id})">Изменить</button><button class="small-btn danger" onclick="deleteMenu(${i.id})">Удалить</button></div></div></article>`).join('')||'<p>Меню пока пустое.</p>'}
-function renderGallery(){$('#galleryAdminGrid').innerHTML=state.gallery.map(i=>`<article class="gallery-admin-card"><img src="${esc(i.image)}" alt="${esc(i.title)}"><div class="gallery-admin-info"><span class="admin-eyebrow">${esc(i.category)}</span><h3>${esc(i.title)}</h3></div><div class="gallery-admin-actions"><button class="small-btn" onclick="openGallery(${i.id})">Изменить</button><button class="small-btn danger" onclick="deleteGallery(${i.id})">Удалить</button></div></article>`).join('')}
-function tableStatusLabel(s){return {available:'Свободен',occupied:'Занят',reserved:'Бронь',service:'Сервис'}[s]||s}
-function renderTables(){const view=state.tableView||{date:dateNow(),time:new Date().toTimeString().slice(0,5)};if($('#tableDate'))$('#tableDate').value=view.date;if($('#tableTime'))$('#tableTime').value=view.time;$('#adminFloor').innerHTML=state.tables.map(t=>{const status=t.computedStatus||t.status||'available';return `<button class="admin-table-seat ${status==='occupied'?'busy':status==='service'?'service':status==='reserved'?'reserved':''}" style="left:${t.x}%;top:${t.y}%" onclick="openTable(${t.id})"><div><b>${esc(t.name)}</b><small>${t.seats} места · ${tableStatusLabel(status)}</small></div></button>`}).join('')}
-function renderCustomers(){
- const box=$('#customersAdminGrid');
- if(!box)return;
- const customers=state.customers||[];
- box.innerHTML=customers.map(c=>{
-   const orders=state.orders.filter(o=>Number(o.customerId)===Number(c.id)||(!o.customerId&&o.customer?.phone===c.phone));
-   const bookings=state.reservations.filter(r=>Number(r.customerId)===Number(c.id)||(!r.customerId&&r.phone===c.phone));
-   const revenue=orders.reduce((a,o)=>a+Number(o.total||0),0);
-   return `<article class="customer-admin-card">
+async function load() {
+  try {
+    state = await api("/api/admin");
+    businessTimezone = state.timezone || "Asia/Yerevan";
+    if (
+      (state.permissions || []).includes("schedule") ||
+      (state.permissions || []).includes("all")
+    ) {
+      try {
+        const sh = await api("/api/admin/shifts");
+        state.shifts = sh.shifts || [];
+        state.scheduleEmployees = sh.employees || [];
+      } catch {
+        state.shifts = [];
+        state.scheduleEmployees = [];
+      }
+    }
+    renderAll();
+  } catch (e) {
+    throw e;
+  }
+}
+function periodText(x) {
+  return `${x?.orders || 0} заказов · средний чек ${money(x?.avgCheck)}`;
+}
+function renderAll() {
+  const s = state.stats || {};
+  if (state.settings) {
+    if ($("#siteName")) $("#siteName").value = state.settings.siteName || "";
+    if ($("#siteSubtitle"))
+      $("#siteSubtitle").value = state.settings.siteSubtitle || "";
+    fillLanguageSelect();
+  }
+  ["day", "week", "month", "year"].forEach((k) => {
+    const x = s.periods?.[k] || {};
+    const r = $(`#p${k[0].toUpperCase() + k.slice(1)}Revenue`);
+    const m = $(`#p${k[0].toUpperCase() + k.slice(1)}Meta`);
+    if (r) r.textContent = money(x.revenue);
+    if (m) m.textContent = periodText(x);
+  });
+  $("#mRevenue").textContent = money(s.revenue);
+  $("#mOrders").textContent = s.orders || 0;
+  $("#mBookings").textContent = s.reservations || 0;
+  $("#mGuests").textContent = s.customers || 0;
+  $("#mAvg").textContent = money(s.avgCheck);
+  $("#mToday").textContent = s.todayOrders || 0;
+  const mine =
+    state.staff?.id && state.staff.id !== "owner"
+      ? state.employees.find((e) => Number(e.id) === Number(state.staff.id))
+      : null;
+  if (mine) {
+    const st = mine.stats || {};
+    [
+      ["day", "myDayRevenue", "myDayOrders"],
+      ["week", "myWeekRevenue", "myWeekOrders"],
+      ["month", "myMonthRevenue", "myMonthOrders"],
+      ["year", "myYearRevenue", "myYearOrders"],
+    ].forEach(([k, rev, ord]) => {
+      if ($("#" + rev)) $("#" + rev).textContent = money(st[k]?.revenue);
+      if ($("#" + ord))
+        $("#" + ord).textContent = `${st[k]?.orders || 0} выполненных заказов`;
+    });
+    if ($("#myShift"))
+      $("#myShift").textContent = mine.shiftActive
+        ? "Смена открыта"
+        : "Смена закрыта";
+  }
+  $("#dashboardOrders").innerHTML =
+    state.orders
+      .slice(0, 5)
+      .map(
+        (o) =>
+          `<div class="mini-row"><div><b>#${o.number}</b> · ${esc(o.customer?.name)}</div><div>${money(o.total)} <small>${esc(statusLabel(o.status))}</small></div></div>`,
+      )
+      .join("") || "<p>Заказов пока нет.</p>";
+  $("#topItems").innerHTML =
+    state.popularItems
+      .map(
+        (x, i) =>
+          `<div class="rank-row"><span><b>${i + 1}.</b> ${esc(x.name)}</span><small>${x.quantity} шт.</small></div>`,
+      )
+      .join("") || "<p>Недостаточно данных.</p>";
+  renderMenu();
+  renderOrders();
+  renderBookings();
+  renderTables();
+  renderGallery();
+  renderCustomers();
+  renderAnalytics();
+  renderHistory();
+  renderEmployees();
+  renderSchedule();
+  applyRole();
+}
+const orderStatuses = [
+  "new",
+  "confirmed",
+  "preparing",
+  "ready",
+  "in_transit",
+  "completed",
+  "cancelled",
+];
+const bookingStatuses = [
+  "new",
+  "confirmed",
+  "arrived",
+  "completed",
+  "cancelled",
+];
+function statusLabel(s) {
+  return (
+    {
+      new: "Новый",
+      confirmed: "Подтверждён",
+      preparing: "Готовится",
+      ready: "Готов",
+      in_transit: "В пути",
+      arrived: "Гость пришёл",
+      completed: "Завершён",
+      delivered: "Доставлен",
+      cancelled: "Отменён",
+    }[String(s).toLowerCase()] ||
+    s ||
+    "—"
+  );
+}
+function renderOrders() {
+  const q = ($("#orderSearch")?.value || "").toLowerCase();
+  const role = state.staff?.role;
+  let rows = state.orders.filter((o) =>
+    `${o.number} ${o.customer?.name || ""} ${o.customer?.phone || ""} ${o.customer?.comment || o.comment || ""}`
+      .toLowerCase()
+      .includes(q),
+  );
+  const type = (o) => String(o.orderType || "delivery").toLowerCase();
+  if (role === "delivery") rows = rows.filter((o) => type(o) === "delivery");
+  if (role === "waiter") rows = rows.filter((o) => type(o) === "waiter");
+  if (role === "cook")
+    rows = rows.filter((o) => ["delivery", "waiter"].includes(type(o)));
+  const worker = ["waiter", "delivery", "cook"].includes(role);
+  const active = (o) =>
+    !["completed", "cancelled"].includes(String(o.status).toLowerCase());
+  const assignedIdFor = (o, r) =>
+    r === "waiter"
+      ? o.waiterId
+      : r === "delivery"
+        ? o.deliveryId
+        : r === "cook"
+          ? o.kitchenId
+          : o.waiterId ||
+            o.deliveryId ||
+            o.kitchenId ||
+            o.employeeId ||
+            o.staffId;
+  const managementAssignee = (o) =>
+    o.orderType === "waiter"
+      ? o.waiterId
+      : o.orderType === "delivery"
+        ? o.deliveryId
+        : o.kitchenId || o.employeeId || o.staffId;
+  const card = (o) => {
+    const comment = o.customer?.comment || o.comment || "Комментария нет";
+    const items = (o.items || [])
+      .map((i) => `${esc(i.name)} ×${i.quantity}`)
+      .join(" · ");
+    const assignedId = assignedIdFor(o, role);
+    const staff = state.employees.find(
+      (e) => Number(e.id) === Number(assignedId),
+    );
+    const isMine = staff && Number(staff.id) === Number(state.staff?.id);
+    const canClaim = worker && active(o) && !assignedId;
+    const staffOptions = state.employees.filter((e) => {
+      const er = e.role;
+      return o.orderType === "waiter"
+        ? er === "waiter"
+        : o.orderType === "delivery"
+          ? er === "delivery"
+          : ["cook", "manager", "administrator", "director", "owner"].includes(
+              er,
+            );
+    });
+    return `<article class="order-admin-card" onclick="openOrder(${o.id})"><div class="order-card-top"><div><span class="admin-eyebrow">${esc(type(o).toUpperCase())}</span><h3>#${o.number}</h3><small>${window.noireFormatDateTime ? noireFormatDateTime(o.createdAt) : new Date(o.createdAt).toLocaleString()}</small></div><span class="order-status-badge">${esc(statusLabel(o.status))}</span></div><div class="order-card-client"><b>${esc(o.customer?.name || "Гость")}</b><span>${esc(o.customer?.phone || "")}</span></div><div class="order-card-items">${items || "Нет позиций"}</div><div class="order-card-bottom"><strong>${money(o.total)}</strong><span>${staff ? `Ответственный: ${esc(staff.name)}` : "Не принят"}</span></div><div class="order-card-comment"><small>Комментарий</small><p>${esc(comment)}</p></div><div class="order-card-actions" onclick="event.stopPropagation()">${canClaim ? `<button class="small-btn" onclick="claimOrder(${o.id})">Принять заказ</button>` : ""}${worker && isMine && active(o) ? `<button class="small-btn" onclick="completeMyOrder(${o.id})">Заказ завершён</button><button class="small-btn danger" onclick="cancelMyOrder(${o.id})">Отменить</button>` : ""}${!worker ? `<select class="status-select" onchange="updateOrder(${o.id},this.value)">${orderStatuses.map((st) => `<option value="${st}" ${st === String(o.status).toLowerCase() ? "selected" : ""}>${statusLabel(st)}</option>`).join("")}</select><select class="status-select staff-select" onchange="assignOrder(${o.id},this.value)"><option value="">Сотрудник…</option>${staffOptions.map((e) => `<option value="${e.id}" ${Number(managementAssignee(o)) === Number(e.id) ? "selected" : ""}>${esc(e.name)} · ${esc(window.noireRoleLabel ? noireRoleLabel(e.role) : e.role)}</option>`).join("")}</select>` : ""}</div></article>`;
+  };
+  let all = [],
+    mine = [],
+    completed = [];
+  if (worker) {
+    const assigned = (o) => assignedIdFor(o, role);
+    all =
+      role === "cook"
+        ? rows.filter(active)
+        : rows.filter((o) => active(o) && !assigned(o));
+    mine = rows.filter(
+      (o) => Number(assigned(o)) === Number(state.staff?.id) && active(o),
+    );
+    completed = rows.filter(
+      (o) => Number(assigned(o)) === Number(state.staff?.id) && !active(o),
+    );
+  } else {
+    all = rows.filter(active);
+    completed = rows.filter((o) => !active(o));
+  }
+  const set = (id, items, empty) => {
+    const b = $("#" + id);
+    if (b)
+      b.innerHTML =
+        items.map(card).join("") ||
+        `<div class="empty-admin-state"><h3>${empty}</h3></div>`;
+  };
+  set("ordersAllCards", all, "Доступных заказов нет");
+  set("ordersMineCards", mine, worker ? "Вы пока не приняли заказов" : "");
+  set(
+    "ordersCompletedCards",
+    completed,
+    worker ? "У вас нет завершённых заказов" : "Выполненных заказов нет",
+  );
+  const mineWrap = $("#ordersMineWrap"),
+    allWrap = $("#ordersAllWrap"),
+    completedWrap = $("#ordersCompletedWrap");
+  if (mineWrap) mineWrap.hidden = !worker;
+  if (allWrap) allWrap.hidden = false;
+  if (completedWrap) completedWrap.hidden = false;
+  const panel = allWrap?.parentElement;
+  if (panel) panel.classList.toggle("worker-orders", worker);
+  const add = $("#addWaiterOrderBtn");
+  if (add) add.hidden = role !== "waiter";
+}
+async function claimOrder(id) {
+  try {
+    await api(`/api/admin/orders/${id}/claim`, { method: "POST" });
+    toast("Заказ принят");
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function completeMyOrder(id) {
+  try {
+    await api(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: "completed" }),
+    });
+    toast("Заказ завершён");
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function cancelMyOrder(id) {
+  if (!confirm("Отменить заказ?")) return;
+  try {
+    await api(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: "cancelled" }),
+    });
+    toast("Заказ отменён");
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+function openOrder(id) {
+  const o = state.orders.find((x) => Number(x.id) === Number(id));
+  if (!o) return;
+  const assignedId =
+    o.orderType === "waiter"
+      ? o.waiterId
+      : o.orderType === "delivery"
+        ? o.deliveryId
+        : o.kitchenId || o.employeeId || o.staffId;
+  const staff = state.employees.find(
+    (e) => Number(e.id) === Number(assignedId),
+  );
+  const items = (o.items || [])
+    .map(
+      (i) =>
+        `<div class="mini-row"><span><b>${esc(i.name)}</b> ×${i.quantity}</span><strong>${money(Number(i.price) * Number(i.quantity))}</strong></div>`,
+    )
+    .join("");
+  openModal(
+    `<span class="admin-eyebrow">ORDER #${o.number}</span><h2>${esc(o.customer?.name || "Гость")}</h2><div class="detail-grid"><div><small>Телефон</small><b>${esc(o.customer?.phone || "—")}</b></div><div><small>Тип</small><b>${esc(String(o.orderType || "delivery").toUpperCase())}</b></div><div><small>Статус</small><b>${esc(statusLabel(o.status))}</b></div><div><small>Дата и время</small><b>${window.noireFormatDateTime ? noireFormatDateTime(o.createdAt) : new Date(o.createdAt).toLocaleString()}</b></div><div><small>Ответственный</small><b>${esc(staff?.name || "Не назначен")}</b></div><div><small>Адрес</small><b>${esc(o.customer?.address || "—")}</b></div><div><small>Время доставки</small><b>${esc(o.customer?.deliveryTime || o.deliveryTime || "—")}</b></div><div><small>Оплата</small><b>${esc(o.customer?.payment || o.payment || "—")}</b></div><div><small>Стол</small><b>${o.tableId ? `T${String(o.tableId).padStart(2, "0")}` : "—"}</b></div><div class="full"><small>Комментарий клиента</small><b>${esc(o.customer?.comment || o.comment || "—")}</b></div></div><h3>Состав заказа</h3><div class="history-detail-list">${items || "<p>Нет позиций.</p>"}</div><div class="order-total-line"><span>Итого</span><strong>${money(o.total)}</strong></div>`,
+  );
+}
+function renderBookings() {
+  const q = ($("#bookingSearch")?.value || "").toLowerCase();
+  const rows = state.reservations.filter((r) =>
+    `${r.number} ${r.name} ${r.phone} ${r.occasion || ""}`
+      .toLowerCase()
+      .includes(q),
+  );
+  $("#bookingsBody").innerHTML =
+    rows
+      .map((r) => {
+        const rel = r.relatedOrders || [];
+        const linked = r.orderId
+          ? rel.find((o) => Number(o.id) === Number(r.orderId))
+          : null;
+        return `<tr><td><b>#${r.number}</b><br><small>${window.noireFormatDateTime ? noireFormatDateTime(r.createdAt) : new Date(r.createdAt).toLocaleString()}</small></td><td><b>${esc(r.name)}</b><br><small>${esc(r.phone)}</small></td><td>${esc(window.noireFormatDate ? noireFormatDate(r.date) : r.date)}</td><td>${esc(r.time)}</td><td>${r.guests}</td><td>${r.tableId ? `T${String(r.tableId).padStart(2, "0")}` : "—"}</td><td>${r.budget ? money(r.budget) : "—"}</td><td>${esc(r.occasion || "—")}<br><small>${esc(r.comment || "")}</small></td><td><select class="status-select" onchange="updateBooking(${r.id},this.value)">${bookingStatuses.map((s) => `<option value="${s}" ${s === String(r.status).toLowerCase() ? "selected" : ""}>${statusLabel(s)}</option>`).join("")}</select></td><td><button class="small-btn" onclick="openBooking(${r.id})">Детали</button>${linked ? `<div class="linked-order">Заказ #${linked.number}</div>` : ""}</td></tr>`;
+      })
+      .join("") || '<tr><td colspan="10">Ничего не найдено.</td></tr>';
+}
+function renderMenu() {
+  const cats = {
+    coffee: "Кофе",
+    tea: "Чай",
+    breakfast: "Завтраки",
+    snacks: "Закуски",
+    food: "Основные",
+    desserts: "Десерты",
+    drinks: "Напитки",
+    beer: "Пиво",
+    sauces: "Соусы",
+  };
+  $("#menuAdminGrid").innerHTML =
+    state.menu
+      .map(
+        (i) =>
+          `<article class="admin-product"><img src="${esc(i.image || "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80")}" alt="${esc(i.name)}"><div class="admin-product-body"><h3>${esc(i.name)}</h3><p>${esc(i.description)}</p><div class="admin-product-meta"><span>${money(i.price)}</span><small>${cats[i.category] || i.category}${i.popular ? " · ★" : ""}</small></div><div class="admin-product-actions"><button class="small-btn" onclick="openMenu(${i.id})">Изменить</button><button class="small-btn danger" onclick="deleteMenu(${i.id})">Удалить</button></div></div></article>`,
+      )
+      .join("") || "<p>Меню пока пустое.</p>";
+}
+function renderGallery() {
+  $("#galleryAdminGrid").innerHTML = state.gallery
+    .map(
+      (i) =>
+        `<article class="gallery-admin-card"><img src="${esc(i.image)}" alt="${esc(i.title)}"><div class="gallery-admin-info"><span class="admin-eyebrow">${esc(i.category)}</span><h3>${esc(i.title)}</h3></div><div class="gallery-admin-actions"><button class="small-btn" onclick="openGallery(${i.id})">Изменить</button><button class="small-btn danger" onclick="deleteGallery(${i.id})">Удалить</button></div></article>`,
+    )
+    .join("");
+}
+function tableStatusLabel(s) {
+  return (
+    {
+      available: "Свободен",
+      occupied: "Занят",
+      reserved: "Бронь",
+      service: "Сервис",
+    }[s] || s
+  );
+}
+function renderTables() {
+  const view = state.tableView || {
+    date: dateNow(),
+    time: new Date().toTimeString().slice(0, 5),
+  };
+  if ($("#tableDate")) $("#tableDate").value = view.date;
+  if ($("#tableTime")) $("#tableTime").value = view.time;
+  $("#adminFloor").innerHTML = state.tables
+    .map((t) => {
+      const status = t.computedStatus || t.status || "available";
+      return `<button class="admin-table-seat ${status === "occupied" ? "busy" : status === "service" ? "service" : status === "reserved" ? "reserved" : ""}" style="left:${t.x}%;top:${t.y}%" onclick="openTable(${t.id})"><div><b>${esc(t.name)}</b><small>${t.seats} места · ${tableStatusLabel(status)}</small></div></button>`;
+    })
+    .join("");
+}
+function renderCustomers() {
+  const box = $("#customersAdminGrid");
+  if (!box) return;
+  const customers = state.customers || [];
+  box.innerHTML =
+    customers
+      .map((c) => {
+        const orders = state.orders.filter(
+          (o) =>
+            Number(o.customerId) === Number(c.id) ||
+            (!o.customerId && o.customer?.phone === c.phone),
+        );
+        const bookings = state.reservations.filter(
+          (r) =>
+            Number(r.customerId) === Number(c.id) ||
+            (!r.customerId && r.phone === c.phone),
+        );
+        const revenue = orders.reduce((a, o) => a + Number(o.total || 0), 0);
+        return `<article class="customer-admin-card">
      <label class="customer-select" onclick="event.stopPropagation()">
        <input type="checkbox" class="customer-checkbox" value="${c.id}" onchange="updateCustomerSelection()">
        <span class="customer-checkmark"></span>
      </label>
-     <div class="customer-avatar" onclick="openCustomer(${c.id})">${esc((c.name||'?').slice(0,1).toUpperCase())}</div>
+     <div class="customer-avatar" onclick="openCustomer(${c.id})">${esc((c.name || "?").slice(0, 1).toUpperCase())}</div>
      <div class="customer-main" onclick="openCustomer(${c.id})">
-       <span class="admin-eyebrow">${c.registered===false?'GUEST CONTACT':'CLIENT'}</span>
-       <h3>${esc(c.name||'Без имени')}</h3>
-       <p>${esc(c.phone||'—')}${c.email?` · ${esc(c.email)}`:''}</p>
+       <span class="admin-eyebrow">${c.registered === false ? "GUEST CONTACT" : "CLIENT"}</span>
+       <h3>${esc(c.name || "Без имени")}</h3>
+       <p>${esc(c.phone || "—")}${c.email ? ` · ${esc(c.email)}` : ""}</p>
        <div class="customer-stats"><span>${orders.length} заказов</span><span>${bookings.length} броней</span><strong>${money(revenue)}</strong></div>
      </div>
      <button type="button" class="customer-delete-btn" onclick="deleteCustomer(${c.id},event)">Удалить</button>
    </article>`;
- }).join('')||'<div class="empty-admin-state"><h3>Клиентов пока нет</h3><p>После заказов и регистраций они появятся здесь.</p></div>';
- updateCustomerSelection();
+      })
+      .join("") ||
+    '<div class="empty-admin-state"><h3>Клиентов пока нет</h3><p>После заказов и регистраций они появятся здесь.</p></div>';
+  updateCustomerSelection();
 }
-function getSelectedCustomerIds(){
- return [...document.querySelectorAll('.customer-checkbox:checked')].map(x=>Number(x.value)).filter(Number.isFinite);
+function getSelectedCustomerIds() {
+  return [...document.querySelectorAll(".customer-checkbox:checked")]
+    .map((x) => Number(x.value))
+    .filter(Number.isFinite);
 }
-function updateCustomerSelection(){
- const selected=getSelectedCustomerIds();
- const count=$('#selectedCustomersCount');
- const button=$('#deleteSelectedCustomers');
- if(count)count.textContent=`Выбрано: ${selected.length}`;
- if(button)button.disabled=selected.length===0;
+function updateCustomerSelection() {
+  const selected = getSelectedCustomerIds();
+  const count = $("#selectedCustomersCount");
+  const button = $("#deleteSelectedCustomers");
+  if (count) count.textContent = `Выбрано: ${selected.length}`;
+  if (button) button.disabled = selected.length === 0;
 }
-async function deleteCustomer(id,event){
- if(event)event.stopPropagation();
- const customer=(state.customers||[]).find(c=>Number(c.id)===Number(id));
- if(!customer)return;
- if(!confirm(`Удалить клиента «${customer.name||'Без имени'}»?\n\nБудут также удалены все его заказы и бронирования.\n\nЭто действие нельзя отменить.`))return;
- try{
-   await api(`/api/admin/customers/${encodeURIComponent(id)}`,{method:'DELETE'});
-   await load();
-   toast('Клиент, заказы и бронирования удалены');
- }catch(err){toast(err.message||'Не удалось удалить клиента')}
+async function deleteCustomer(id, event) {
+  if (event) event.stopPropagation();
+  const customer = (state.customers || []).find(
+    (c) => Number(c.id) === Number(id),
+  );
+  if (!customer) return;
+  if (
+    !confirm(
+      `Удалить клиента «${customer.name || "Без имени"}»?\n\nБудут также удалены все его заказы и бронирования.\n\nЭто действие нельзя отменить.`,
+    )
+  )
+    return;
+  try {
+    await api(`/api/admin/customers/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    });
+    await load();
+    toast("Клиент, заказы и бронирования удалены");
+  } catch (err) {
+    toast(err.message || "Не удалось удалить клиента");
+  }
 }
-async function deleteSelectedCustomers(){
- const ids=getSelectedCustomerIds();
- if(!ids.length)return;
- if(!confirm(`Удалить выбранных клиентов: ${ids.length}?\n\nУ выбранных клиентов также будут удалены заказы и бронирования.\n\nЭто действие нельзя отменить.`))return;
- try{
-   const results=await Promise.all(ids.map(id=>api(`/api/admin/customers/${encodeURIComponent(id)}`,{method:'DELETE'})));
-   await load();
-   toast(`Удалено клиентов: ${results.length}`);
- }catch(err){toast(err.message||'Не удалось удалить выбранных клиентов')}
+async function deleteSelectedCustomers() {
+  const ids = getSelectedCustomerIds();
+  if (!ids.length) return;
+  if (
+    !confirm(
+      `Удалить выбранных клиентов: ${ids.length}?\n\nУ выбранных клиентов также будут удалены заказы и бронирования.\n\nЭто действие нельзя отменить.`,
+    )
+  )
+    return;
+  try {
+    const results = await Promise.all(
+      ids.map((id) =>
+        api(`/api/admin/customers/${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        }),
+      ),
+    );
+    await load();
+    toast(`Удалено клиентов: ${results.length}`);
+  } catch (err) {
+    toast(err.message || "Не удалось удалить выбранных клиентов");
+  }
 }
-async function deleteAllCustomers(){
- const total=(state.customers||[]).length;
- if(!total){toast('Клиентов для удаления нет');return;}
- if(!confirm(`Удалить ВСЕХ клиентов (${total})?\n\nБудут также удалены ВСЕ заказы и ВСЕ бронирования.\n\nЭто действие нельзя отменить.`))return;
- if(!confirm('Последнее подтверждение: удалить клиентов, заказы и бронирования?'))return;
- try{
-   await api('/api/admin/customers',{method:'DELETE'});
-   await load();
-   toast('Все клиенты, заказы и бронирования удалены');
- }catch(err){toast(err.message||'Не удалось удалить клиентов')}
+async function deleteAllCustomers() {
+  const total = (state.customers || []).length;
+  if (!total) {
+    toast("Клиентов для удаления нет");
+    return;
+  }
+  if (
+    !confirm(
+      `Удалить ВСЕХ клиентов (${total})?\n\nБудут также удалены ВСЕ заказы и ВСЕ бронирования.\n\nЭто действие нельзя отменить.`,
+    )
+  )
+    return;
+  if (
+    !confirm(
+      "Последнее подтверждение: удалить клиентов, заказы и бронирования?",
+    )
+  )
+    return;
+  try {
+    await api("/api/admin/customers", { method: "DELETE" });
+    await load();
+    toast("Все клиенты, заказы и бронирования удалены");
+  } catch (err) {
+    toast(err.message || "Не удалось удалить клиентов");
+  }
 }
-function openCustomer(id){const c=state.customers.find(x=>Number(x.id)===Number(id));if(!c)return;const orders=state.orders.filter(o=>Number(o.customerId)===Number(c.id)||(!o.customerId&&o.customer?.phone===c.phone));const bookings=state.reservations.filter(r=>Number(r.customerId)===Number(c.id)||(!r.customerId&&r.phone===c.phone));openModal(`<span class="admin-eyebrow">CLIENT PROFILE</span><h2>${esc(c.name||'Клиент')}</h2><div class="detail-grid"><div><small>Телефон</small><b>${esc(c.phone||'—')}</b></div><div><small>Email</small><b>${esc(c.email||'—')}</b></div><div><small>Регистрация</small><b>${c.registered===false?'Гостевой контакт':'Зарегистрирован'}</b></div><div><small>Заказов</small><b>${orders.length}</b></div><div><small>Бронирований</small><b>${bookings.length}</b></div></div><h3>Заказы клиента</h3><div class="history-detail-list">${orders.map(o=>`<button class="client-detail-row" onclick="openOrder(${o.id})"><span><b>#${o.number}</b> · ${esc(statusLabel(o.status))}</span><strong>${money(o.total)}</strong></button>`).join('')||'<p>Заказов нет.</p>'}</div><h3>Бронирования клиента</h3><div class="history-detail-list">${bookings.map(r=>`<div class="mini-row"><span><b>#${r.number}</b> · ${esc(window.noireFormatDate?noireFormatDate(r.date):r.date)} ${esc(r.time)}</span><span>${esc(statusLabel(r.status))}</span></div><div class="client-comment">${esc(r.comment||'Без комментария')}</div>`).join('')||'<p>Бронирований нет.</p>'}</div>`)}
-function renderAnalytics(){const days=state.analytics?.days||[];const max=Math.max(...days.map(x=>x.revenue),1);$('#salesBars').innerHTML=days.map(x=>`<div class="bar" style="height:${Math.max(8,x.revenue/max*210)}px"><b>${x.revenue?money(x.revenue).replace(' ֏',''):0}</b><span>${x.label}</span></div>`).join('')||'<p>Нет данных по продажам.</p>';$('#customersList').innerHTML=state.customers.slice(0,8).map(c=>`<div class="mini-row"><span>${esc(c.name||'Гость')}</span><small>${esc(c.phone||c.email||'')}</small></div>`).join('')||'<p>Нет клиентов.</p>';$('#analyticsTop').innerHTML=(state.analytics?.topItems||[]).slice(0,8).map((x,i)=>`<div class="rank-row"><span><b>${i+1}.</b> ${esc(x.name)}</span><small>${x.quantity} шт.</small></div>`).join('')||'<p>Нет данных.</p>';$('#categoryList').innerHTML=(state.analytics?.topCategories||[]).slice(0,8).map(x=>`<div class="mini-row"><span>${esc(x.category)}</span><small>${x.quantity} шт.</small></div>`).join('')||'<p>Нет данных.</p>';}
-function openModal(html){$('#modalContent').innerHTML=html;$('#modal').hidden=false;if(window.noireInitTimeInputs)noireInitTimeInputs($('#modalContent'));}function closeModal(){$('#modal').hidden=true;$('#modalContent').innerHTML=''}
-function imageFieldData(form, name = 'image'){
-  return String(
-    form.querySelector(`[name="${name}"]`)?.value || ''
-  ).trim();
+function openCustomer(id) {
+  const c = state.customers.find((x) => Number(x.id) === Number(id));
+  if (!c) return;
+  const orders = state.orders.filter(
+    (o) =>
+      Number(o.customerId) === Number(c.id) ||
+      (!o.customerId && o.customer?.phone === c.phone),
+  );
+  const bookings = state.reservations.filter(
+    (r) =>
+      Number(r.customerId) === Number(c.id) ||
+      (!r.customerId && r.phone === c.phone),
+  );
+  openModal(
+    `<span class="admin-eyebrow">CLIENT PROFILE</span><h2>${esc(c.name || "Клиент")}</h2><div class="detail-grid"><div><small>Телефон</small><b>${esc(c.phone || "—")}</b></div><div><small>Email</small><b>${esc(c.email || "—")}</b></div><div><small>Регистрация</small><b>${c.registered === false ? "Гостевой контакт" : "Зарегистрирован"}</b></div><div><small>Заказов</small><b>${orders.length}</b></div><div><small>Бронирований</small><b>${bookings.length}</b></div></div><h3>Заказы клиента</h3><div class="history-detail-list">${orders.map((o) => `<button class="client-detail-row" onclick="openOrder(${o.id})"><span><b>#${o.number}</b> · ${esc(statusLabel(o.status))}</span><strong>${money(o.total)}</strong></button>`).join("") || "<p>Заказов нет.</p>"}</div><h3>Бронирования клиента</h3><div class="history-detail-list">${bookings.map((r) => `<div class="mini-row"><span><b>#${r.number}</b> · ${esc(window.noireFormatDate ? noireFormatDate(r.date) : r.date)} ${esc(r.time)}</span><span>${esc(statusLabel(r.status))}</span></div><div class="client-comment">${esc(r.comment || "Без комментария")}</div>`).join("") || "<p>Бронирований нет.</p>"}</div>`,
+  );
 }
-function photoFieldMarkup(value = '', name = 'image') {
-    return `
+function renderAnalytics() {
+  const days = state.analytics?.days || [];
+  const max = Math.max(...days.map((x) => x.revenue), 1);
+  $("#salesBars").innerHTML =
+    days
+      .map(
+        (x) =>
+          `<div class="bar" style="height:${Math.max(8, (x.revenue / max) * 210)}px"><b>${x.revenue ? money(x.revenue).replace(" ֏", "") : 0}</b><span>${x.label}</span></div>`,
+      )
+      .join("") || "<p>Нет данных по продажам.</p>";
+  $("#customersList").innerHTML =
+    state.customers
+      .slice(0, 8)
+      .map(
+        (c) =>
+          `<div class="mini-row"><span>${esc(c.name || "Гость")}</span><small>${esc(c.phone || c.email || "")}</small></div>`,
+      )
+      .join("") || "<p>Нет клиентов.</p>";
+  $("#analyticsTop").innerHTML =
+    (state.analytics?.topItems || [])
+      .slice(0, 8)
+      .map(
+        (x, i) =>
+          `<div class="rank-row"><span><b>${i + 1}.</b> ${esc(x.name)}</span><small>${x.quantity} шт.</small></div>`,
+      )
+      .join("") || "<p>Нет данных.</p>";
+  $("#categoryList").innerHTML =
+    (state.analytics?.topCategories || [])
+      .slice(0, 8)
+      .map(
+        (x) =>
+          `<div class="mini-row"><span>${esc(x.category)}</span><small>${x.quantity} шт.</small></div>`,
+      )
+      .join("") || "<p>Нет данных.</p>";
+}
+function openModal(html) {
+  $("#modalContent").innerHTML = html;
+  $("#modal").hidden = false;
+  if (window.noireInitTimeInputs) noireInitTimeInputs($("#modalContent"));
+}
+function closeModal() {
+  $("#modal").hidden = true;
+  $("#modalContent").innerHTML = "";
+}
+function imageFieldData(form, name = "image") {
+  return String(form.querySelector(`[name="${name}"]`)?.value || "").trim();
+}
+function photoFieldMarkup(value = "", name = "image") {
+  return `
         <label class="full">
             URL изображения
             <input
                 name="${name}"
-                value="${esc(value || '')}"
+                value="${esc(value || "")}"
                 placeholder="https://example.com/image.jpg"
                 autocomplete="url"
             >
@@ -160,97 +744,636 @@ function photoFieldMarkup(value = '', name = 'image') {
     `;
 }
 
-function openMenu(id=null){const i=id?state.menu.find(x=>Number(x.id)===Number(id)):{};openModal(`<span class="admin-eyebrow">NOIRÉ · MENU</span><h2>${id?'Редактировать позицию':'Добавить позицию'}</h2><form id="menuForm" class="menu-form"><label>Название<input name="name" value="${esc(i.name||'')}" required></label><label>Цена<input name="price" type="number" value="${i.price||''}" min="0" required></label><label>Категория<select name="category">${['coffee','tea','breakfast','snacks','food','desserts','drinks','beer','sauces'].map(c=>`<option ${c===i.category?'selected':''} value="${c}">${c}</option>`).join('')}</select></label>${photoFieldMarkup(i.image||'','image')}<label class="full">Описание<textarea name="description">${esc(i.description||'')}</textarea></label><label class="check full"><input type="checkbox" name="popular" ${i.popular?'checked':''}> Показывать как популярное</label><div class="full"><button class="admin-primary">Сохранить</button></div></form>`);const form=$('#menuForm');const file=form.querySelector('[data-photo-input]');const preview=form.querySelector('[data-photo-preview]');file?.addEventListener('change',async()=>{try{const src=await readImageFile(file.files[0]);preview.hidden=false;preview.innerHTML=`<img src="${src}" alt="Предпросмотр">`}catch(err){file.value='';toast(err.message)}});form.onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{const image=await imageFieldData(e.target);const body={...Object.fromEntries(f),price:Number(f.get('price')),popular:f.get('popular')==='on',image};delete body.imageFile;await api(id?`/api/admin/menu/${id}`:'/api/admin/menu',{method:id?'PUT':'POST',body:JSON.stringify(body)});closeModal();await load();toast('Меню обновлено')}catch(err){toast(err.message)}}}
-
-async function deleteMenu(id){if(!confirm('Удалить эту позицию из меню?'))return;try{await api(`/api/admin/menu/${id}`,{method:'DELETE'});await load();toast('Позиция удалена')}catch(e){toast(e.message)}}
-function openGallery(id=null){const item=id?state.gallery.find(x=>Number(x.id)===Number(id)):{};openModal(`<span class="admin-eyebrow">SPACE ONLY</span><h2>${id?'Редактировать фото NOIRÉ':'Добавить фото NOIRÉ'}</h2><form id="galleryForm" class="menu-form"><label>Название<input name="title" value="${esc(item.title||'')}" required></label><label>Категория<select name="category">${['Interior','Atmosphere','Seating','Details','Facade'].map(c=>`<option ${c===(item.category||'Interior')?'selected':''}>${c}</option>`).join('')}</select></label>${photoFieldMarkup(item.image||'','image')}<div class="full"><button class="admin-primary">${id?'Сохранить':'Добавить'}</button></div></form>`);const form=$('#galleryForm');const file=form.querySelector('[data-photo-input]');const preview=form.querySelector('[data-photo-preview]');file?.addEventListener('change',async()=>{try{const src=await readImageFile(file.files[0]);preview.hidden=false;preview.innerHTML=`<img src="${src}" alt="Предпросмотр">`}catch(err){file.value='';toast(err.message)}});form.onsubmit=async e=>{e.preventDefault();try{const f=new FormData(e.target);const body={title:f.get('title'),category:f.get('category'),image:await imageFieldData(e.target)};if(!body.image)throw new Error('Выберите фото или укажите URL');await api(id?`/api/admin/gallery/${id}`:'/api/admin/gallery',{method:id?'PUT':'POST',body:JSON.stringify(body)});closeModal();await load();toast(id?'Фото обновлено':'Фото добавлено')}catch(err){toast(err.message)}}}
-async function deleteGallery(id){if(!confirm('Удалить фото из Gallery?'))return;try{await api(`/api/admin/gallery/${id}`,{method:'DELETE'});await load();toast('Фото удалено')}catch(e){toast(e.message)}}
-async function updateOrder(id,status){try{await api(`/api/admin/orders/${id}`,{method:'PATCH',body:JSON.stringify({status})});toast('Статус заказа обновлён');await load()}catch(e){toast(e.message)}}
-async function assignOrder(id,employeeId){try{await api(`/api/admin/orders/${id}`,{method:'PATCH',body:JSON.stringify({employeeId:employeeId||null})});toast('Ответственный сотрудник обновлён');await load()}catch(e){toast(e.message)}}
-async function updateBooking(id,status){try{await api(`/api/admin/reservations/${id}`,{method:'PATCH',body:JSON.stringify({status})});toast('Бронирование обновлено');await load()}catch(e){toast(e.message)}}
-async function linkBookingOrder(id,orderId){try{await api(`/api/admin/reservations/${id}`,{method:'PATCH',body:JSON.stringify({orderId:orderId||null})});toast('Заказ привязан к бронированию');await load()}catch(e){toast(e.message)}}
-async function loadTables(){try{const date=$('#tableDate').value,time=$('#tableTime').value;const d=await api(`/api/admin/tables?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`);state.tables=d.tables;state.tableView={date:d.date,time:d.time};renderTables()}catch(e){toast(e.message)}}
-function openTable(id){const t=state.tables.find(x=>Number(x.id)===Number(id));if(!t)return;const r=t.reservation,o=t.activeOrder;openModal(`<span class="admin-eyebrow">NOIRÉ FLOOR PLAN</span><h2>${esc(t.name)}</h2><div class="detail-grid"><div><small>Статус</small><b>${tableStatusLabel(t.computedStatus||t.status)}</b></div><div><small>Мест</small><b>${t.seats}</b></div><div><small>Зона</small><b>${esc(t.zone||'—')}</b></div><div><small>Бронь</small><b>${r?`#${r.number} · ${esc(r.name)} · ${esc(r.time)}`:'Нет'}</b></div><div class="full"><small>Заказ</small><b>${o?`#${o.number} · ${money(o.total)} · ${statusLabel(o.status)}`:'Нет'}</b></div></div><div class="modal-actions"><button class="small-btn" onclick="setTableStatus(${t.id},'occupied')">Занять</button><button class="small-btn" onclick="setTableStatus(${t.id},'service')">В сервис</button><button class="small-btn" onclick="setTableStatus(${t.id},'available')">Освободить</button></div>`)}
-async function setTableStatus(id,status){try{await api(`/api/admin/tables/${id}`,{method:'PATCH',body:JSON.stringify({status})});closeModal();await loadTables();toast('Состояние стола обновлено')}catch(e){toast(e.message)}}
-function openNewBooking(){
- if(!['owner','director','administrator','manager'].includes(state.staff?.role)){toast('Недостаточно прав');return}
- const people=state.tables||[]; openModal(`<span class="admin-eyebrow">RESERVATION · PHONE</span><h2>Новое бронирование</h2><form id="adminBookingForm" class="menu-form"><label>Имя<input name="name" required></label><label>Телефон<input name="phone" required></label><label>Дата<input name="date" type="date" value="${dateNow()}" required></label><label>Время<input name="time" data-noire-time inputmode="numeric" placeholder="19:30" required></label><label>Гостей<input name="guests" type="number" min="1" max="30" value="2" required></label><label>Стол<select name="tableId"><option value="">Без стола</option>${people.map(t=>`<option value="${t.id}">${esc(t.name)} · ${t.seats} мест</option>`).join('')}</select></label><label>Бюджет<input name="budget" type="number" min="0"></label><label>Повод<input name="occasion"></label><label class="full">Комментарий<textarea name="comment"></textarea></label><div class="full"><button class="admin-primary">Создать бронь</button></div></form>`); window.noireInitTimeInputs?.($('#adminBookingForm')); $('#adminBookingForm').onsubmit=async ev=>{ev.preventDefault();if(window.noireNormalizeTime)ev.target.time.value=noireNormalizeTime(ev.target.time.value)||ev.target.time.value;const f=new FormData(ev.target);try{await api('/api/admin/reservations',{method:'POST',body:JSON.stringify(Object.fromEntries(f))});closeModal();await load();toast('Бронь создана')}catch(e){toast(e.message)}};
+function openMenu(id = null) {
+  const i = id ? state.menu.find((x) => Number(x.id) === Number(id)) : {};
+  openModal(
+    `<span class="admin-eyebrow">NOIRÉ · MENU</span><h2>${id ? "Редактировать позицию" : "Добавить позицию"}</h2><form id="menuForm" class="menu-form"><label>Название<input name="name" value="${esc(i.name || "")}" required></label><label>Цена<input name="price" type="number" value="${i.price || ""}" min="0" required></label><label>Категория<select name="category">${["coffee", "tea", "breakfast", "snacks", "food", "desserts", "drinks", "beer", "sauces"].map((c) => `<option ${c === i.category ? "selected" : ""} value="${c}">${c}</option>`).join("")}</select></label>${photoFieldMarkup(i.image || "", "image")}<label class="full">Описание<textarea name="description">${esc(i.description || "")}</textarea></label><label class="check full"><input type="checkbox" name="popular" ${i.popular ? "checked" : ""}> Показывать как популярное</label><div class="full"><button class="admin-primary">Сохранить</button></div></form>`,
+  );
+  const form = $("#menuForm");
+  const file = form.querySelector("[data-photo-input]");
+  const preview = form.querySelector("[data-photo-preview]");
+  file?.addEventListener("change", async () => {
+    try {
+      const src = await readImageFile(file.files[0]);
+      preview.hidden = false;
+      preview.innerHTML = `<img src="${src}" alt="Предпросмотр">`;
+    } catch (err) {
+      file.value = "";
+      toast(err.message);
+    }
+  });
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    try {
+      const image = await imageFieldData(e.target);
+      const body = {
+        ...Object.fromEntries(f),
+        price: Number(f.get("price")),
+        popular: f.get("popular") === "on",
+        image,
+      };
+      delete body.imageFile;
+      await api(id ? `/api/admin/menu/${id}` : "/api/admin/menu", {
+        method: id ? "PUT" : "POST",
+        body: JSON.stringify(body),
+      });
+      closeModal();
+      await load();
+      toast("Меню обновлено");
+    } catch (err) {
+      toast(err.message);
+    }
+  };
 }
 
-function openBooking(id){const r=state.reservations.find(x=>Number(x.id)===Number(id));if(!r)return;const orders=r.relatedOrders||[];openModal(`<span class="admin-eyebrow">RESERVATION #${r.number}</span><h2>${esc(r.name)}</h2><div class="detail-grid"><div><small>Телефон</small><b>${esc(r.phone)}</b></div><div><small>Дата</small><b>${esc(window.noireFormatDate?noireFormatDate(r.date):r.date)}</b></div><div><small>Время</small><b>${esc(r.time)}</b></div><div><small>Гостей</small><b>${r.guests}</b></div><div><small>Стол</small><b>${r.tableId?`T${String(r.tableId).padStart(2,'0')}`:'Не выбран'}</b></div><div><small>Бюджет</small><b>${r.budget?money(r.budget):'—'}</b></div><div class="full"><small>Повод</small><b>${esc(r.occasion||'—')}</b></div><div class="full"><small>Комментарий</small><b>${esc(r.comment||'—')}</b></div></div><h3>Связанные заказы</h3><select id="bookingOrderSelect" class="admin-search"><option value="">Не привязан</option>${orders.map(o=>`<option value="${o.id}" ${Number(r.orderId)===Number(o.id)?'selected':''}>#${o.number} · ${money(o.total)} · ${esc(o.customer?.name||'')}</option>`).join('')}</select><button class="admin-primary" onclick="linkBookingOrder(${r.id},document.querySelector('#bookingOrderSelect').value)">Сохранить связь</button>`)}
-function openEmployee(id=null){const e=id?state.employees.find(x=>Number(x.id)===Number(id)):{};const canManage=['owner','director','administrator'].includes(state.staff?.role);if(!canManage){toast('Недостаточно прав');return}openModal(`<span class="admin-eyebrow">NOIRÉ TEAM</span><h2>${id?'Редактировать сотрудника':'Новый сотрудник'}</h2><form id="employeeForm" class="menu-form"><label>Имя<input name="firstName" value="${esc(e.firstName||e.name||'')}" required></label><label>Фамилия<input name="lastName" value="${esc(e.lastName||'')}" required></label><label>Отчество<input name="middleName" value="${esc(e.middleName||'')}"></label><label>Логин<input name="username" value="${esc(e.username||'')}" required></label><label>Пароль<div class="password-field"><input name="password" type="password" minlength="8" placeholder="${id?'Оставьте пустым, если не меняете':''}" ${id?'':'required'}><button type="button" class="password-toggle" aria-label="Показать пароль" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div></label><label>Роль<select name="role">${['director','administrator','manager','waiter','cook','delivery'].map(r=>`<option value="${r}" ${r===e.role?'selected':''}>${window.noireRoleLabel?noireRoleLabel(r):r}</option>`).join('')}</select></label><label>Email<input name="email" type="email" value="${esc(e.email||'')}"></label><label>Телефон<input name="phone" value="${esc(e.phone||'')}"></label>${photoFieldMarkup(e.photo||'','photo')}<label class="check full"><input type="checkbox" name="active" ${e.active!==false?'checked':''}> Аккаунт активен</label><div class="full"><button class="admin-primary">${id?'Сохранить изменения':'Создать аккаунт'}</button></div></form>`);initAdminPasswordToggle();$('#employeeForm').onsubmit=async ev=>{ev.preventDefault();const f=new FormData(ev.target);try{const body=Object.fromEntries(f);body.name=[body.firstName,body.middleName,body.lastName].filter(Boolean).join(' ');body.active=f.get('active')==='on';body.photo=await imageFieldData(ev.target,'photo','photoFile');delete body.photoFile;if(!body.password)delete body.password;await api(id?`/api/admin/employees/${id}`:'/api/admin/employees',{method:id?'PATCH':'POST',body:JSON.stringify(body)});closeModal();await load();toast(id?'Сотрудник обновлён':'Аккаунт сотрудника создан')}catch(err){toast(err.message)}}}
-
-function openDeliveryOrder(){
- if(!['owner','director','administrator','manager'].includes(state.staff?.role)){toast('Недостаточно прав');return}
- openModal(`<span class="admin-eyebrow">DELIVERY · NEW ORDER</span><h2>Новая доставка</h2><form id="deliveryOrderForm" class="menu-form"><label>Имя клиента<input name="name" required></label><label>Телефон<input name="phone" required></label><label>Email<input name="email" type="email"></label><label class="full">Адрес<input name="address" required></label><label>Подъезд<input name="entrance"></label><label>Этаж<input name="floor"></label><label>Оплата<select name="payment"><option value="card">Картой курьеру</option><option value="cash">Наличными</option></select></label><label>Время доставки<select name="deliveryTime"><option>Как можно скорее</option><option>Через 30 минут</option><option>Через 60 минут</option></select></label><label class="full">Комментарий<textarea name="comment"></textarea></label><div class="full" id="deliveryItems"></div><div class="full"><button type="button" class="small-btn" id="addDeliveryItem">+ Добавить позицию</button></div><div class="full"><strong>Итого: <span id="deliveryTotal">0 ֏</span></strong></div><div class="full"><button class="admin-primary">Создать доставку</button></div></form>`);
- let items=[]; const render=()=>{$('#deliveryItems').innerHTML=items.map((x,i)=>`<div class="menu-form-row"><select data-di="${i}">${state.menu.map(m=>`<option value="${m.id}" ${Number(m.id)===Number(x.id)?'selected':''}>${esc(m.name)} · ${money(m.price)}</option>`).join('')}</select><input data-dq="${i}" type="number" min="1" max="50" value="${x.quantity}"><button type="button" class="small-btn danger" data-dr="${i}">×</button></div>`).join('')||'<p class="admin-muted">Добавьте блюда.</p>';$('#deliveryTotal').textContent=money(items.reduce((a,x)=>a+Number(state.menu.find(m=>Number(m.id)===Number(x.id))?.price||0)*x.quantity,0));document.querySelectorAll('[data-di]').forEach(el=>el.onchange=()=>{items[Number(el.dataset.di)].id=Number(el.value);render()});document.querySelectorAll('[data-dq]').forEach(el=>el.oninput=()=>{items[Number(el.dataset.dq)].quantity=Math.max(1,Math.min(50,Number(el.value)||1));render()});document.querySelectorAll('[data-dr]').forEach(el=>el.onclick=()=>{items.splice(Number(el.dataset.dr),1);render()})};
- $('#addDeliveryItem').onclick=()=>{items.push({id:state.menu[0]?.id||0,quantity:1});render()}; render(); window.noireInitTimeInputs?.($('#deliveryOrderForm')); $('#deliveryOrderForm').onsubmit=async ev=>{ev.preventDefault();if(!items.length){toast('Добавьте позиции');return}const f=new FormData(ev.target);try{await api('/api/admin/orders',{method:'POST',body:JSON.stringify({orderType:'delivery',customer:Object.fromEntries(f),items})});closeModal();await load();toast('Доставка создана')}catch(e){toast(e.message)}};
+async function deleteMenu(id) {
+  if (!confirm("Удалить эту позицию из меню?")) return;
+  try {
+    await api(`/api/admin/menu/${id}`, { method: "DELETE" });
+    await load();
+    toast("Позиция удалена");
+  } catch (e) {
+    toast(e.message);
+  }
+}
+function openGallery(id = null) {
+  const item = id ? state.gallery.find((x) => Number(x.id) === Number(id)) : {};
+  openModal(
+    `<span class="admin-eyebrow">SPACE ONLY</span><h2>${id ? "Редактировать фото NOIRÉ" : "Добавить фото NOIRÉ"}</h2><form id="galleryForm" class="menu-form"><label>Название<input name="title" value="${esc(item.title || "")}" required></label><label>Категория<select name="category">${["Interior", "Atmosphere", "Seating", "Details", "Facade"].map((c) => `<option ${c === (item.category || "Interior") ? "selected" : ""}>${c}</option>`).join("")}</select></label>${photoFieldMarkup(item.image || "", "image")}<div class="full"><button class="admin-primary">${id ? "Сохранить" : "Добавить"}</button></div></form>`,
+  );
+  const form = $("#galleryForm");
+  const file = form.querySelector("[data-photo-input]");
+  const preview = form.querySelector("[data-photo-preview]");
+  file?.addEventListener("change", async () => {
+    try {
+      const src = await readImageFile(file.files[0]);
+      preview.hidden = false;
+      preview.innerHTML = `<img src="${src}" alt="Предпросмотр">`;
+    } catch (err) {
+      file.value = "";
+      toast(err.message);
+    }
+  });
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const f = new FormData(e.target);
+      const body = {
+        title: f.get("title"),
+        category: f.get("category"),
+        image: await imageFieldData(e.target),
+      };
+      if (!body.image) throw new Error("Выберите фото или укажите URL");
+      await api(id ? `/api/admin/gallery/${id}` : "/api/admin/gallery", {
+        method: id ? "PUT" : "POST",
+        body: JSON.stringify(body),
+      });
+      closeModal();
+      await load();
+      toast(id ? "Фото обновлено" : "Фото добавлено");
+    } catch (err) {
+      toast(err.message);
+    }
+  };
+}
+async function deleteGallery(id) {
+  if (!confirm("Удалить фото из Gallery?")) return;
+  try {
+    await api(`/api/admin/gallery/${id}`, { method: "DELETE" });
+    await load();
+    toast("Фото удалено");
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function updateOrder(id, status) {
+  try {
+    await api(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    });
+    toast("Статус заказа обновлён");
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function assignOrder(id, employeeId) {
+  try {
+    await api(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ employeeId: employeeId || null }),
+    });
+    toast("Ответственный сотрудник обновлён");
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function updateBooking(id, status) {
+  try {
+    await api(`/api/admin/reservations/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    });
+    toast("Бронирование обновлено");
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function linkBookingOrder(id, orderId) {
+  try {
+    await api(`/api/admin/reservations/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ orderId: orderId || null }),
+    });
+    toast("Заказ привязан к бронированию");
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function loadTables() {
+  try {
+    const date = $("#tableDate").value,
+      time = $("#tableTime").value;
+    const d = await api(
+      `/api/admin/tables?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`,
+    );
+    state.tables = d.tables;
+    state.tableView = { date: d.date, time: d.time };
+    renderTables();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+function openTable(id) {
+  const t = state.tables.find((x) => Number(x.id) === Number(id));
+  if (!t) return;
+  const r = t.reservation,
+    o = t.activeOrder;
+  openModal(
+    `<span class="admin-eyebrow">NOIRÉ FLOOR PLAN</span><h2>${esc(t.name)}</h2><div class="detail-grid"><div><small>Статус</small><b>${tableStatusLabel(t.computedStatus || t.status)}</b></div><div><small>Мест</small><b>${t.seats}</b></div><div><small>Зона</small><b>${esc(t.zone || "—")}</b></div><div><small>Бронь</small><b>${r ? `#${r.number} · ${esc(r.name)} · ${esc(r.time)}` : "Нет"}</b></div><div class="full"><small>Заказ</small><b>${o ? `#${o.number} · ${money(o.total)} · ${statusLabel(o.status)}` : "Нет"}</b></div></div><div class="modal-actions"><button class="small-btn" onclick="setTableStatus(${t.id},'occupied')">Занять</button><button class="small-btn" onclick="setTableStatus(${t.id},'service')">В сервис</button><button class="small-btn" onclick="setTableStatus(${t.id},'available')">Освободить</button></div>`,
+  );
+}
+async function setTableStatus(id, status) {
+  try {
+    await api(`/api/admin/tables/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    });
+    closeModal();
+    await loadTables();
+    toast("Состояние стола обновлено");
+  } catch (e) {
+    toast(e.message);
+  }
+}
+function openNewBooking() {
+  if (
+    !["owner", "director", "administrator", "manager"].includes(
+      state.staff?.role,
+    )
+  ) {
+    toast("Недостаточно прав");
+    return;
+  }
+  const people = state.tables || [];
+  openModal(
+    `<span class="admin-eyebrow">RESERVATION · PHONE</span><h2>Новое бронирование</h2><form id="adminBookingForm" class="menu-form"><label>Имя<input name="name" required></label><label>Телефон<input name="phone" required></label><label>Дата<input name="date" type="date" value="${dateNow()}" required></label><label>Время<input name="time" data-noire-time inputmode="numeric" placeholder="19:30" required></label><label>Гостей<input name="guests" type="number" min="1" max="30" value="2" required></label><label>Стол<select name="tableId"><option value="">Без стола</option>${people.map((t) => `<option value="${t.id}">${esc(t.name)} · ${t.seats} мест</option>`).join("")}</select></label><label>Бюджет<input name="budget" type="number" min="0"></label><label>Повод<input name="occasion"></label><label class="full">Комментарий<textarea name="comment"></textarea></label><div class="full"><button class="admin-primary">Создать бронь</button></div></form>`,
+  );
+  window.noireInitTimeInputs?.($("#adminBookingForm"));
+  $("#adminBookingForm").onsubmit = async (ev) => {
+    ev.preventDefault();
+    if (window.noireNormalizeTime)
+      ev.target.time.value =
+        noireNormalizeTime(ev.target.time.value) || ev.target.time.value;
+    const f = new FormData(ev.target);
+    try {
+      await api("/api/admin/reservations", {
+        method: "POST",
+        body: JSON.stringify(Object.fromEntries(f)),
+      });
+      closeModal();
+      await load();
+      toast("Бронь создана");
+    } catch (e) {
+      toast(e.message);
+    }
+  };
 }
 
-function openWaiterOrder(){if(state.staff?.role!=='waiter'){toast('Только официант может создавать заказ в зале');return}openModal(`<span class="admin-eyebrow">WAITER · NEW ORDER</span><h2>Новый заказ в зале</h2><form id="waiterOrderForm" class="menu-form"><label>Имя гостя<input name="name" value="Гость"></label><label>Телефон<input name="phone"></label><label>Комментарий<input name="comment"></label><div class="full" id="waiterItems"></div><div class="full"><button type="button" class="small-btn" id="addWaiterItem">+ Добавить позицию</button></div><div class="full"><strong>Итого: <span id="waiterTotal">0 ֏</span></strong></div><div class="full"><button class="admin-primary">Создать заказ</button></div></form>`);let items=[];const renderItems=()=>{$('#waiterItems').innerHTML=items.map((x,i)=>`<div class="menu-form-row"><select data-item="${i}">${state.menu.map(m=>`<option value="${m.id}" ${Number(m.id)===Number(x.id)?'selected':''}>${esc(m.name)} · ${money(m.price)}</option>`).join('')}</select><input data-qty="${i}" type="number" min="1" max="50" value="${x.quantity}"><button type="button" class="small-btn danger" data-remove="${i}">×</button></div>`).join('')||'<p class="admin-muted">Добавьте блюда.</p>';$('#waiterTotal').textContent=money(items.reduce((a,x)=>a+Number(state.menu.find(m=>Number(m.id)===Number(x.id))?.price||0)*x.quantity,0));document.querySelectorAll('[data-item]').forEach(el=>el.onchange=()=>{items[Number(el.dataset.item)].id=Number(el.value);renderItems()});document.querySelectorAll('[data-qty]').forEach(el=>el.oninput=()=>{items[Number(el.dataset.qty)].quantity=Math.max(1,Math.min(50,Number(el.value)||1));renderItems()});document.querySelectorAll('[data-remove]').forEach(el=>el.onclick=()=>{items.splice(Number(el.dataset.remove),1);renderItems()})};$('#addWaiterItem').onclick=()=>{items.push({id:state.menu[0]?.id||0,quantity:1});renderItems()};renderItems();$('#waiterOrderForm').onsubmit=async ev=>{ev.preventDefault();if(!items.length){toast('Добавьте позиции');return}const f=new FormData(ev.target);try{await api('/api/admin/orders',{method:'POST',body:JSON.stringify({orderType:'waiter',customer:{name:f.get('name'),phone:f.get('phone'),comment:f.get('comment')},items})});closeModal();await load();toast('Заказ создан')}catch(e){toast(e.message)}}}
-async function removeEmployee(id){if(!confirm('Удалить аккаунт сотрудника?'))return;try{await api(`/api/admin/employees/${id}`,{method:'DELETE'});await load();toast('Сотрудник удалён')}catch(e){toast(e.message)}}
-async function shift(id,action){try{const d=await api(`/api/admin/employees/${id}/shift/${action}`,{method:'POST'});const name=d.employee?.name||'Сотрудник';toast(action==='start'?`${name}: смена открыта`:`${name}: смена закрыта`);await load()}catch(e){toast(e.message)}}
-function renderHistory(){
- const box=$('#historyList'); if(!box)return;
- const year=$('#historyYear')?.value||'all'; const history=Array.isArray(state.history)?state.history:[];
- const years=[...new Set(history.map(h=>String(h.month||'').slice(0,4)).filter(Boolean))].sort((a,b)=>Number(b)-Number(a));
- if($('#historyYear')){const current=$('#historyYear').value||year;$('#historyYear').innerHTML='<option value="all">Все годы</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');$('#historyYear').value=years.includes(current)?current:'all';}
- const filtered=($('#historyYear')?.value||'all')==='all'?history:history.filter(h=>String(h.month||'').startsWith($('#historyYear').value));
- box.innerHTML=filtered.map(h=>{const st=h.stats||{};return `<article class="history-card"><div class="history-card-head"><div><span class="admin-eyebrow">${esc(h.month||'')}</span><h3>${esc(h.month?new Intl.DateTimeFormat(document.documentElement.lang||'ru',{month:'long',year:'numeric'}).format(new Date(h.month+'-01T12:00:00')):(h.label||''))}</h3><small>Архив создан: ${new Date(h.archivedAt).toLocaleString('ru-RU')}</small></div></div><div class="history-metrics"><div><small>Выручка</small><b>${money(st.revenue)}</b></div><div><small>Заказы</small><b>${st.orders||0}</b></div><div><small>Брони</small><b>${st.reservations||0}</b></div><div><small>Средний чек</small><b>${money(st.avgCheck)}</b></div></div><div class="history-card-actions"><button class="small-btn" onclick="openHistory('${esc(h.id)}')">Посмотреть данные</button><button class="small-btn danger" onclick="deleteHistory('${esc(h.id)}')">Удалить архив</button></div></article>`}).join('')||'<div class="history-empty"><h3>История пока пустая</h3><p>Когда месяц закончится, нажмите «Архивировать прошлый месяц». Данные сохранятся здесь и исчезнут из текущих заказов и прошедших бронирований.</p></div>';
+function openBooking(id) {
+  const r = state.reservations.find((x) => Number(x.id) === Number(id));
+  if (!r) return;
+  const orders = r.relatedOrders || [];
+  openModal(
+    `<span class="admin-eyebrow">RESERVATION #${r.number}</span><h2>${esc(r.name)}</h2><div class="detail-grid"><div><small>Телефон</small><b>${esc(r.phone)}</b></div><div><small>Дата</small><b>${esc(window.noireFormatDate ? noireFormatDate(r.date) : r.date)}</b></div><div><small>Время</small><b>${esc(r.time)}</b></div><div><small>Гостей</small><b>${r.guests}</b></div><div><small>Стол</small><b>${r.tableId ? `T${String(r.tableId).padStart(2, "0")}` : "Не выбран"}</b></div><div><small>Бюджет</small><b>${r.budget ? money(r.budget) : "—"}</b></div><div class="full"><small>Повод</small><b>${esc(r.occasion || "—")}</b></div><div class="full"><small>Комментарий</small><b>${esc(r.comment || "—")}</b></div></div><h3>Связанные заказы</h3><select id="bookingOrderSelect" class="admin-search"><option value="">Не привязан</option>${orders.map((o) => `<option value="${o.id}" ${Number(r.orderId) === Number(o.id) ? "selected" : ""}>#${o.number} · ${money(o.total)} · ${esc(o.customer?.name || "")}</option>`).join("")}</select><button class="admin-primary" onclick="linkBookingOrder(${r.id},document.querySelector('#bookingOrderSelect').value)">Сохранить связь</button>`,
+  );
 }
-function openHistory(id){const h=(state.history||[]).find(x=>String(x.id)===String(id));if(!h)return;const st=h.stats||{};const orders=h.orders||[], reservations=h.reservations||[];openModal(`<span class="admin-eyebrow">ARCHIVE · ${esc(h.month)}</span><h2>${esc(h.month?new Intl.DateTimeFormat(document.documentElement.lang||'ru',{month:'long',year:'numeric'}).format(new Date(h.month+'-01T12:00:00')):(h.label||h.month))}</h2><div class="detail-grid"><div><small>Выручка</small><b>${money(st.revenue)}</b></div><div><small>Заказы</small><b>${orders.length}</b></div><div><small>Брони</small><b>${reservations.length}</b></div><div><small>Клиенты в архиве</small><b>${(h.customers||[]).length}</b></div></div><h3>Заказы</h3><div class="history-detail-list">${orders.map(o=>`<div class="mini-row"><span><b>#${o.number}</b> · ${esc(o.customer?.name||'Гость')}</span><small>${money(o.total)} · ${(window.noireFormatDateTime?noireFormatDateTime(o.createdAt):new Date(o.createdAt).toLocaleString())}</small></div>`).join('')||'<p>Нет заказов.</p>'}</div><h3>Бронирования</h3><div class="history-detail-list">${reservations.map(r=>`<div class="mini-row"><span><b>#${r.number}</b> · ${esc(r.name||'Гость')}</span><small>${esc(window.noireFormatDate?noireFormatDate(r.date):r.date)} ${esc(r.time||'')} · ${esc(statusLabel(r.status))}</small></div>`).join('')||'<p>Нет бронирований.</p>'}</div>`)}
-async function archivePreviousMonth(){if(!confirm('Перенести прошлый месяц в историю? Его заказы и прошедшие бронирования исчезнут из текущей базы и будут сохранены в архиве.'))return;try{const d=await api('/api/admin/history/archive-month',{method:'POST',body:JSON.stringify({})});state.history=d.history||[];state.orders=state.orders.filter(o=>!d.archive.orders.some(a=>Number(a.id)===Number(o.id)));state.reservations=state.reservations.filter(r=>!d.archive.reservations.some(a=>Number(a.id)===Number(r.id)));renderAll();toast(`${d.archive.label}: данные перенесены в историю`)}catch(e){toast(e.message)}}
-async function deleteHistory(id){if(!confirm('Удалить этот архив? Данные текущих заказов и бронирований не изменятся.'))return;try{const d=await api(`/api/admin/history/${encodeURIComponent(id)}`,{method:'DELETE'});state.history=d.history||[];renderHistory();toast('Архив удалён')}catch(e){toast(e.message)}}
-async function clearHistory(){if(!confirm('Удалить ВСЮ историю архивов? Это действие нельзя отменить.'))return;try{const d=await api('/api/admin/history',{method:'DELETE'});state.history=d.history||[];renderHistory();toast('Вся история удалена')}catch(e){toast(e.message)}}
+function openEmployee(id = null) {
+  const e = id ? state.employees.find((x) => Number(x.id) === Number(id)) : {};
+  const canManage = ["owner", "director", "administrator", "manager"].includes(
+    state.staff?.role,
+  );
+  if (!canManage) {
+    toast("Недостаточно прав");
+    return;
+  }
+  openModal(
+    `<span class="admin-eyebrow">NOIRÉ TEAM</span><h2>${id ? "Редактировать сотрудника" : "Новый сотрудник"}</h2><form id="employeeForm" class="menu-form"><label>Имя<input name="firstName" value="${esc(e.firstName || e.name || "")}" required></label><label>Фамилия<input name="lastName" value="${esc(e.lastName || "")}" required></label><label>Отчество<input name="middleName" value="${esc(e.middleName || "")}"></label><label>Логин<input name="username" value="${esc(e.username || "")}" required></label><label>Пароль<div class="password-field"><input name="password" type="password" minlength="8" placeholder="${id ? "Оставьте пустым, если не меняете" : ""}" ${id ? "" : "required"}><button type="button" class="password-toggle" aria-label="Показать пароль" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div></label><label>Роль<select name="role">${["director", "administrator", "manager", "waiter", "cook", "delivery"].map((r) => `<option value="${r}" ${r === e.role ? "selected" : ""}>${window.noireRoleLabel ? noireRoleLabel(r) : r}</option>`).join("")}</select></label><label>Email<input name="email" type="email" value="${esc(e.email || "")}"></label><label>Телефон<input name="phone" value="${esc(e.phone || "")}"></label>${photoFieldMarkup(e.photo || "", "photo")}<label class="check full"><input type="checkbox" name="active" ${e.active !== false ? "checked" : ""}> Аккаунт активен</label><div class="full"><button class="admin-primary">${id ? "Сохранить изменения" : "Создать аккаунт"}</button></div></form>`,
+  );
+  initAdminPasswordToggle();
+  $("#employeeForm").onsubmit = async (ev) => {
+    ev.preventDefault();
+    const f = new FormData(ev.target);
+    try {
+      const body = Object.fromEntries(f);
+      body.name = [body.firstName, body.middleName, body.lastName]
+        .filter(Boolean)
+        .join(" ");
+      body.active = f.get("active") === "on";
+      body.photo = await imageFieldData(ev.target, "photo", "photoFile");
+      delete body.photoFile;
+      if (!body.password) delete body.password;
+      await api(id ? `/api/admin/employees/${id}` : "/api/admin/employees", {
+        method: id ? "PATCH" : "POST",
+        body: JSON.stringify(body),
+      });
+      closeModal();
+      await load();
+      toast(id ? "Сотрудник обновлён" : "Аккаунт сотрудника создан");
+    } catch (err) {
+      toast(err.message);
+    }
+  };
+}
 
-function renderEmployees(){const box=$('#employeesGrid');if(!box)return;const canManage=['owner','director','administrator'].includes(state.staff?.role);box.innerHTML=(state.employees||[]).map(e=>{const canShift=canManage||Number(e.id)===Number(state.staff?.id);return `<article class="employee-card"><div class="employee-avatar">${e.photo?`<img src="${esc(e.photo)}" alt="${esc(e.name||'Сотрудник')}" loading="lazy">`:esc((e.name||'?')[0])}</div><div><h3>${esc(e.name)}</h3><p>@${esc(e.username)}</p><span>${esc(window.noireRoleLabel?noireRoleLabel(e.role):e.role)}</span></div><div class="employee-shift ${e.shiftActive?'on':''}"><i></i>${e.shiftActive?'На смене':'Не работает'}</div><div class="employee-metrics"><div><small>День</small><b>${money(e.stats?.day?.revenue)}</b><span>${e.stats?.day?.orders||0} заказов</span></div><div><small>Неделя</small><b>${money(e.stats?.week?.revenue)}</b><span>${e.stats?.week?.orders||0} заказов</span></div><div><small>Месяц</small><b>${money(e.stats?.month?.revenue)}</b><span>${e.stats?.month?.orders||0} заказов</span></div></div><small class="employee-contact">${esc(e.email||e.phone||'Контакты не указаны')}</small><div class="employee-actions">${canShift?(e.shiftActive?`<button class="small-btn" onclick="shift(${e.id},'stop')">Закрыть смену</button>`:`<button class="small-btn" onclick="shift(${e.id},'start')">Начать смену</button>`):''}${canManage?`<button class="small-btn" onclick="openEmployee(${e.id})">Изменить</button><button class="small-btn danger" onclick="removeEmployee(${e.id})">Удалить</button>`:''}</div></article>`}).join('')||'<p>Сотрудников пока нет.</p>'}
+function openDeliveryOrder() {
+  if (
+    !["owner", "director", "administrator", "manager"].includes(
+      state.staff?.role,
+    )
+  ) {
+    toast("Недостаточно прав");
+    return;
+  }
+  openModal(
+    `<span class="admin-eyebrow">DELIVERY · NEW ORDER</span><h2>Новая доставка</h2><form id="deliveryOrderForm" class="menu-form"><label>Имя клиента<input name="name" required></label><label>Телефон<input name="phone" required></label><label>Email<input name="email" type="email"></label><label class="full">Адрес<input name="address" required></label><label>Подъезд<input name="entrance"></label><label>Этаж<input name="floor"></label><label>Оплата<select name="payment"><option value="card">Картой курьеру</option><option value="cash">Наличными</option></select></label><label>Время доставки<select name="deliveryTime"><option>Как можно скорее</option><option>Через 30 минут</option><option>Через 60 минут</option></select></label><label class="full">Комментарий<textarea name="comment"></textarea></label><div class="full" id="deliveryItems"></div><div class="full"><button type="button" class="small-btn" id="addDeliveryItem">+ Добавить позицию</button></div><div class="full"><strong>Итого: <span id="deliveryTotal">0 ֏</span></strong></div><div class="full"><button class="admin-primary">Создать доставку</button></div></form>`,
+  );
+  let items = [];
+  const render = () => {
+    $("#deliveryItems").innerHTML =
+      items
+        .map(
+          (x, i) =>
+            `<div class="menu-form-row"><select data-di="${i}">${state.menu.map((m) => `<option value="${m.id}" ${Number(m.id) === Number(x.id) ? "selected" : ""}>${esc(m.name)} · ${money(m.price)}</option>`).join("")}</select><input data-dq="${i}" type="number" min="1" max="50" value="${x.quantity}"><button type="button" class="small-btn danger" data-dr="${i}">×</button></div>`,
+        )
+        .join("") || '<p class="admin-muted">Добавьте блюда.</p>';
+    $("#deliveryTotal").textContent = money(
+      items.reduce(
+        (a, x) =>
+          a +
+          Number(
+            state.menu.find((m) => Number(m.id) === Number(x.id))?.price || 0,
+          ) *
+            x.quantity,
+        0,
+      ),
+    );
+    document.querySelectorAll("[data-di]").forEach(
+      (el) =>
+        (el.onchange = () => {
+          items[Number(el.dataset.di)].id = Number(el.value);
+          render();
+        }),
+    );
+    document.querySelectorAll("[data-dq]").forEach(
+      (el) =>
+        (el.oninput = () => {
+          items[Number(el.dataset.dq)].quantity = Math.max(
+            1,
+            Math.min(50, Number(el.value) || 1),
+          );
+          render();
+        }),
+    );
+    document.querySelectorAll("[data-dr]").forEach(
+      (el) =>
+        (el.onclick = () => {
+          items.splice(Number(el.dataset.dr), 1);
+          render();
+        }),
+    );
+  };
+  $("#addDeliveryItem").onclick = () => {
+    items.push({ id: state.menu[0]?.id || 0, quantity: 1 });
+    render();
+  };
+  render();
+  window.noireInitTimeInputs?.($("#deliveryOrderForm"));
+  $("#deliveryOrderForm").onsubmit = async (ev) => {
+    ev.preventDefault();
+    if (!items.length) {
+      toast("Добавьте позиции");
+      return;
+    }
+    const f = new FormData(ev.target);
+    try {
+      await api("/api/admin/orders", {
+        method: "POST",
+        body: JSON.stringify({
+          orderType: "delivery",
+          customer: Object.fromEntries(f),
+          items,
+        }),
+      });
+      closeModal();
+      await load();
+      toast("Доставка создана");
+    } catch (e) {
+      toast(e.message);
+    }
+  };
+}
 
-function shiftMonth(delta){const el=$('#scheduleDate');const base=new Date((el?.value||dateNow())+'T12:00:00');base.setMonth(base.getMonth()+delta,1);if(el)el.value=`${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-01`;renderSchedule();}
-function shiftToday(){const el=$('#scheduleDate');if(el)el.value=dateNow();renderSchedule();}
-function renderSchedule(){
-  const box = $('#scheduleCalendar');
-  if(!box) return;
+function openWaiterOrder() {
+  if (state.staff?.role !== "waiter") {
+    toast("Только официант может создавать заказ в зале");
+    return;
+  }
+  openModal(
+    `<span class="admin-eyebrow">WAITER · NEW ORDER</span><h2>Новый заказ в зале</h2><form id="waiterOrderForm" class="menu-form"><label>Имя гостя<input name="name" value="Гость"></label><label>Телефон<input name="phone"></label><label>Комментарий<input name="comment"></label><div class="full" id="waiterItems"></div><div class="full"><button type="button" class="small-btn" id="addWaiterItem">+ Добавить позицию</button></div><div class="full"><strong>Итого: <span id="waiterTotal">0 ֏</span></strong></div><div class="full"><button class="admin-primary">Создать заказ</button></div></form>`,
+  );
+  let items = [];
+  const renderItems = () => {
+    $("#waiterItems").innerHTML =
+      items
+        .map(
+          (x, i) =>
+            `<div class="menu-form-row"><select data-item="${i}">${state.menu.map((m) => `<option value="${m.id}" ${Number(m.id) === Number(x.id) ? "selected" : ""}>${esc(m.name)} · ${money(m.price)}</option>`).join("")}</select><input data-qty="${i}" type="number" min="1" max="50" value="${x.quantity}"><button type="button" class="small-btn danger" data-remove="${i}">×</button></div>`,
+        )
+        .join("") || '<p class="admin-muted">Добавьте блюда.</p>';
+    $("#waiterTotal").textContent = money(
+      items.reduce(
+        (a, x) =>
+          a +
+          Number(
+            state.menu.find((m) => Number(m.id) === Number(x.id))?.price || 0,
+          ) *
+            x.quantity,
+        0,
+      ),
+    );
+    document.querySelectorAll("[data-item]").forEach(
+      (el) =>
+        (el.onchange = () => {
+          items[Number(el.dataset.item)].id = Number(el.value);
+          renderItems();
+        }),
+    );
+    document.querySelectorAll("[data-qty]").forEach(
+      (el) =>
+        (el.oninput = () => {
+          items[Number(el.dataset.qty)].quantity = Math.max(
+            1,
+            Math.min(50, Number(el.value) || 1),
+          );
+          renderItems();
+        }),
+    );
+    document.querySelectorAll("[data-remove]").forEach(
+      (el) =>
+        (el.onclick = () => {
+          items.splice(Number(el.dataset.remove), 1);
+          renderItems();
+        }),
+    );
+  };
+  $("#addWaiterItem").onclick = () => {
+    items.push({ id: state.menu[0]?.id || 0, quantity: 1 });
+    renderItems();
+  };
+  renderItems();
+  $("#waiterOrderForm").onsubmit = async (ev) => {
+    ev.preventDefault();
+    if (!items.length) {
+      toast("Добавьте позиции");
+      return;
+    }
+    const f = new FormData(ev.target);
+    try {
+      await api("/api/admin/orders", {
+        method: "POST",
+        body: JSON.stringify({
+          orderType: "waiter",
+          customer: {
+            name: f.get("name"),
+            phone: f.get("phone"),
+            comment: f.get("comment"),
+          },
+          items,
+        }),
+      });
+      closeModal();
+      await load();
+      toast("Заказ создан");
+    } catch (e) {
+      toast(e.message);
+    }
+  };
+}
+async function removeEmployee(id) {
+  if (!confirm("Удалить аккаунт сотрудника?")) return;
+  try {
+    await api(`/api/admin/employees/${id}`, { method: "DELETE" });
+    await load();
+    toast("Сотрудник удалён");
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function shift(id, action) {
+  try {
+    const d = await api(`/api/admin/employees/${id}/shift/${action}`, {
+      method: "POST",
+    });
+    const name = d.employee?.name || "Сотрудник";
+    toast(
+      action === "start" ? `${name}: смена открыта` : `${name}: смена закрыта`,
+    );
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+function renderHistory() {
+  const box = $("#historyList");
+  if (!box) return;
+  const year = $("#historyYear")?.value || "all";
+  const history = Array.isArray(state.history) ? state.history : [];
+  const years = [
+    ...new Set(
+      history.map((h) => String(h.month || "").slice(0, 4)).filter(Boolean),
+    ),
+  ].sort((a, b) => Number(b) - Number(a));
+  if ($("#historyYear")) {
+    const current = $("#historyYear").value || year;
+    $("#historyYear").innerHTML =
+      '<option value="all">Все годы</option>' +
+      years.map((y) => `<option value="${y}">${y}</option>`).join("");
+    $("#historyYear").value = years.includes(current) ? current : "all";
+  }
+  const filtered =
+    ($("#historyYear")?.value || "all") === "all"
+      ? history
+      : history.filter((h) =>
+          String(h.month || "").startsWith($("#historyYear").value),
+        );
+  box.innerHTML =
+    filtered
+      .map((h) => {
+        const st = h.stats || {};
+        return `<article class="history-card"><div class="history-card-head"><div><span class="admin-eyebrow">${esc(h.month || "")}</span><h3>${esc(h.month ? new Intl.DateTimeFormat(document.documentElement.lang || "ru", { month: "long", year: "numeric" }).format(new Date(h.month + "-01T12:00:00")) : h.label || "")}</h3><small>Архив создан: ${new Date(h.archivedAt).toLocaleString("ru-RU")}</small></div></div><div class="history-metrics"><div><small>Выручка</small><b>${money(st.revenue)}</b></div><div><small>Заказы</small><b>${st.orders || 0}</b></div><div><small>Брони</small><b>${st.reservations || 0}</b></div><div><small>Средний чек</small><b>${money(st.avgCheck)}</b></div></div><div class="history-card-actions"><button class="small-btn" onclick="openHistory('${esc(h.id)}')">Посмотреть данные</button><button class="small-btn danger" onclick="deleteHistory('${esc(h.id)}')">Удалить архив</button></div></article>`;
+      })
+      .join("") ||
+    '<div class="history-empty"><h3>История пока пустая</h3><p>Когда месяц закончится, нажмите «Архивировать прошлый месяц». Данные сохранятся здесь и исчезнут из текущих заказов и прошедших бронирований.</p></div>';
+}
+function openHistory(id) {
+  const h = (state.history || []).find((x) => String(x.id) === String(id));
+  if (!h) return;
+  const st = h.stats || {};
+  const orders = h.orders || [],
+    reservations = h.reservations || [];
+  openModal(
+    `<span class="admin-eyebrow">ARCHIVE · ${esc(h.month)}</span><h2>${esc(h.month ? new Intl.DateTimeFormat(document.documentElement.lang || "ru", { month: "long", year: "numeric" }).format(new Date(h.month + "-01T12:00:00")) : h.label || h.month)}</h2><div class="detail-grid"><div><small>Выручка</small><b>${money(st.revenue)}</b></div><div><small>Заказы</small><b>${orders.length}</b></div><div><small>Брони</small><b>${reservations.length}</b></div><div><small>Клиенты в архиве</small><b>${(h.customers || []).length}</b></div></div><h3>Заказы</h3><div class="history-detail-list">${orders.map((o) => `<div class="mini-row"><span><b>#${o.number}</b> · ${esc(o.customer?.name || "Гость")}</span><small>${money(o.total)} · ${window.noireFormatDateTime ? noireFormatDateTime(o.createdAt) : new Date(o.createdAt).toLocaleString()}</small></div>`).join("") || "<p>Нет заказов.</p>"}</div><h3>Бронирования</h3><div class="history-detail-list">${reservations.map((r) => `<div class="mini-row"><span><b>#${r.number}</b> · ${esc(r.name || "Гость")}</span><small>${esc(window.noireFormatDate ? noireFormatDate(r.date) : r.date)} ${esc(r.time || "")} · ${esc(statusLabel(r.status))}</small></div>`).join("") || "<p>Нет бронирований.</p>"}</div>`,
+  );
+}
+async function archivePreviousMonth() {
+  if (
+    !confirm(
+      "Перенести прошлый месяц в историю? Его заказы и прошедшие бронирования исчезнут из текущей базы и будут сохранены в архиве.",
+    )
+  )
+    return;
+  try {
+    const d = await api("/api/admin/history/archive-month", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+    state.history = d.history || [];
+    state.orders = state.orders.filter(
+      (o) => !d.archive.orders.some((a) => Number(a.id) === Number(o.id)),
+    );
+    state.reservations = state.reservations.filter(
+      (r) => !d.archive.reservations.some((a) => Number(a.id) === Number(r.id)),
+    );
+    renderAll();
+    toast(`${d.archive.label}: данные перенесены в историю`);
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function deleteHistory(id) {
+  if (
+    !confirm(
+      "Удалить этот архив? Данные текущих заказов и бронирований не изменятся.",
+    )
+  )
+    return;
+  try {
+    const d = await api(`/api/admin/history/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    });
+    state.history = d.history || [];
+    renderHistory();
+    toast("Архив удалён");
+  } catch (e) {
+    toast(e.message);
+  }
+}
+async function clearHistory() {
+  if (!confirm("Удалить ВСЮ историю архивов? Это действие нельзя отменить."))
+    return;
+  try {
+    const d = await api("/api/admin/history", { method: "DELETE" });
+    state.history = d.history || [];
+    renderHistory();
+    toast("Вся история удалена");
+  } catch (e) {
+    toast(e.message);
+  }
+}
 
-  const date = $('#scheduleDate')?.value || dateNow();
-  const employeeId = $('#scheduleEmployee')?.value || '';
-  const role = $('#scheduleRole')?.value || '';
+function renderEmployees() {
+  const box = $("#employeesGrid");
+  if (!box) return;
+  const canManage = ["owner", "director", "administrator"].includes(
+    state.staff?.role,
+  );
+  box.innerHTML =
+    (state.employees || [])
+      .map((e) => {
+        const canShift = canManage || Number(e.id) === Number(state.staff?.id);
+        return `<article class="employee-card"><div class="employee-avatar">${e.photo ? `<img src="${esc(e.photo)}" alt="${esc(e.name || "Сотрудник")}" loading="lazy">` : esc((e.name || "?")[0])}</div><div><h3>${esc(e.name)}</h3><p>@${esc(e.username)}</p><span>${esc(window.noireRoleLabel ? noireRoleLabel(e.role) : e.role)}</span></div><div class="employee-shift ${e.shiftActive ? "on" : ""}"><i></i>${e.shiftActive ? "На смене" : "Не работает"}</div><div class="employee-metrics"><div><small>День</small><b>${money(e.stats?.day?.revenue)}</b><span>${e.stats?.day?.orders || 0} заказов</span></div><div><small>Неделя</small><b>${money(e.stats?.week?.revenue)}</b><span>${e.stats?.week?.orders || 0} заказов</span></div><div><small>Месяц</small><b>${money(e.stats?.month?.revenue)}</b><span>${e.stats?.month?.orders || 0} заказов</span></div></div><small class="employee-contact">${esc(e.email || e.phone || "Контакты не указаны")}</small><div class="employee-actions">${canShift ? (e.shiftActive ? `<button class="small-btn" onclick="shift(${e.id},'stop')">Закрыть смену</button>` : `<button class="small-btn" onclick="shift(${e.id},'start')">Начать смену</button>`) : ""}${canManage ? `<button class="small-btn" onclick="openEmployee(${e.id})">Изменить</button><button class="small-btn danger" onclick="removeEmployee(${e.id})">Удалить</button>` : ""}</div></article>`;
+      })
+      .join("") || "<p>Сотрудников пока нет.</p>";
+}
+
+function shiftMonth(delta) {
+  const el = $("#scheduleDate");
+  const base = new Date((el?.value || dateNow()) + "T12:00:00");
+  base.setMonth(base.getMonth() + delta, 1);
+  if (el)
+    el.value = `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}-01`;
+  renderSchedule();
+}
+function shiftToday() {
+  const el = $("#scheduleDate");
+  if (el) el.value = dateNow();
+  renderSchedule();
+}
+function renderSchedule() {
+  const box = $("#scheduleCalendar");
+  if (!box) return;
+
+  const date = $("#scheduleDate")?.value || dateNow();
+  const employeeId = $("#scheduleEmployee")?.value || "";
+  const role = $("#scheduleRole")?.value || "";
 
   const employees = state.scheduleEmployees || state.employees || [];
 
-  const filtered = (state.shifts || []).filter(x => {
-  if(x.date !== date) return false;
+  const filtered = (state.shifts || []).filter((x) => {
+    if (x.date !== date) return false;
 
-  if(
-    employeeId &&
-    employeeId !== 'all' &&
-    String(x.employeeId) !== String(employeeId)
-  ){
-    return false;
-  }
-
-  if(role && role !== 'all'){
-    const employee = employees.find(
-      e => String(e.id) === String(x.employeeId)
-    );
-
-    if(String(employee?.role || '') !== String(role)){
+    if (
+      employeeId &&
+      employeeId !== "all" &&
+      String(x.employeeId) !== String(employeeId)
+    ) {
       return false;
     }
-  }
 
-  return true;
-});
+    if (role && role !== "all") {
+      const employee = employees.find(
+        (e) => String(e.id) === String(x.employeeId),
+      );
 
+      if (String(employee?.role || "") !== String(role)) {
+        return false;
+      }
+    }
 
+    return true;
+  });
 
-  const canManage = [
-    'owner',
-    'director',
-    'administrator',
-    'manager'
-  ].includes(state.staff?.role);
+  const canManage = ["owner", "director", "administrator", "manager"].includes(
+    state.staff?.role,
+  );
 
-  if(!filtered.length){
+  if (!filtered.length) {
     box.innerHTML = `
       <div class="empty-state">
         На выбранную дату смен нет.
@@ -261,12 +1384,13 @@ function renderSchedule(){
     return;
   }
 
-  box.innerHTML = filtered.map(x => {
-    const employee = employees.find(
-      e => String(e.id) === String(x.employeeId)
-    );
+  box.innerHTML = filtered
+    .map((x) => {
+      const employee = employees.find(
+        (e) => String(e.id) === String(x.employeeId),
+      );
 
-    return `
+      return `
       <div class="schedule-mini">
         <label class="schedule-shift-select">
           <input
@@ -276,12 +1400,12 @@ function renderSchedule(){
             onclick="event.stopPropagation();updateShiftSelection()"
           >
           <span>
-            ${esc(employee?.name || 'Сотрудник')}
+            ${esc(employee?.name || "Сотрудник")}
           </span>
         </label>
 
         <small>
-          ${esc(x.start || '')}–${esc(x.end || '')}
+          ${esc(x.start || "")}–${esc(x.end || "")}
         </small>
 
         ${
@@ -296,134 +1420,126 @@ function renderSchedule(){
                 ✎
               </button>
             `
-            : ''
+            : ""
         }
       </div>
     `;
-  }).join('');
+    })
+    .join("");
 
   updateShiftSelection();
 }
-function getSelectedShiftIds(){
-  return Array.from(
-    document.querySelectorAll('.schedule-select:checked')
-  )
-    .map(input => Number(input.value))
+function getSelectedShiftIds() {
+  return Array.from(document.querySelectorAll(".schedule-select:checked"))
+    .map((input) => Number(input.value))
     .filter(Number.isFinite);
 }
-function updateShiftSelection(){
+function updateShiftSelection() {
   const ids = getSelectedShiftIds();
 
-  const count = $('#selectedShiftsCount');
+  const count = $("#selectedShiftsCount");
 
-  if(count){
+  if (count) {
     count.textContent = `Выбрано: ${ids.length}`;
   }
 
-  const selectedButton = $('#deleteSelectedShifts');
+  const selectedButton = $("#deleteSelectedShifts");
 
-  if(selectedButton){
+  if (selectedButton) {
     selectedButton.disabled = ids.length === 0;
   }
 
-  document
-    .querySelectorAll('.schedule-mini')
-    .forEach(card => {
-      const checkbox = card.querySelector('.schedule-select');
+  document.querySelectorAll(".schedule-mini").forEach((card) => {
+    const checkbox = card.querySelector(".schedule-select");
 
-      card.classList.toggle(
-        'is-selected',
-        Boolean(checkbox?.checked)
-      );
-    });
+    card.classList.toggle("is-selected", Boolean(checkbox?.checked));
+  });
 }
-async function deleteSelectedShifts(){
+async function deleteSelectedShifts() {
   const ids = getSelectedShiftIds();
 
-  if(!ids.length){
-    toast('Выберите хотя бы одну смену');
+  if (!ids.length) {
+    toast("Выберите хотя бы одну смену");
     return;
   }
 
-  if(!confirm(`Удалить выбранные смены (${ids.length})?`)){
+  if (!confirm(`Удалить выбранные смены (${ids.length})?`)) {
     return;
   }
 
-  try{
+  try {
     await Promise.all(
-      ids.map(id =>
+      ids.map((id) =>
         api(`/api/admin/shifts/${id}`, {
-          method: 'DELETE'
-        })
-      )
+          method: "DELETE",
+        }),
+      ),
     );
 
     state.shifts = (state.shifts || []).filter(
-      shift => !ids.includes(Number(shift.id))
+      (shift) => !ids.includes(Number(shift.id)),
     );
 
     renderSchedule();
     toast(`Удалено смен: ${ids.length}`);
-  }catch(e){
+  } catch (e) {
     toast(e.message);
   }
 }
-async function deleteAllShifts(){
+async function deleteAllShifts() {
   const shifts = state.shifts || [];
 
-  if(!shifts.length){
-    toast('Смен для удаления нет');
+  if (!shifts.length) {
+    toast("Смен для удаления нет");
     return;
   }
 
-  if(!confirm(
-    `Удалить ВСЕ смены (${shifts.length})? Это действие нельзя отменить.`
-  )){
+  if (
+    !confirm(
+      `Удалить ВСЕ смены (${shifts.length})? Это действие нельзя отменить.`,
+    )
+  ) {
     return;
   }
 
-  try{
+  try {
     await Promise.all(
-      shifts.map(shift =>
+      shifts.map((shift) =>
         api(`/api/admin/shifts/${shift.id}`, {
-          method: 'DELETE'
-        })
-      )
+          method: "DELETE",
+        }),
+      ),
     );
 
     state.shifts = [];
 
     renderSchedule();
     toast(`Удалено смен: ${shifts.length}`);
-  }catch(e){
+  } catch (e) {
     toast(e.message);
   }
 }
 function openSchedule(id = null) {
-    const existing = id
-        ? (state.shifts || []).find(x => Number(x.id) === Number(id))
-        : null;
+  const existing = id
+    ? (state.shifts || []).find((x) => Number(x.id) === Number(id))
+    : null;
 
-    const date =
-        existing?.date ||
-        $('#scheduleDate')?.value ||
-        dateNow();
+  const date = existing?.date || $("#scheduleDate")?.value || dateNow();
 
-    const people =
-        state.scheduleEmployees?.length
-            ? state.scheduleEmployees
-            : state.employees;
+  const people = state.scheduleEmployees?.length
+    ? state.scheduleEmployees
+    : state.employees;
 
-    if (!people || !people.length) {
-        toast('Нет доступных сотрудников для создания смены');
-        return;
-    }
+  if (!people || !people.length) {
+    toast("Нет доступных сотрудников для создания смены");
+    return;
+  }
 
-    openModal(`
+  openModal(`
         <span class="admin-eyebrow">SHIFT SCHEDULE</span>
 
         <h2>
-            ${existing ? 'Редактировать' : 'Добавить'}
+            ${existing ? "Редактировать" : "Добавить"}
             плановую смену
         </h2>
 
@@ -447,25 +1563,28 @@ function openSchedule(id = null) {
                     name="employeeId"
                     required
                 >
-                    ${people.map(e => `
+                    ${people
+                      .map(
+                        (e) => `
                         <option
                             value="${e.id}"
                             ${
-                                Number(e.id) ===
-                                Number(existing?.employeeId)
-                                    ? 'selected'
-                                    : ''
+                              Number(e.id) === Number(existing?.employeeId)
+                                ? "selected"
+                                : ""
                             }
                         >
                             ${esc(e.name)}
                             ·
                             ${esc(
-                                window.noireRoleLabel
-                                    ? noireRoleLabel(e.role)
-                                    : e.role
+                              window.noireRoleLabel
+                                ? noireRoleLabel(e.role)
+                                : e.role,
                             )}
                         </option>
-                    `).join('')}
+                    `,
+                      )
+                      .join("")}
                 </select>
             </label>
 
@@ -477,7 +1596,7 @@ function openSchedule(id = null) {
                     data-noire-time
                     inputmode="numeric"
                     placeholder="10:00"
-                    value="${esc(existing?.start || '10:00')}"
+                    value="${esc(existing?.start || "10:00")}"
                     required
                 >
             </label>
@@ -490,7 +1609,7 @@ function openSchedule(id = null) {
                     data-noire-time
                     inputmode="numeric"
                     placeholder="18:00"
-                    value="${esc(existing?.end || '18:00')}"
+                    value="${esc(existing?.end || "18:00")}"
                     required
                 >
             </label>
@@ -502,10 +1621,9 @@ function openSchedule(id = null) {
                     <option
                         value="planned"
                         ${
-                            !existing ||
-                            existing.status === 'planned'
-                                ? 'selected'
-                                : ''
+                          !existing || existing.status === "planned"
+                            ? "selected"
+                            : ""
                         }
                     >
                         Запланирована
@@ -513,11 +1631,7 @@ function openSchedule(id = null) {
 
                     <option
                         value="cancelled"
-                        ${
-                            existing?.status === 'cancelled'
-                                ? 'selected'
-                                : ''
-                        }
+                        ${existing?.status === "cancelled" ? "selected" : ""}
                     >
                         Отменена
                     </option>
@@ -530,206 +1644,396 @@ function openSchedule(id = null) {
                     class="admin-primary"
                     id="scheduleSubmitBtn"
                 >
-                    ${existing ? 'Сохранить изменения' : 'Сохранить'}
+                    ${existing ? "Сохранить изменения" : "Сохранить"}
                 </button>
             </div>
 
         </form>
     `);
 
-    const form = $('#scheduleForm');
+  const form = $("#scheduleForm");
 
-    if (!form) return;
+  if (!form) return;
 
-    window.noireInitTimeInputs?.(form);
+  window.noireInitTimeInputs?.(form);
 
-    form.onsubmit = async function (ev) {
-        ev.preventDefault();
+  form.onsubmit = async function (ev) {
+    ev.preventDefault();
 
-        const submitButton =
-            form.querySelector('button[type="submit"]');
+    const submitButton = form.querySelector('button[type="submit"]');
 
-        if (submitButton?.disabled) return;
+    if (submitButton?.disabled) return;
 
-        try {
-            /*
-             * Нормализуем время.
-             */
-            form
-                .querySelectorAll('input[data-noire-time]')
-                .forEach(input => {
-                    if (window.noireNormalizeTime) {
-                        input.value =
-                            noireNormalizeTime(input.value) ||
-                            input.value;
-                    }
-                });
-
-            const formData =
-                Object.fromEntries(new FormData(form));
-
-            const employeeId =
-                Number(formData.employeeId);
-
-            const date =
-                String(formData.date || '').trim();
-
-            const start =
-                String(formData.start || '').trim();
-
-            const end =
-                String(formData.end || '').trim();
-
-            /*
-             * Frontend validation.
-             */
-            if (!employeeId) {
-                throw new Error(
-                    'Выберите сотрудника'
-                );
-            }
-
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-                throw new Error(
-                    'Укажите корректную дату'
-                );
-            }
-
-            if (!/^\d{2}:\d{2}$/.test(start)) {
-                throw new Error(
-                    'Укажите время начала в формате ЧЧ:ММ'
-                );
-            }
-
-            if (!/^\d{2}:\d{2}$/.test(end)) {
-                throw new Error(
-                    'Укажите время окончания в формате ЧЧ:ММ'
-                );
-            }
-
-            const startMinutes =
-                Number(start.slice(0, 2)) * 60 +
-                Number(start.slice(3, 5));
-
-            const endMinutes =
-                Number(end.slice(0, 2)) * 60 +
-                Number(end.slice(3, 5));
-
-            if (
-                startMinutes < 0 ||
-                startMinutes > 1439 ||
-                endMinutes < 0 ||
-                endMinutes > 1439
-            ) {
-                throw new Error(
-                    'Укажите корректное время'
-                );
-            }
-
-            if (startMinutes >= endMinutes) {
-                throw new Error(
-                    'Время окончания должно быть позже начала'
-                );
-            }
-
-            /*
-             * Блокируем кнопку,
-             * чтобы нельзя было создать две смены
-             * двойным нажатием.
-             */
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.textContent =
-                    existing
-                        ? 'Сохраняю...'
-                        : 'Добавляю...';
-            }
-
-            /*
-             * Используем существующий API.
-             */
-            const response = await api(
-                id
-                    ? `/api/admin/shifts/${id}`
-                    : '/api/admin/shifts',
-                {
-                    method: id ? 'PATCH' : 'POST',
-
-                    body: JSON.stringify({
-                        employeeId,
-                        date,
-                        start,
-                        end,
-                        status:
-                            formData.status || 'planned'
-                    })
-                }
-            );
-
-            if (!response?.success) {
-                throw new Error(
-                    response?.message ||
-                    'Не удалось сохранить смену'
-                );
-            }
-
-            /*
-             * Закрываем модальное окно только
-             * после успешного ответа сервера.
-             */
-            closeModal();
-
-            /*
-             * Загружаем свежие данные из backend,
-             * чтобы смена появилась сразу.
-             */
-            const schedule =
-                await api('/api/admin/shifts');
-
-            state.shifts =
-                schedule.shifts || [];
-
-            state.scheduleEmployees =
-                schedule.employees ||
-                state.scheduleEmployees;
-
-            renderSchedule();
-
-            toast(
-                id
-                    ? 'Смена успешно обновлена'
-                    : 'Смена успешно добавлена'
-            );
-
-        } catch (error) {
-
-            console.error(
-                'NOIRE schedule error:',
-                error
-            );
-
-            if (submitButton) {
-                submitButton.disabled = false;
-
-                submitButton.textContent =
-                    existing
-                        ? 'Сохранить изменения'
-                        : 'Сохранить';
-            }
-
-            toast(
-                error?.message ||
-                'Не удалось сохранить смену'
-            );
+    try {
+      /*
+       * Нормализуем время.
+       */
+      form.querySelectorAll("input[data-noire-time]").forEach((input) => {
+        if (window.noireNormalizeTime) {
+          input.value = noireNormalizeTime(input.value) || input.value;
         }
-    };
+      });
+
+      const formData = Object.fromEntries(new FormData(form));
+
+      const employeeId = Number(formData.employeeId);
+
+      const date = String(formData.date || "").trim();
+
+      const start = String(formData.start || "").trim();
+
+      const end = String(formData.end || "").trim();
+
+      /*
+       * Frontend validation.
+       */
+      if (!employeeId) {
+        throw new Error("Выберите сотрудника");
+      }
+
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        throw new Error("Укажите корректную дату");
+      }
+
+      if (!/^\d{2}:\d{2}$/.test(start)) {
+        throw new Error("Укажите время начала в формате ЧЧ:ММ");
+      }
+
+      if (!/^\d{2}:\d{2}$/.test(end)) {
+        throw new Error("Укажите время окончания в формате ЧЧ:ММ");
+      }
+
+      const startMinutes =
+        Number(start.slice(0, 2)) * 60 + Number(start.slice(3, 5));
+
+      const endMinutes = Number(end.slice(0, 2)) * 60 + Number(end.slice(3, 5));
+
+      if (
+        startMinutes < 0 ||
+        startMinutes > 1439 ||
+        endMinutes < 0 ||
+        endMinutes > 1439
+      ) {
+        throw new Error("Укажите корректное время");
+      }
+
+      if (startMinutes >= endMinutes) {
+        throw new Error("Время окончания должно быть позже начала");
+      }
+
+      /*
+       * Блокируем кнопку,
+       * чтобы нельзя было создать две смены
+       * двойным нажатием.
+       */
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = existing ? "Сохраняю..." : "Добавляю...";
+      }
+
+      /*
+       * Используем существующий API.
+       */
+      const response = await api(
+        id ? `/api/admin/shifts/${id}` : "/api/admin/shifts",
+        {
+          method: id ? "PATCH" : "POST",
+
+          body: JSON.stringify({
+            employeeId,
+            date,
+            start,
+            end,
+            status: formData.status || "planned",
+          }),
+        },
+      );
+
+      if (!response?.success) {
+        throw new Error(response?.message || "Не удалось сохранить смену");
+      }
+
+      /*
+       * Закрываем модальное окно только
+       * после успешного ответа сервера.
+       */
+      closeModal();
+
+      /*
+       * Загружаем свежие данные из backend,
+       * чтобы смена появилась сразу.
+       */
+      const schedule = await api("/api/admin/shifts");
+
+      state.shifts = schedule.shifts || [];
+
+      state.scheduleEmployees = schedule.employees || state.scheduleEmployees;
+
+      renderSchedule();
+
+      toast(id ? "Смена успешно обновлена" : "Смена успешно добавлена");
+    } catch (error) {
+      console.error("NOIRE schedule error:", error);
+
+      if (submitButton) {
+        submitButton.disabled = false;
+
+        submitButton.textContent = existing
+          ? "Сохранить изменения"
+          : "Сохранить";
+      }
+
+      toast(error?.message || "Не удалось сохранить смену");
+    }
+  };
 }
-async function deleteSchedule(id){if(!confirm('Отменить/удалить плановую смену?'))return;try{await api(`/api/admin/shifts/${id}`,{method:'DELETE'});state.shifts=(state.shifts||[]).filter(x=>Number(x.id)!==Number(id));renderSchedule();toast('Смена удалена')}catch(e){toast(e.message)}}
+async function deleteSchedule(id) {
+  if (!confirm("Отменить/удалить плановую смену?")) return;
+  try {
+    await api(`/api/admin/shifts/${id}`, { method: "DELETE" });
+    state.shifts = (state.shifts || []).filter(
+      (x) => Number(x.id) !== Number(id),
+    );
+    renderSchedule();
+    toast("Смена удалена");
+  } catch (e) {
+    toast(e.message);
+  }
+}
 
-function applyRole(){const allowed=state.permissions||[];document.querySelectorAll('#adminNav button').forEach(b=>{const v=b.dataset.view;const map={dashboard:'dashboard',menu:'menu',orders:'orders',bookings:'bookings',tables:'orders',gallery:'menu',analytics:'analytics',customers:'customers',history:'history',employees:'employees',schedule:'schedule',settings:'settings',ai:'ai'};b.hidden=!(allowed.includes('all')||allowed.includes(map[v]));});const canManage=['owner','director','administrator'].includes(state.staff?.role);if($('#addEmployeeBtn'))$('#addEmployeeBtn').hidden=!canManage;if($('#settingsForm'))$('#settingsForm').querySelectorAll('input,button').forEach(x=>x.disabled=!(allowed.includes('all')||allowed.includes('settings')))}
+function applyRole() {
+  const allowed = state.permissions || [];
+  document.querySelectorAll("#adminNav button").forEach((b) => {
+    const v = b.dataset.view;
+    const map = {
+      dashboard: "dashboard",
+      menu: "menu",
+      orders: "orders",
+      bookings: "bookings",
+      tables: "orders",
+      gallery: "menu",
+      analytics: "analytics",
+      customers: "customers",
+      history: "history",
+      employees: "employees",
+      schedule: "schedule",
+      settings: "settings",
+      ai: "ai",
+    };
+    b.hidden = !(allowed.includes("all") || allowed.includes(map[v]));
+  });
+  const canManage = ["owner", "director", "administrator"].includes(
+    state.staff?.role,
+  );
+  if ($("#addEmployeeBtn")) $("#addEmployeeBtn").hidden = !canManage;
+  if ($("#settingsForm"))
+    $("#settingsForm")
+      .querySelectorAll("input,button")
+      .forEach(
+        (x) =>
+          (x.disabled = !(
+            allowed.includes("all") || allowed.includes("settings")
+          )),
+      );
+}
 
-function initAdminPasswordToggle(){document.querySelectorAll('.password-toggle').forEach(btn=>{if(btn.dataset.ready)return;btn.dataset.ready='1';btn.addEventListener('click',()=>{const input=btn.parentElement.querySelector('input');if(!input)return;const show=input.type==='password';input.type=show?'text':'password';btn.setAttribute('aria-label',show?'Скрыть пароль':'Показать пароль');btn.setAttribute('aria-pressed',String(show));btn.innerHTML=show?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 9.5 7 9.5 7a18 18 0 0 1-3.1 3.7"/><path d="M6.2 6.2C3.9 7.9 2.5 12 2.5 12S6 19 12 19a10.5 10.5 0 0 0 4.1-.8"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/><circle cx="12" cy="12" r="2.5"/></svg>';});});}
-function nav(){document.querySelectorAll('#adminNav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#adminNav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');const v=b.dataset.view;document.querySelectorAll('.admin-view').forEach(s=>s.classList.toggle('active',s.dataset.section===v));$('#viewTitle').textContent=b.textContent;$('#viewSubtitle').textContent={dashboard:'Всё важное о NOIRÉ — на одном экране.',menu:'Контроль позиций, цен и фотографий.',orders:'Заказы гостей и ответственные сотрудники.',bookings:'Брони, гости, столики, контакты и связанные заказы.',tables:'Свободные, занятые и забронированные столы.',gallery:'Только пространство NOIRÉ.',analytics:'Выручка, динамика, топ-позиции и категории.',history:'Архив закрытых месяцев и прошлых лет.',employees:'Смены, роли, личная выручка и рабочие показатели.',schedule:'Плановый календарь смен сотрудников.',customers:'Зарегистрированные клиенты, их заказы и бронирования.',settings:'Название и фирменные настройки сайта.',ai:'Живой помощник по данным и задачам NOIRÉ.'}[v]||''})}
-async function askAI(q){const box=$('#adminAiMessages');box.innerHTML+=`<div class="ai-msg user">${esc(q)}</div>`;try{const d=await api('/api/admin/ai',{method:'POST',body:JSON.stringify({message:q,language:document.documentElement.lang||'ru'})});box.innerHTML+=`<div class="ai-msg"><b>NOIRÉ AI</b><br>${esc(d.answer)}</div>`;box.scrollTop=box.scrollHeight}catch(e){box.innerHTML+=`<div class="ai-msg">Не удалось выполнить запрос: ${esc(e.message)}</div>`}}
-document.addEventListener('DOMContentLoaded',()=>{nav();initAdminPasswordToggle();$('#loginForm').onsubmit=login;$('#logoutBtn').onclick=async()=>{try{await api('/api/admin/logout',{method:'POST'})}catch{}token=null;showLogin()};$('#modalClose').onclick=closeModal;$('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()};$('#addMenuBtn').onclick=()=>openMenu();$('#addGalleryBtn').onclick=openGallery;$('#addEmployeeBtn')?.addEventListener('click',()=>openEmployee());$('#addWaiterOrderBtn')?.addEventListener('click',openWaiterOrder);$('#addDeliveryOrderBtn')?.addEventListener('click',openDeliveryOrder);$('#addScheduleBtn')?.addEventListener('click',openSchedule);$('#addBookingBtn')?.addEventListener('click',openNewBooking);$('#settingsForm')?.addEventListener('submit',async e=>{e.preventDefault();try{const d=await api('/api/admin/settings',{method:'PATCH',body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});state.settings=d.settings;toast('Настройки сохранены')}catch(err){toast(err.message)}});$('#orderSearch').oninput=renderOrders;$('#bookingSearch').oninput=renderBookings;$('#adminAiForm').onsubmit=e=>{e.preventDefault();const q=$('#adminAiInput').value.trim();if(q){$('#adminAiInput').value='';askAI(q)}};document.querySelectorAll('[data-ai]').forEach(b=>b.onclick=()=>askAI(b.dataset.ai));document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>document.querySelector('#adminNav [data-view="'+b.dataset.go+'"]')?.click());$('#tableDate')?.addEventListener('change',loadTables);$('#tableTime')?.addEventListener('change',loadTables);$('#archivePrevMonthBtn')?.addEventListener('click',archivePreviousMonth);$('#deleteHistoryBtn')?.addEventListener('click',clearHistory);$('#deleteSelectedCustomers')?.addEventListener('click',deleteSelectedCustomers);$('#deleteAllCustomers')?.addEventListener('click',deleteAllCustomers);$('#historyYear')?.addEventListener('change',renderHistory);$('#scheduleDate')?.addEventListener('change',renderSchedule);$('#schedulePrevMonth')?.addEventListener('click',()=>shiftMonth(-1));$('#scheduleTodayMonth')?.addEventListener('click',shiftToday);$('#scheduleNextMonth')?.addEventListener('click',()=>shiftMonth(1));$('#scheduleEmployee')?.addEventListener('change',renderSchedule);$('#scheduleRole')?.addEventListener('change',renderSchedule);setInterval(()=>{if($('#clock'))$('#clock').textContent=new Intl.DateTimeFormat(document.documentElement.lang||'ru',{timeZone:businessTimezone,weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date())},1000);load().then(()=>showApp()).catch(()=>showLogin())});
-window.openOrder=openOrder;window.openCustomer=openCustomer;window.openMenu=openMenu;window.deleteMenu=deleteMenu;window.deleteGallery=deleteGallery;window.updateOrder=updateOrder;window.assignOrder=assignOrder;window.updateBooking=updateBooking;window.openBooking=openBooking;window.linkBookingOrder=linkBookingOrder;window.openTable=openTable;window.setTableStatus=setTableStatus;window.openEmployee=openEmployee;window.openWaiterOrder=openWaiterOrder;window.openDeliveryOrder=openDeliveryOrder;window.claimOrder=claimOrder;window.completeMyOrder=completeMyOrder;window.cancelMyOrder=cancelMyOrder;window.openSchedule=openSchedule;window.deleteSchedule=deleteSchedule;window.removeEmployee=removeEmployee;window.shift=shift;window.openHistory=openHistory;window.deleteHistory=deleteHistory;window.clearHistory=clearHistory;window.deleteCustomer=deleteCustomer;window.updateCustomerSelection=updateCustomerSelection;window.deleteSelectedCustomers=deleteSelectedCustomers;window.deleteAllCustomers=deleteAllCustomers;
+function initAdminPasswordToggle() {
+  document.querySelectorAll(".password-toggle").forEach((btn) => {
+    if (btn.dataset.ready) return;
+    btn.dataset.ready = "1";
+    btn.addEventListener("click", () => {
+      const input = btn.parentElement.querySelector("input");
+      if (!input) return;
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      btn.setAttribute(
+        "aria-label",
+        show ? "Скрыть пароль" : "Показать пароль",
+      );
+      btn.setAttribute("aria-pressed", String(show));
+      btn.innerHTML = show
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 9.5 7 9.5 7a18 18 0 0 1-3.1 3.7"/><path d="M6.2 6.2C3.9 7.9 2.5 12 2.5 12S6 19 12 19a10.5 10.5 0 0 0 4.1-.8"/></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/><circle cx="12" cy="12" r="2.5"/></svg>';
+    });
+  });
+}
+function nav() {
+  document.querySelectorAll("#adminNav button").forEach(
+    (b) =>
+      (b.onclick = () => {
+        document
+          .querySelectorAll("#adminNav button")
+          .forEach((x) => x.classList.remove("active"));
+        b.classList.add("active");
+        const v = b.dataset.view;
+        document
+          .querySelectorAll(".admin-view")
+          .forEach((s) =>
+            s.classList.toggle("active", s.dataset.section === v),
+          );
+        $("#viewTitle").textContent = b.textContent;
+        $("#viewSubtitle").textContent =
+          {
+            dashboard: "Всё важное о NOIRÉ — на одном экране.",
+            menu: "Контроль позиций, цен и фотографий.",
+            orders: "Заказы гостей и ответственные сотрудники.",
+            bookings: "Брони, гости, столики, контакты и связанные заказы.",
+            tables: "Свободные, занятые и забронированные столы.",
+            gallery: "Только пространство NOIRÉ.",
+            analytics: "Выручка, динамика, топ-позиции и категории.",
+            history: "Архив закрытых месяцев и прошлых лет.",
+            employees: "Смены, роли, личная выручка и рабочие показатели.",
+            schedule: "Плановый календарь смен сотрудников.",
+            customers: "Зарегистрированные клиенты, их заказы и бронирования.",
+            settings: "Название и фирменные настройки сайта.",
+            ai: "Живой помощник по данным и задачам NOIRÉ.",
+          }[v] || "";
+      }),
+  );
+}
+async function askAI(q) {
+  const box = $("#adminAiMessages");
+  box.innerHTML += `<div class="ai-msg user">${esc(q)}</div>`;
+  try {
+    const d = await api("/api/admin/ai", {
+      method: "POST",
+      body: JSON.stringify({
+        message: q,
+        language: document.documentElement.lang || "ru",
+      }),
+    });
+    box.innerHTML += `<div class="ai-msg"><b>NOIRÉ AI</b><br>${esc(d.answer)}</div>`;
+    box.scrollTop = box.scrollHeight;
+  } catch (e) {
+    box.innerHTML += `<div class="ai-msg">Не удалось выполнить запрос: ${esc(e.message)}</div>`;
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  nav();
+  initAdminPasswordToggle();
+  $("#loginForm").onsubmit = login;
+  $("#logoutBtn").onclick = async () => {
+    try {
+      await api("/api/admin/logout", { method: "POST" });
+    } catch {}
+    token = null;
+    showLogin();
+  };
+  $("#modalClose").onclick = closeModal;
+  $("#modal").onclick = (e) => {
+    if (e.target.id === "modal") closeModal();
+  };
+  $("#addMenuBtn").onclick = () => openMenu();
+  $("#addGalleryBtn").onclick = openGallery;
+  $("#addEmployeeBtn")?.addEventListener("click", () => openEmployee());
+  $("#addWaiterOrderBtn")?.addEventListener("click", openWaiterOrder);
+  $("#addDeliveryOrderBtn")?.addEventListener("click", openDeliveryOrder);
+  $("#addScheduleBtn")?.addEventListener("click", openSchedule);
+  $("#addBookingBtn")?.addEventListener("click", openNewBooking);
+  $('#deleteSelectedCustomers')?.addEventListener(
+    'click',
+    deleteSelectedCustomers
+);
+
+$('#deleteAllCustomers')?.addEventListener(
+    'click',
+    deleteAllCustomers
+);
+  $("#settingsForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      const d = await api("/api/admin/settings", {
+        method: "PATCH",
+        body: JSON.stringify(Object.fromEntries(new FormData(e.target))),
+      });
+      state.settings = d.settings;
+      toast("Настройки сохранены");
+    } catch (err) {
+      toast(err.message);
+    }
+  });
+  $("#orderSearch").oninput = renderOrders;
+  $("#bookingSearch").oninput = renderBookings;
+  $("#adminAiForm").onsubmit = (e) => {
+    e.preventDefault();
+    const q = $("#adminAiInput").value.trim();
+    if (q) {
+      $("#adminAiInput").value = "";
+      askAI(q);
+    }
+  };
+  document
+    .querySelectorAll("[data-ai]")
+    .forEach((b) => (b.onclick = () => askAI(b.dataset.ai)));
+  document
+    .querySelectorAll("[data-go]")
+    .forEach(
+      (b) =>
+        (b.onclick = () =>
+          document
+            .querySelector('#adminNav [data-view="' + b.dataset.go + '"]')
+            ?.click()),
+    );
+  $("#tableDate")?.addEventListener("change", loadTables);
+  $("#tableTime")?.addEventListener("change", loadTables);
+  $("#archivePrevMonthBtn")?.addEventListener("click", archivePreviousMonth);
+  $("#deleteHistoryBtn")?.addEventListener("click", clearHistory);
+  $("#deleteSelectedCustomers")?.addEventListener(
+    "click",
+    deleteSelectedCustomers,
+  );
+  $("#deleteAllCustomers")?.addEventListener("click", deleteAllCustomers);
+  $("#historyYear")?.addEventListener("change", renderHistory);
+  $("#scheduleDate")?.addEventListener("change", renderSchedule);
+  $("#schedulePrevMonth")?.addEventListener("click", () => shiftMonth(-1));
+  $("#scheduleTodayMonth")?.addEventListener("click", shiftToday);
+  $("#scheduleNextMonth")?.addEventListener("click", () => shiftMonth(1));
+  $("#scheduleEmployee")?.addEventListener("change", renderSchedule);
+  $("#scheduleRole")?.addEventListener("change", renderSchedule);
+  setInterval(() => {
+    if ($("#clock"))
+      $("#clock").textContent = new Intl.DateTimeFormat(
+        document.documentElement.lang || "ru",
+        {
+          timeZone: businessTimezone,
+          weekday: "short",
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        },
+      ).format(new Date());
+  }, 1000);
+  load()
+    .then(() => showApp())
+    .catch(() => showLogin());
+});
+window.openOrder = openOrder;
+window.openCustomer = openCustomer;
+window.openMenu = openMenu;
+window.deleteMenu = deleteMenu;
+window.deleteGallery = deleteGallery;
+window.updateOrder = updateOrder;
+window.assignOrder = assignOrder;
+window.updateBooking = updateBooking;
+window.openBooking = openBooking;
+window.linkBookingOrder = linkBookingOrder;
+window.openTable = openTable;
+window.setTableStatus = setTableStatus;
+window.openEmployee = openEmployee;
+window.openWaiterOrder = openWaiterOrder;
+window.openDeliveryOrder = openDeliveryOrder;
+window.claimOrder = claimOrder;
+window.completeMyOrder = completeMyOrder;
+window.cancelMyOrder = cancelMyOrder;
+window.openSchedule = openSchedule;
+window.deleteSchedule = deleteSchedule;
+window.removeEmployee = removeEmployee;
+window.shift = shift;
+window.openHistory = openHistory;
+window.deleteHistory = deleteHistory;
+window.clearHistory = clearHistory;
+window.deleteCustomer = deleteCustomer;
+window.updateCustomerSelection = updateCustomerSelection;
+window.deleteSelectedCustomers = deleteSelectedCustomers;
+window.deleteAllCustomers = deleteAllCustomers;
