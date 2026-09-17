@@ -328,21 +328,93 @@ function saveAuditLogs(value) { auditLogs = value; return save('audit_logs', val
 
 
 async function claimIdempotent(scope, key) {
-  if (!key) return {claimed:true};
-  const k=`${scope}:${key}`;
+  if (!key) return { claimed: true };
+
+  const k = `${scope}:${key}`;
+
   if (localMode || !process.env.DATABASE_URL) {
-    const now=Date.now(), row=localIdempotency.get(k);
-    if(!row || row.createdAt<now-24*60*60*1000){ localIdempotency.set(k,{response:{pending:true},createdAt:now}); return {claimed:true}; }
-    if(row.response?.pending===true && row.createdAt<now-5*60*1000){ localIdempotency.set(k,{response:{pending:true},createdAt:now}); return {claimed:true}; }
-    return {claimed:false,response:row.response||null};
+    const now = Date.now();
+    const row = localIdempotency.get(k);
+
+    if (!row || row.createdAt < now - 24 * 60 * 60 * 1000) {
+      localIdempotency.set(k, {
+        response: { pending: true },
+        createdAt: now,
+      });
+
+      return { claimed: true };
+    }
+
+    if (
+      row.response?.pending === true &&
+      row.createdAt < now - 5 * 60 * 1000
+    ) {
+      localIdempotency.set(k, {
+        response: { pending: true },
+        createdAt: now,
+      });
+
+      return { claimed: true };
+    }
+
+    return {
+      claimed: false,
+      response: row.response || null,
+    };
   }
+
   const sql = neon(process.env.DATABASE_URL);
-  const inserted = await sql`INSERT INTO noire_idempotency(scope,idempotency_key,response) VALUES(${String(scope)},${String(key)},{"pending":true}::jsonb) ON CONFLICT (scope,idempotency_key) DO NOTHING RETURNING response`;
-  if (inserted.length) return {claimed:true};
-  const rows = await sql`SELECT response,created_at FROM noire_idempotency WHERE scope=${String(scope)} AND idempotency_key=${String(key)}`;
-  const row=rows[0];
-  if(row && row.response && row.response.pending===true && new Date(row.created_at).getTime() < Date.now()-5*60*1000){ await sql`DELETE FROM noire_idempotency WHERE scope=${String(scope)} AND idempotency_key=${String(key)}`; return claimIdempotent(scope,key); }
-  return {claimed:false,response:row?.response||null};
+
+  const pendingResponse = JSON.stringify({ pending: true });
+
+  const inserted = await sql`
+    INSERT INTO noire_idempotency (
+      scope,
+      idempotency_key,
+      response
+    )
+    VALUES (
+      ${String(scope)},
+      ${String(key)},
+      ${pendingResponse}::jsonb
+    )
+    ON CONFLICT (scope, idempotency_key)
+    DO NOTHING
+    RETURNING response
+  `;
+
+  if (inserted.length) {
+    return { claimed: true };
+  }
+
+  const rows = await sql`
+    SELECT response, created_at
+    FROM noire_idempotency
+    WHERE scope = ${String(scope)}
+      AND idempotency_key = ${String(key)}
+  `;
+
+  const row = rows[0];
+
+  if (
+    row &&
+    row.response &&
+    row.response.pending === true &&
+    new Date(row.created_at).getTime() < Date.now() - 5 * 60 * 1000
+  ) {
+    await sql`
+      DELETE FROM noire_idempotency
+      WHERE scope = ${String(scope)}
+        AND idempotency_key = ${String(key)}
+    `;
+
+    return claimIdempotent(scope, key);
+  }
+
+  return {
+    claimed: false,
+    response: row?.response || null,
+  };
 }
 async function clearIdempotent(scope, key) {
     if (!key) return;
