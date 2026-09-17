@@ -1928,7 +1928,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#addEmployeeBtn")?.addEventListener("click", () => openEmployee());
   $("#addWaiterOrderBtn")?.addEventListener("click", openWaiterOrder);
   $("#addDeliveryOrderBtn")?.addEventListener("click", openDeliveryOrder);
-  $("#addScheduleBtn")?.addEventListener("click", openSchedule);
+$('#addScheduleBtn')?.addEventListener('click',()=>openSchedule());
   $("#addBookingBtn")?.addEventListener("click", openNewBooking);
   $('#deleteSelectedCustomers')?.addEventListener(
     'click',
