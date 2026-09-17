@@ -1151,9 +1151,8 @@ app.post(
           message: "Телефон заказа не совпадает с аккаунтом",
         });
         
-    console.log("ORDER 1: before claimIdempotent");
+   
 const idem = await db.claimIdempotent("public-order", idemKey);
-console.log("ORDER 2: after claimIdempotent");
 
     if (!idem.claimed) {
       if (idem.response?.pending) {
@@ -1168,7 +1167,6 @@ console.log("ORDER 2: after claimIdempotent");
     }
 
     try {
-      console.log("ORDER 3: before reserveNumber");
       const order = {
         id: Date.now() + Math.floor(Math.random() * 1000),
         number: await db.reserveNumber("order"),
@@ -1196,14 +1194,11 @@ console.log("ORDER 2: after claimIdempotent");
         customerId: signedCustomer ? Number(signedCustomer.id) : null,
         createdAt: new Date().toISOString(),
       };
-console.log("ORDER 3: before reserveNumber");
       store.orders.push(order);
 
       upsertCustomer(store, customer);
 
-     console.log("ORDER 5: before saveStore");
 await saveStore(store);
-console.log("ORDER 6: after saveStore");
 
       const safeOrder = signedCustomer
         ? order
@@ -1219,9 +1214,8 @@ console.log("ORDER 6: after saveStore");
         order: safeOrder,
       };
 
-    console.log("ORDER 7: before putIdempotent");
+    
 await db.putIdempotent("public-order", idemKey, response);
-console.log("ORDER 8: after putIdempotent");
 
 return res.json(response);
     } catch (error) {
