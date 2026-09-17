@@ -266,19 +266,7 @@ function setupNavbar() {
             );
         }
     );
-
-    const toggle =
-        document.querySelector("#mobileToggle");
-
-    const nav =
-        document.querySelector(".nav-menu");
-
-    toggle?.addEventListener(
-        "click",
-        () => {
-            nav?.classList.toggle("open");
-        }
-    );
+  
 }
 
 document.addEventListener(
