@@ -1,5 +1,33 @@
 const CART_KEY = "noireCart";
 
+const cartT = (key, vars = {}) =>
+    window.noireT
+        ? window.noireT(key, vars)
+        : key.replace(
+            /\{(\w+)\}/g,
+            (_, name) => vars[name] ?? `{${name}}`
+        );
+
+
+        function cartItemText(item, field = "name") {
+    const lang = window.noireGetLanguage
+        ? window.noireGetLanguage()
+        : "ru";
+
+    if (lang === "ru") {
+        return item?.[field] || "";
+    }
+
+    const translations =
+        window.NOIRE_MENU_TRANSLATIONS || {};
+
+    const translated =
+        translations[String(item?.id)]?.[lang]?.[field];
+
+    return translated || item?.[field] || "";
+}
+
+
 function getCart() {
     try {
         const value = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
@@ -37,9 +65,11 @@ function addToCart(product) {
 
     saveCart(cart);
 
-    showToast(
-        `${product.name} добавлен в корзину`
-    );
+   showToast(
+    cartT("{name} добавлен в корзину", {
+        name: cartItemText(product, "name")
+    })
+);
 }
 
 function removeFromCart(id) {
@@ -114,10 +144,10 @@ function updateCartUI() {
                     ☕
                 </div>
 
-                <h3>Корзина пуста</h3>
+                <h3>${cartT("Корзина пуста")}</h3>
 
                 <p style="margin-top:8px">
-                    Добавьте что-нибудь вкусное
+                   ${cartT("Добавьте что-нибудь вкусное")}
                 </p>
             </div>
         `;
@@ -129,18 +159,33 @@ function updateCartUI() {
         return;
     }
 
-    container.innerHTML = cart.map(item => `
-        <div class="cart-item">
+    container.innerHTML = cart.map(item => {
+    const displayName =
+        cartItemText(item, "name");
 
+    const safeName =
+        String(displayName).replace(
+            /[&<>"']/g,
+            c => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                "\"": "&quot;",
+                "'": "&#039;"
+            }[c])
+        );
+
+    return `
+                    <div class="cart-item">
             <img
                 class="cart-item-image"
                 src="${item.image}"
-                alt="${String(item.name).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#039;"}[c]))}"
+                alt="${safeName}"
             >
 
             <div>
                 <div class="cart-item-name">
-                    ${String(item.name).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#039;"}[c]))}
+                    ${safeName}
                 </div>
 
                 <div class="cart-item-price">
@@ -170,9 +215,10 @@ function updateCartUI() {
             >
                 ×
             </button>
-
         </div>
-    `).join("");
+        `;
+}).join("");
+   
 
     if (total) {
         total.textContent =
@@ -197,7 +243,9 @@ function repeatLastOrder() {
     try { last = JSON.parse(localStorage.getItem("noireLastOrder") || "null"); } catch { localStorage.removeItem("noireLastOrder"); }
 
     if (!last || !last.items?.length) {
-        showToast("Предыдущих заказов пока нет");
+       showToast(
+    cartT("Предыдущих заказов пока нет")
+);
         return;
     }
 
@@ -207,8 +255,9 @@ function repeatLastOrder() {
         }))
     );
 
-    showToast("Предыдущий заказ добавлен в корзину");
-
+    showToast(
+    cartT("Предыдущий заказ добавлен в корзину")
+);
     setTimeout(() => {
         window.location.href = "/checkout.html";
     }, 700);
@@ -228,3 +277,13 @@ window.repeatLastOrder = repeatLastOrder;
 window.getCart = getCart;
 window.cartTotal = cartTotal;
 window.formatMoney = formatMoney;
+
+
+document.addEventListener(
+    "noire:languagechange",
+    () => {
+        if (typeof updateCartUI === "function") {
+            updateCartUI();
+        }
+}
+);

@@ -1,5 +1,264 @@
-<!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOIRÉ — Gallery</title><link rel="stylesheet" href="/css/style.css"><style>.gallery-page{padding:150px 5vw 80px;max-width:1500px;margin:auto}.gallery-hero{max-width:720px;margin-bottom:55px}.gallery-hero h1{font:600 clamp(48px,7vw,92px) 'Playfair Display',serif;margin:12px 0}.gallery-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.gallery-item{position:relative;min-height:320px;overflow:hidden;border-radius:20px;border:1px solid var(--border);grid-column:span 4}.gallery-item:nth-child(1),.gallery-item:nth-child(4){grid-column:span 8}.gallery-item img{width:100%;height:100%;min-height:320px;object-fit:cover;transition:transform .7s}.gallery-item:hover img{transform:scale(1.045)}.gallery-item:after{content:'';position:absolute;inset:40% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.8))}.gallery-caption{position:absolute;z-index:2;left:20px;right:20px;bottom:18px}.gallery-caption span{color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase}.gallery-caption h3{font:500 26px 'Playfair Display',serif;margin-top:5px}.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;place-items:center;padding:30px}.lightbox.open{display:grid}.lightbox img{max-width:94vw;max-height:88vh;object-fit:contain}.lightbox button{position:absolute;top:18px;right:24px;border:0;background:transparent;color:white;font-size:38px}@media(max-width:800px){.gallery-item,.gallery-item:nth-child(1),.gallery-item:nth-child(4){grid-column:span 12}.gallery-page{padding-top:125px}}</style></head><body><header class="header"><div class="navbar"><a href="/" class="logo"><span class="logo-main">NOIRÉ</span><span class="logo-sub">COFFEE & KITCHEN</span></a><nav class="nav-menu"><a class="nav-link" href="/menu.html">Menu</a><a class="nav-link active" href="/gallery.html">Gallery</a><a class="nav-link" href="/reservation.html">Tables</a><a class="nav-link" href="/checkout.html">Order</a></nav><button id="mobileToggle" class="mobile-toggle" aria-label="Меню" aria-expanded="false">☰</button><div class="nav-actions"><button id="aiOpenTop" class="icon-button" title="NOIRÉ AI">✦</button><button id="cartButton" class="icon-button cart-button">🛒<span class="cart-count">0</span></button></div></div></header><main class="gallery-page"><div class="gallery-hero"><span class="section-kicker">THE SPACE</span><h1>Inside NOIRÉ.</h1><p class="section-description">Галерея только о самом месте: интерьер, свет, столики, детали и настроение вечера.</p></div><section id="galleryGrid" class="gallery-grid"></section></main><div id="lightbox" class="lightbox"><button id="lightboxClose">×</button><img id="lightboxImage" alt="NOIRÉ"></div><script src="/js/cart.js"></script><script src="/js/app.js"></script><script>document.addEventListener('DOMContentLoaded',async()=>{const grid=document.querySelector('#galleryGrid');try{const r=await fetch('/api/gallery',{cache:'no-store'});if(!r.ok)throw new Error('gallery');const g=await r.json();const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;'); const safe=u=>{const value=String(u||'').trim();if(/^data:image\/(jpeg|jpg|png|webp|gif|avif);base64,[A-Za-z0-9+/=]+$/i.test(value))return value;try{const x=new URL(value,location.origin);return ['http:','https:'].includes(x.protocol)?x.href:''}catch{return ''}}; grid.innerHTML=g.map(x=>`<article class="gallery-item"><img src="${safe(x.image)}" alt="${esc(x.title)}" loading="lazy"><div class="gallery-caption"><span>${esc(x.category)}</span><h3>${esc(x.title)}</h3></div></article>`).join('');const lb=document.querySelector('#lightbox'),lbClose=document.querySelector('#lightboxClose'),lbImage=document.querySelector('#lightboxImage');grid.querySelectorAll('img').forEach(img=>img.onclick=()=>{lb.classList.add('open');lbImage.src=img.src});lbClose.onclick=()=>lb.classList.remove('open');lb.onclick=e=>{if(e.target===lb)lb.classList.remove('open')};document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('open')});}catch{grid.innerHTML='<p style="color:#aaa">Галерея временно недоступна.</p>'}});</script><script src="/js/site-language.js"></script>
-</body></html>
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>NOIRÉ — Gallery</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      .gallery-page {
+        padding: 150px 5vw 80px;
+        max-width: 1500px;
+        margin: auto;
+      }
+      .gallery-hero {
+        max-width: 720px;
+        margin-bottom: 55px;
+      }
+      .gallery-hero h1 {
+        font:
+          600 clamp(48px, 7vw, 92px) "Playfair Display",
+          serif;
+        margin: 12px 0;
+      }
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 14px;
+      }
+      .gallery-item {
+        position: relative;
+        min-height: 320px;
+        overflow: hidden;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        grid-column: span 4;
+      }
+      .gallery-item:nth-child(1),
+      .gallery-item:nth-child(4) {
+        grid-column: span 8;
+      }
+      .gallery-item img {
+        width: 100%;
+        height: 100%;
+        min-height: 320px;
+        object-fit: cover;
+        transition: transform 0.7s;
+      }
+      .gallery-item:hover img {
+        transform: scale(1.045);
+      }
+      .gallery-item:after {
+        content: "";
+        position: absolute;
+        inset: 40% 0 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      }
+      .gallery-caption {
+        position: absolute;
+        z-index: 2;
+        left: 20px;
+        right: 20px;
+        bottom: 18px;
+      }
+      .gallery-caption span {
+        color: var(--gold);
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+      .gallery-caption h3 {
+        font:
+          500 26px "Playfair Display",
+          serif;
+        margin-top: 5px;
+      }
+      .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 500;
+        display: none;
+        place-items: center;
+        padding: 30px;
+      }
+      .lightbox.open {
+        display: grid;
+      }
+      .lightbox img {
+        max-width: 94vw;
+        max-height: 88vh;
+        object-fit: contain;
+      }
+      .lightbox button {
+        position: absolute;
+        top: 18px;
+        right: 24px;
+        border: 0;
+        background: transparent;
+        color: white;
+        font-size: 38px;
+      }
+      @media (max-width: 800px) {
+        .gallery-item,
+        .gallery-item:nth-child(1),
+        .gallery-item:nth-child(4) {
+          grid-column: span 12;
+        }
+        .gallery-page {
+          padding-top: 125px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="navbar">
+        <a href="/" class="logo"
+          ><span class="logo-main">NOIRÉ</span
+          ><span class="logo-sub">COFFEE & KITCHEN</span></a
+        >
+        <nav class="nav-menu">
+          <a class="nav-link" href="/menu.html">Menu</a
+          ><a class="nav-link active" href="/gallery.html">Gallery</a
+          ><a class="nav-link" href="/reservation.html">Tables</a
+          ><a class="nav-link" href="/checkout.html">Order</a>
+        </nav>
+        <button
+          id="mobileToggle"
+          class="mobile-toggle"
+          aria-label="Меню"
+          aria-expanded="false"
+        >
+          ☰
+        </button>
+        <div class="nav-actions">
+          <button id="aiOpenTop" class="icon-button" title="NOIRÉ AI">✦</button
+          ><button id="cartButton" class="icon-button cart-button">
+            🛒<span class="cart-count">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+    <main class="gallery-page">
+      <div class="gallery-hero">
+        <span class="section-kicker">THE SPACE</span>
+        <h1>Inside NOIRÉ.</h1>
+        <p class="section-description">
+          Галерея только о самом месте: интерьер, свет, столики, детали и
+          настроение вечера.
+        </p>
+      </div>
+      <section id="galleryGrid" class="gallery-grid"></section>
+    </main>
+    <div id="lightbox" class="lightbox">
+      <button id="lightboxClose">×</button
+      ><img id="lightboxImage" alt="NOIRÉ" />
+    </div>
+    <script src="/js/site-language.js"></script>
+    <script src="/js/menu-translations.js"></script>
+<script src="/js/cart.js"></script>
+<script src="/js/app.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const grid = document.querySelector("#galleryGrid");
+        try {
+          const r = await fetch("/api/gallery", { cache: "no-store" });
+          if (!r.ok) throw new Error("gallery");
+          const g = await r.json();
+          const esc = (v) =>
+            String(v ?? "")
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/\"/g, "&quot;")
+              .replace(/'/g, "&#39;");
+          const safe = (u) => {
+            const value = String(u || "").trim();
+            if (
+              /^data:image\/(jpeg|jpg|png|webp|gif|avif);base64,[A-Za-z0-9+/=]+$/i.test(
+                value,
+              )
+            )
+              return value;
+            try {
+              const x = new URL(value, location.origin);
+              return ["http:", "https:"].includes(x.protocol) ? x.href : "";
+            } catch {
+              return "";
+            }
+          };
+          grid.innerHTML = g
+            .map(
+              (x) =>
+                `<article class="gallery-item"><img src="${safe(x.image)}" alt="${esc(x.title)}" loading="lazy"><div class="gallery-caption"><span>${esc(x.category)}</span><h3>${esc(x.title)}</h3></div></article>`,
+            )
+            .join("");
+          const lb = document.querySelector("#lightbox"),
+            lbClose = document.querySelector("#lightboxClose"),
+            lbImage = document.querySelector("#lightboxImage");
+          grid.querySelectorAll("img").forEach(
+            (img) =>
+              (img.onclick = () => {
+                lb.classList.add("open");
+                lbImage.src = img.src;
+              }),
+          );
+          lbClose.onclick = () => lb.classList.remove("open");
+          lb.onclick = (e) => {
+            if (e.target === lb) lb.classList.remove("open");
+          };
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") lb.classList.remove("open");
+          });
+        } catch {
+          grid.innerHTML =
+            '<p style="color:#aaa">Галерея временно недоступна.</p>';
+        }
+      });
+    </script>
+    <script src="/js/site-language.js"></script>
+  </body>
+</html>
 <style>
-@media(max-width:600px){.gallery-page{padding:120px 16px 55px}.gallery-hero{margin-bottom:35px}.gallery-grid{gap:10px}.gallery-item,.gallery-item:nth-child(1),.gallery-item:nth-child(4){grid-column:span 12;min-height:240px}.gallery-item img{min-height:240px}.gallery-caption{left:14px;right:14px;bottom:14px}.gallery-caption h3{font-size:22px}.lightbox{padding:12px}.lightbox img{max-width:96vw;max-height:82vh}.lightbox button{right:12px;top:8px;font-size:34px}}
+  @media (max-width: 600px) {
+    .gallery-page {
+      padding: 120px 16px 55px;
+    }
+    .gallery-hero {
+      margin-bottom: 35px;
+    }
+    .gallery-grid {
+      gap: 10px;
+    }
+    .gallery-item,
+    .gallery-item:nth-child(1),
+    .gallery-item:nth-child(4) {
+      grid-column: span 12;
+      min-height: 240px;
+    }
+    .gallery-item img {
+      min-height: 240px;
+    }
+    .gallery-caption {
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+    }
+    .gallery-caption h3 {
+      font-size: 22px;
+    }
+    .lightbox {
+      padding: 12px;
+    }
+    .lightbox img {
+      max-width: 96vw;
+      max-height: 82vh;
+    }
+    .lightbox button {
+      right: 12px;
+      top: 8px;
+      font-size: 34px;
+    }
+  }
 </style>

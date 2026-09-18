@@ -1,176 +1,604 @@
 <!doctype html>
 <html lang="ru">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NOIRÉ — Management</title>
-<link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/admin.css">
-</head>
-<body class="admin-body">
-<section id="adminLogin" class="admin-login">
-  <form id="loginForm" class="login-card" autocomplete="on">
-    <span class="admin-eyebrow">NOIRÉ MANAGEMENT</span>
-    <h1>Добро пожаловать</h1>
-    <p class="admin-muted">Закрытый кабинет NOIRÉ COFFEE. Введите рабочий логин и пароль.</p>
-    <label>Логин<input name="username" autocomplete="username" required></label>
-    <label>Пароль<div class="password-field"><input name="password" type="password" autocomplete="current-password" required><button type="button" class="password-toggle" aria-label="Показать пароль" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div></label>
-    <button class="admin-primary" type="submit">Войти в кабинет</button>
-    <div id="loginError" class="admin-error"></div>
-  </form>
-</section>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>NOIRÉ — Management</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <section id="adminLogin" class="admin-login">
+      <form id="loginForm" class="login-card" autocomplete="on">
+        <span class="admin-eyebrow">NOIRÉ MANAGEMENT</span>
+        <h1>Добро пожаловать</h1>
+        <p class="admin-muted">
+          Закрытый кабинет NOIRÉ COFFEE. Введите рабочий логин и пароль.
+        </p>
+        <label
+          >Логин<input name="username" autocomplete="username" required
+        /></label>
+        <label
+          >Пароль
+          <div class="password-field">
+            <input
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+            /><button
+              type="button"
+              class="password-toggle"
+              aria-label="Показать пароль"
+              aria-pressed="false"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"
+                />
+                <circle cx="12" cy="12" r="2.5" />
+              </svg>
+            </button></div
+        ></label>
+        <button class="admin-primary" type="submit">Войти в кабинет</button>
+        <div id="loginError" class="admin-error"></div>
+      </form>
+    </section>
 
-<section id="adminDashboard" class="admin-app" hidden>
-<header class="admin-topbar">
-  <a href="/" class="admin-brand"><span>NOIRÉ</span><small>COFFEE & KITCHEN</small></a>
-  <nav id="adminNav">
-    <button data-view="dashboard" class="active">Обзор</button>
-    <button data-view="menu">Меню</button>
-    <button data-view="orders">Заказы</button>
-    <button data-view="bookings">Бронирования</button>
-    <button data-view="tables">Столы</button>
-    <button data-view="gallery">Галерея</button>
-    <button data-view="analytics">Аналитика</button>
-    <button data-view="customers">Клиенты</button>
-    <button data-view="history">История</button>
-    <button data-view="employees">Сотрудники</button>
-    <button data-view="schedule">График смен</button>
-    <button data-view="settings">Настройки</button>
-    <button data-view="ai">AI</button>
-  </nav>
-  <div class="admin-top-actions"><a href="/" class="admin-ghost">Сайт</a><button id="logoutBtn" class="admin-ghost">Выйти</button></div>
-</header>
+    <section id="adminDashboard" class="admin-app" hidden>
+      <header class="admin-topbar">
+        <a href="/" class="admin-brand"
+          ><span>NOIRÉ</span><small>COFFEE & KITCHEN</small></a
+        >
+        <nav id="adminNav">
+          <button data-view="dashboard" class="active">Обзор</button>
+          <button data-view="menu">Меню</button>
+          <button data-view="orders">Заказы</button>
+          <button data-view="bookings">Бронирования</button>
+          <button data-view="tables">Столы</button>
+          <button data-view="gallery">Галерея</button>
+          <button data-view="analytics">Аналитика</button>
+          <button data-view="customers">Клиенты</button>
+          <button data-view="history">История</button>
+          <button data-view="employees">Сотрудники</button>
+          <button data-view="schedule">График смен</button>
+          <button data-view="settings">Настройки</button>
+          <button data-view="ai">AI</button>
+        </nav>
+        <div class="admin-top-actions">
+          <a href="/" class="admin-ghost">Сайт</a
+          ><button id="logoutBtn" class="admin-ghost">Выйти</button>
+        </div>
+      </header>
 
-<main class="admin-content">
-<div class="admin-heading"><div><span class="admin-eyebrow">PRIVATE SPACE</span><h1 id="viewTitle">Обзор</h1><p id="viewSubtitle">Всё важное о NOIRÉ — на одном экране.</p></div><div id="clock" class="admin-clock"></div></div>
+      <main class="admin-content">
+        <div class="admin-heading">
+          <div>
+            <span class="admin-eyebrow">PRIVATE SPACE</span>
+            <h1 id="viewTitle">Обзор</h1>
+            <p id="viewSubtitle">Всё важное о NOIRÉ — на одном экране.</p>
+          </div>
+          <div id="clock" class="admin-clock"></div>
+        </div>
 
-<section data-section="dashboard" class="admin-view active">
-  <div class="metric-grid">
-    <article class="metric"><span>Выручка</span><strong id="mRevenue">0 ֏</strong><small>за всё время</small></article>
-    <article class="metric"><span>Заказы</span><strong id="mOrders">0</strong><small>в базе</small></article>
-    <article class="metric"><span>Бронирования</span><strong id="mBookings">0</strong><small>активные и завершённые</small></article>
-    <article class="metric"><span>Гости</span><strong id="mGuests">0</strong><small>клиентов</small></article>
-    <article class="metric"><span>Средний чек</span><strong id="mAvg">0 ֏</strong><small>на заказ</small></article>
-    <article class="metric"><span>Сегодня</span><strong id="mToday">0</strong><small>заказов</small></article>
-  </div>
-  <div class="period-grid">
-    <article class="period-card"><span>День</span><strong id="pDayRevenue">0 ֏</strong><small id="pDayMeta">0 заказов</small></article>
-    <article class="period-card"><span>Неделя</span><strong id="pWeekRevenue">0 ֏</strong><small id="pWeekMeta">0 заказов</small></article>
-    <article class="period-card"><span>Месяц</span><strong id="pMonthRevenue">0 ֏</strong><small id="pMonthMeta">0 заказов</small></article>
-    <article class="period-card"><span>Год</span><strong id="pYearRevenue">0 ֏</strong><small id="pYearMeta">0 заказов</small></article>
-  </div>
-  <div class="my-stats panel"><div><span class="admin-eyebrow">MY WORK</span><h2>Мои показатели</h2><p>Личная статистика сотрудника за текущий месяц.</p></div><div class="my-stats-grid courier-periods"><div><small>Сегодня</small><b id="myDayRevenue">—</b><span id="myDayOrders">—</span></div><div><small>Неделя</small><b id="myWeekRevenue">—</b><span id="myWeekOrders">—</span></div><div><small>Месяц</small><b id="myMonthRevenue">—</b><span id="myMonthOrders">—</span></div><div><small>Год</small><b id="myYearRevenue">—</b><span id="myYearOrders">—</span></div><div><small>Смена</small><b id="myShift">—</b></div></div></div>
-  <div class="split-grid">
-    <article class="panel"><div class="panel-head"><div><span class="admin-eyebrow">RECENT</span><h2>Последние заказы</h2></div><button class="admin-ghost" data-go="orders">Все заказы</button></div><div id="dashboardOrders" class="mini-list"></div></article>
-    <article class="panel"><div class="panel-head"><div><span class="admin-eyebrow">TOP ITEMS</span><h2>Заказывают чаще</h2></div></div><div id="topItems" class="rank-list"></div></article>
-  </div>
-</section>
+        <section data-section="dashboard" class="admin-view active">
+          <div class="metric-grid">
+            <article class="metric">
+              <span>Выручка</span><strong id="mRevenue">0 ֏</strong
+              ><small>за всё время</small>
+            </article>
+            <article class="metric">
+              <span>Заказы</span><strong id="mOrders">0</strong
+              ><small>в базе</small>
+            </article>
+            <article class="metric">
+              <span>Бронирования</span><strong id="mBookings">0</strong
+              ><small>активные и завершённые</small>
+            </article>
+            <article class="metric">
+              <span>Гости</span><strong id="mGuests">0</strong
+              ><small>клиентов</small>
+            </article>
+            <article class="metric">
+              <span>Средний чек</span><strong id="mAvg">0 ֏</strong
+              ><small>на заказ</small>
+            </article>
+            <article class="metric">
+              <span>Сегодня</span><strong id="mToday">0</strong
+              ><small>заказов</small>
+            </article>
+          </div>
+          <div class="period-grid">
+            <article class="period-card">
+              <span>День</span><strong id="pDayRevenue">0 ֏</strong
+              ><small id="pDayMeta">0 заказов</small>
+            </article>
+            <article class="period-card">
+              <span>Неделя</span><strong id="pWeekRevenue">0 ֏</strong
+              ><small id="pWeekMeta">0 заказов</small>
+            </article>
+            <article class="period-card">
+              <span>Месяц</span><strong id="pMonthRevenue">0 ֏</strong
+              ><small id="pMonthMeta">0 заказов</small>
+            </article>
+            <article class="period-card">
+              <span>Год</span><strong id="pYearRevenue">0 ֏</strong
+              ><small id="pYearMeta">0 заказов</small>
+            </article>
+          </div>
+          <div class="my-stats panel">
+            <div>
+              <span class="admin-eyebrow">MY WORK</span>
+              <h2>Мои показатели</h2>
+              <p>Личная статистика сотрудника за текущий месяц.</p>
+            </div>
+            <div class="my-stats-grid courier-periods">
+              <div>
+                <small>Сегодня</small><b id="myDayRevenue">—</b
+                ><span id="myDayOrders">—</span>
+              </div>
+              <div>
+                <small>Неделя</small><b id="myWeekRevenue">—</b
+                ><span id="myWeekOrders">—</span>
+              </div>
+              <div>
+                <small>Месяц</small><b id="myMonthRevenue">—</b
+                ><span id="myMonthOrders">—</span>
+              </div>
+              <div>
+                <small>Год</small><b id="myYearRevenue">—</b
+                ><span id="myYearOrders">—</span>
+              </div>
+              <div><small>Смена</small><b id="myShift">—</b></div>
+            </div>
+          </div>
+          <div class="split-grid">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <span class="admin-eyebrow">RECENT</span>
+                  <h2>Последние заказы</h2>
+                </div>
+                <button class="admin-ghost" data-go="orders">Все заказы</button>
+              </div>
+              <div id="dashboardOrders" class="mini-list"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <span class="admin-eyebrow">TOP ITEMS</span>
+                  <h2>Заказывают чаще</h2>
+                </div>
+              </div>
+              <div id="topItems" class="rank-list"></div>
+            </article>
+          </div>
+        </section>
 
-<section data-section="menu" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">MENU CONTROL</span><h2>Меню NOIRÉ</h2><p>Добавляйте, редактируйте и удаляйте позиции. Фото можно выбрать прямо с телефона, планшета или компьютера.</p></div><button id="addMenuBtn" class="admin-primary">+ Добавить позицию</button></div><div id="menuAdminGrid" class="product-admin-grid"></div></div></section>
+        <section data-section="menu" class="admin-view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="admin-eyebrow">MENU CONTROL</span>
+                <h2>Меню NOIRÉ</h2>
+                <p>
+                  Добавляйте, редактируйте и удаляйте позиции. Фото можно
+                  выбрать прямо с телефона, планшета или компьютера.
+                </p>
+              </div>
+              <button id="addMenuBtn" class="admin-primary">
+                + Добавить позицию
+              </button>
+            </div>
+            <div id="menuAdminGrid" class="product-admin-grid"></div>
+          </div>
+        </section>
 
-<section data-section="orders" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">ORDERS</span><h2>Заказы</h2></div><div class="panel-head-actions"><button id="addWaiterOrderBtn" class="admin-primary">+ Новый заказ в зале</button><button id="addDeliveryOrderBtn" class="admin-primary">+ Новая доставка</button><input id="orderSearch" class="admin-search" placeholder="Поиск по имени, телефону или №"></div></div><div id="ordersAllWrap"><h3 class="orders-column-title">Все заказы</h3><div id="ordersAllCards" class="orders-card-grid"></div></div><div id="ordersMineWrap"><h3 class="orders-column-title">Мои заказы</h3><div id="ordersMineCards" class="orders-card-grid"></div></div><div id="ordersCompletedWrap"><h3 class="orders-column-title">Выполненные заказы</h3><div id="ordersCompletedCards" class="orders-card-grid"></div></div><div id="ordersCards" hidden></div></div></section>
+        <section data-section="orders" class="admin-view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="admin-eyebrow">ORDERS</span>
+                <h2>Заказы</h2>
+              </div>
+              <div class="panel-head-actions">
+                <button id="addWaiterOrderBtn" class="admin-primary">
+                  + Новый заказ в зале</button
+                ><button id="addDeliveryOrderBtn" class="admin-primary">
+                  + Новая доставка</button
+                ><input
+                  id="orderSearch"
+                  class="admin-search"
+                  placeholder="Поиск по имени, телефону или №"
+                />
+              </div>
+            </div>
+            <div id="ordersAllWrap">
+              <h3 class="orders-column-title">Все заказы</h3>
+              <div id="ordersAllCards" class="orders-card-grid"></div>
+            </div>
+            <div id="ordersMineWrap">
+              <h3 class="orders-column-title">Мои заказы</h3>
+              <div id="ordersMineCards" class="orders-card-grid"></div>
+            </div>
+            <div id="ordersCompletedWrap">
+              <h3 class="orders-column-title">Выполненные заказы</h3>
+              <div id="ordersCompletedCards" class="orders-card-grid"></div>
+            </div>
+            <div id="ordersCards" hidden></div>
+          </div>
+        </section>
 
-<section data-section="bookings" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">RESERVATIONS</span><h2>Бронирования</h2><p>Видно время, стол, имя, телефон, гостей, бюджет, повод, комментарий и связанный заказ.</p></div><div class="panel-head-actions"><button id="addBookingBtn" class="admin-primary">+ Новая бронь</button><input id="bookingSearch" class="admin-search" placeholder="Поиск по имени, телефону, № или поводу"></div></div><div class="table-scroll"><table><thead><tr><th>№ / создано</th><th>Гость</th><th>Дата</th><th>Время</th><th>Гостей</th><th>Стол</th><th>Бюджет</th><th>Пожелания</th><th>Статус</th><th>Заказ</th></tr></thead><tbody id="bookingsBody"></tbody></table></div></div></section>
+        <section data-section="bookings" class="admin-view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="admin-eyebrow">RESERVATIONS</span>
+                <h2>Бронирования</h2>
+                <p>
+                  Видно время, стол, имя, телефон, гостей, бюджет, повод,
+                  комментарий и связанный заказ.
+                </p>
+              </div>
+              <div class="panel-head-actions">
+                <button id="addBookingBtn" class="admin-primary">
+                  + Новая бронь</button
+                ><input
+                  id="bookingSearch"
+                  class="admin-search"
+                  placeholder="Поиск по имени, телефону, № или поводу"
+                />
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>№ / создано</th>
+                    <th>Гость</th>
+                    <th>Дата</th>
+                    <th>Время</th>
+                    <th>Гостей</th>
+                    <th>Стол</th>
+                    <th>Бюджет</th>
+                    <th>Пожелания</th>
+                    <th>Статус</th>
+                    <th>Заказ</th>
+                  </tr>
+                </thead>
+                <tbody id="bookingsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
 
-<section data-section="tables" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">FLOOR PLAN</span><h2>Столы</h2><p>Система показывает свободные, занятые, зарезервированные и сервисные столы на выбранное время.</p></div><div class="table-filters"><label>Дата<input id="tableDate" type="date"></label><label>Время<input id="tableTime" data-noire-time inputmode="numeric" placeholder="19:30" autocomplete="off"></label></div></div><div id="adminFloor" class="floor-plan"></div><div class="legend"><span><i class="dot free"></i>Свободен</span><span><i class="dot busy"></i>Занят</span><span><i class="dot reserved"></i>Бронь</span><span><i class="dot hold"></i>Сервис</span></div></div></section>
+        <section data-section="tables" class="admin-view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="admin-eyebrow">FLOOR PLAN</span>
+                <h2>Столы</h2>
+                <p>
+                  Система показывает свободные, занятые, зарезервированные и
+                  сервисные столы на выбранное время.
+                </p>
+              </div>
+              <div class="table-filters">
+                <label>Дата<input id="tableDate" type="date" /></label
+                ><label
+                  >Время<input
+                    id="tableTime"
+                    data-noire-time
+                    inputmode="numeric"
+                    placeholder="19:30"
+                    autocomplete="off"
+                /></label>
+              </div>
+            </div>
+            <div id="adminFloor" class="floor-plan"></div>
+            <div class="legend">
+              <span><i class="dot free"></i>Свободен</span
+              ><span><i class="dot busy"></i>Занят</span
+              ><span><i class="dot reserved"></i>Бронь</span
+              ><span><i class="dot hold"></i>Сервис</span>
+            </div>
+          </div>
+        </section>
 
-<section data-section="gallery" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">SPACE ONLY</span><h2>Галерея</h2><p>Интерьер, атмосфера, столики и само пространство NOIRÉ. Фото можно загрузить прямо с устройства.</p></div><button id="addGalleryBtn" class="admin-primary">+ Добавить фото</button></div><div id="galleryAdminGrid" class="gallery-admin-grid"></div></div></section>
+        <section data-section="gallery" class="admin-view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="admin-eyebrow">SPACE ONLY</span>
+                <h2>Галерея</h2>
+                <p>
+                  Интерьер, атмосфера, столики и само пространство NOIRÉ. Фото
+                  можно загрузить прямо с устройства.
+                </p>
+              </div>
+              <button id="addGalleryBtn" class="admin-primary">
+                + Добавить фото
+              </button>
+            </div>
+            <div id="galleryAdminGrid" class="gallery-admin-grid"></div>
+          </div>
+        </section>
 
-<section data-section="schedule" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">SHIFT SCHEDULE</span><h2>График смен</h2><p>Плановые смены отдельно от фактического времени работы.</p></div><button id="addScheduleBtn" class="admin-primary">+ Добавить смену</button></div><div class="schedule-toolbar">
-  <div class="schedule-month-nav">
-    <button
-      type="button"
-      class="small-btn"
-      id="schedulePrevMonth"
-    >‹</button>
+        <section data-section="schedule" class="admin-view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="admin-eyebrow">SHIFT SCHEDULE</span>
+                <h2>График смен</h2>
+                <p>Плановые смены отдельно от фактического времени работы.</p>
+              </div>
+              <button id="addScheduleBtn" class="admin-primary">
+                + Добавить смену
+              </button>
+            </div>
+            <div class="schedule-toolbar">
+              <div class="schedule-month-nav">
+                <button type="button" class="small-btn" id="schedulePrevMonth">
+                  ‹
+                </button>
 
-    <button
-      type="button"
-      class="small-btn"
-      id="scheduleTodayMonth"
-    >Сегодня</button>
+                <button type="button" class="small-btn" id="scheduleTodayMonth">
+                  Сегодня
+                </button>
 
-    <button
-      type="button"
-      class="small-btn"
-      id="scheduleNextMonth"
-    >›</button>
-  </div>
+                <button type="button" class="small-btn" id="scheduleNextMonth">
+                  ›
+                </button>
+              </div>
 
-  <label>
-    Дата
-    <input id="scheduleDate" type="date">
-  </label>
+              <label>
+                Дата
+                <input id="scheduleDate" type="date" />
+              </label>
 
-  <label>
-    Сотрудник
-    <select id="scheduleEmployee">
-      <option value="all">Все сотрудники</option>
-    </select>
-  </label>
+              <label>
+                Сотрудник
+                <select id="scheduleEmployee">
+                  <option value="all">Все сотрудники</option>
+                </select>
+              </label>
 
-  <label>
-    Роль
-    <select id="scheduleRole">
-      <option value="all">Все роли</option>
-      <option value="manager">Manager</option>
-      <option value="waiter">Waiter</option>
-      <option value="cook">Повар</option>
-      <option value="delivery">Courier</option>
-      <option value="administrator">Administrator</option>
-      <option value="director">Director</option>
-    </select>
-  </label>
+              <label>
+                Роль
+                <select id="scheduleRole">
+                  <option value="all">Все роли</option>
+                  <option value="manager">Manager</option>
+                  <option value="waiter">Waiter</option>
+                  <option value="cook">Повар</option>
+                  <option value="delivery">Courier</option>
+                  <option value="administrator">Administrator</option>
+                  <option value="director">Director</option>
+                </select>
+              </label>
 
-  <div class="schedule-actions">
-    <span
-      id="selectedShiftsCount"
-      class="schedule-selection-count"
-    >Выбрано: 0</span>
+              <div class="schedule-actions">
+                <span id="selectedShiftsCount" class="schedule-selection-count"
+                  >Выбрано: 0</span
+                >
 
-    <button
-      type="button"
-      class="small-btn danger"
-      id="deleteSelectedShifts"
-      disabled
-    >
-      Удалить выбранные
-    </button>
+                <button
+                  type="button"
+                  class="small-btn danger"
+                  id="deleteSelectedShifts"
+                  disabled
+                >
+                  Удалить выбранные
+                </button>
 
-    <button
-      type="button"
-      class="small-btn danger"
-      id="deleteAllShifts"
-    >
-      Удалить все
-    </button>
-  </div>
-</div>
-<div id="scheduleCalendar" class="schedule-calendar"></div>
-</div>
-</section>
+                <button
+                  type="button"
+                  class="small-btn danger"
+                  id="deleteAllShifts"
+                >
+                  Удалить все
+                </button>
+              </div>
+            </div>
+            <div id="scheduleCalendar" class="schedule-calendar"></div>
+          </div>
+        </section>
 
-<section data-section="employees" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">NOIRÉ TEAM</span><h2>Сотрудники</h2><p>Смены, роли, доступы, выручка и рабочие показатели каждого человека.</p></div><button id="addEmployeeBtn" class="admin-primary">+ Добавить сотрудника</button></div><div id="employeesGrid" class="employees-grid"></div></div></section>
+        <section data-section="employees" class="admin-view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="admin-eyebrow">NOIRÉ TEAM</span>
+                <h2>Сотрудники</h2>
+                <p>
+                  Смены, роли, доступы, выручка и рабочие показатели каждого
+                  человека.
+                </p>
+              </div>
+              <button id="addEmployeeBtn" class="admin-primary">
+                + Добавить сотрудника
+              </button>
+            </div>
+            <div id="employeesGrid" class="employees-grid"></div>
+          </div>
+        </section>
 
-<section data-section="settings" class="admin-view"><div class="panel"><span class="admin-eyebrow">BRAND SETTINGS</span><h2>Настройки NOIRÉ COFFEE</h2><p>Owner и Director могут менять название и подпись сайта без редактирования кода.</p><form id="settingsForm" class="menu-form"><label>Название сайта<input name="siteName" id="siteName"></label><label>Подпись<input name="siteSubtitle" id="siteSubtitle"></label><label class="full">Язык общего сайта<select name="language" id="siteLanguage"></select><small class="admin-muted">Язык выбирается владельцем здесь и применяется для посетителей всего сайта.</small></label><div class="full"><button class="admin-primary">Сохранить настройки</button></div></form></div></section>
+        <section data-section="settings" class="admin-view">
+          <div class="panel">
+            <span class="admin-eyebrow">BRAND SETTINGS</span>
+            <h2>Настройки NOIRÉ COFFEE</h2>
+            <p>
+              Owner и Director могут менять название и подпись сайта без
+              редактирования кода.
+            </p>
+            <form id="settingsForm" class="menu-form">
+              <label
+                >Название сайта<input name="siteName" id="siteName" /></label
+              ><label
+                >Подпись<input name="siteSubtitle" id="siteSubtitle" /></label
+              ><label class="full"
+                >Язык общего сайта<select
+                  name="language"
+                  id="siteLanguage"
+                ></select
+                ><small class="admin-muted"
+                  >Язык выбирается владельцем здесь и применяется для
+                  посетителей всего сайта.</small
+                ></label
+              >
+              <div class="full">
+                <button class="admin-primary">Сохранить настройки</button>
+              </div>
+            </form>
+          </div>
+        </section>
 
-<section data-section="history" class="admin-view">
-  <div class="panel">
-    <div class="panel-head">
-      <div><span class="admin-eyebrow">ARCHIVE</span><h2>История</h2><p>Закрытые месяцы сохраняются здесь. После архивации их заказы и прошедшие бронирования убираются из текущей базы, но остаются доступными в истории.</p></div>
-      <div class="history-actions"><button id="archivePrevMonthBtn" class="admin-primary">Архивировать прошлый месяц</button><button id="deleteHistoryBtn" class="small-btn danger" type="button">Удалить историю</button><span class="admin-muted">Удаление касается только архивов. Системный журнал аудита сохраняется.</span></div>
+        <section data-section="history" class="admin-view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="admin-eyebrow">ARCHIVE</span>
+                <h2>История</h2>
+                <p>
+                  Закрытые месяцы сохраняются здесь. После архивации их заказы и
+                  прошедшие бронирования убираются из текущей базы, но остаются
+                  доступными в истории.
+                </p>
+              </div>
+              <div class="history-actions">
+                <button id="archivePrevMonthBtn" class="admin-primary">
+                  Архивировать прошлый месяц</button
+                ><button
+                  id="deleteHistoryBtn"
+                  class="small-btn danger"
+                  type="button"
+                >
+                  Удалить историю</button
+                ><span class="admin-muted"
+                  >Удаление касается только архивов. Системный журнал аудита
+                  сохраняется.</span
+                >
+              </div>
+            </div>
+            <div class="history-toolbar">
+              <label
+                >Год<select id="historyYear">
+                  <option value="all">Все годы</option>
+                </select></label
+              >
+            </div>
+            <div id="historyList" class="history-list"></div>
+          </div>
+        </section>
+
+        <section data-section="customers" class="admin-view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="admin-eyebrow">NOIRÉ MEMBERS</span>
+                <h2>Клиенты</h2>
+                <p>
+                  Зарегистрированные клиенты и связанные с ними заказы и
+                  бронирования.
+                </p>
+              </div>
+            </div>
+            <div class="customers-toolbar">
+              <div class="customers-selection-info">
+                <span id="selectedCustomersCount">Выбрано: 0</span>
+              </div>
+              <div class="customers-toolbar-actions">
+                <button
+                  id="deleteSelectedCustomers"
+                  class="small-btn danger"
+                  type="button"
+                  disabled
+                >
+                  Удалить выбранных</button
+                ><button
+                  id="deleteAllCustomers"
+                  class="small-btn danger"
+                  type="button"
+                >
+                  Удалить всех
+                </button>
+              </div>
+            </div>
+            <div id="customersAdminGrid" class="customer-card-grid"></div>
+          </div>
+        </section>
+        <section data-section="analytics" class="admin-view">
+          <div class="analytics-grid">
+            <article class="panel analytics-wide">
+              <div class="panel-head">
+                <div>
+                  <span class="admin-eyebrow">SALES / 14 DAYS</span>
+                  <h2>Динамика продаж</h2>
+                </div>
+              </div>
+              <div id="salesBars" class="bars"></div>
+            </article>
+            <article class="panel">
+              <span class="admin-eyebrow">TOP ITEMS</span>
+              <h2>Что продаётся чаще</h2>
+              <div id="analyticsTop" class="rank-list"></div>
+            </article>
+            <article class="panel">
+              <span class="admin-eyebrow">CATEGORIES</span>
+              <h2>Категории</h2>
+              <div id="categoryList" class="mini-list"></div>
+            </article>
+            <article class="panel">
+              <span class="admin-eyebrow">GUESTS</span>
+              <h2>Клиенты</h2>
+              <div id="customersList" class="mini-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section data-section="ai" class="admin-view">
+          <div class="ai-admin-layout">
+            <article class="panel">
+              <span class="admin-eyebrow">NOIRÉ INTELLIGENCE</span>
+              <h2>AI Assistant</h2>
+              <p>
+                Можно спрашивать о продажах, заказах, бронях, столах и
+                сотрудниках. Ассистент также выполняет безопасные команды,
+                например изменение статуса заказа.
+              </p>
+              <div id="adminAiMessages" class="ai-messages"></div>
+              <form id="adminAiForm" class="ai-form">
+                <input
+                  id="adminAiInput"
+                  autocomplete="off"
+                  placeholder="Например: какая выручка за месяц? или покажи свободные столы"
+                /><button class="admin-primary">Спросить</button>
+              </form>
+            </article>
+            <aside class="panel ai-tips">
+              <span class="admin-eyebrow">QUICK QUESTIONS</span
+              ><button data-ai="Какая выручка за сегодня?">
+                Выручка сегодня</button
+              ><button data-ai="Что заказывают чаще всего за месяц?">
+                Топ за месяц</button
+              ><button data-ai="Какие столы сейчас свободны?">
+                Свободные столы</button
+              ><button data-ai="Сколько бронирований сегодня?">
+                Брони сегодня</button
+              ><button data-ai="Кто сейчас на смене?">Кто на смене</button>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </section>
+
+    <div id="modal" class="admin-modal" hidden>
+      <div class="admin-modal-card">
+        <button id="modalClose" class="modal-x">×</button>
+        <div id="modalContent"></div>
+      </div>
     </div>
-    <div class="history-toolbar"><label>Год<select id="historyYear"><option value="all">Все годы</option></select></label></div>
-    <div id="historyList" class="history-list"></div>
-  </div>
-</section>
-
-<section data-section="customers" class="admin-view"><div class="panel"><div class="panel-head"><div><span class="admin-eyebrow">NOIRÉ MEMBERS</span><h2>Клиенты</h2><p>Зарегистрированные клиенты и связанные с ними заказы и бронирования.</p></div></div><div class="customers-toolbar"><div class="customers-selection-info"><span id="selectedCustomersCount">Выбрано: 0</span></div><div class="customers-toolbar-actions"><button id="deleteSelectedCustomers" class="small-btn danger" type="button" disabled>Удалить выбранных</button><button id="deleteAllCustomers" class="small-btn danger" type="button">Удалить всех</button></div></div><div id="customersAdminGrid" class="customer-card-grid"></div></div></section>
-<section data-section="analytics" class="admin-view"><div class="analytics-grid"><article class="panel analytics-wide"><div class="panel-head"><div><span class="admin-eyebrow">SALES / 14 DAYS</span><h2>Динамика продаж</h2></div></div><div id="salesBars" class="bars"></div></article><article class="panel"><span class="admin-eyebrow">TOP ITEMS</span><h2>Что продаётся чаще</h2><div id="analyticsTop" class="rank-list"></div></article><article class="panel"><span class="admin-eyebrow">CATEGORIES</span><h2>Категории</h2><div id="categoryList" class="mini-list"></div></article><article class="panel"><span class="admin-eyebrow">GUESTS</span><h2>Клиенты</h2><div id="customersList" class="mini-list"></div></article></div></section>
-
-<section data-section="ai" class="admin-view"><div class="ai-admin-layout"><article class="panel"><span class="admin-eyebrow">NOIRÉ INTELLIGENCE</span><h2>AI Assistant</h2><p>Можно спрашивать о продажах, заказах, бронях, столах и сотрудниках. Ассистент также выполняет безопасные команды, например изменение статуса заказа.</p><div id="adminAiMessages" class="ai-messages"></div><form id="adminAiForm" class="ai-form"><input id="adminAiInput" autocomplete="off" placeholder="Например: какая выручка за месяц? или покажи свободные столы"><button class="admin-primary">Спросить</button></form></article><aside class="panel ai-tips"><span class="admin-eyebrow">QUICK QUESTIONS</span><button data-ai="Какая выручка за сегодня?">Выручка сегодня</button><button data-ai="Что заказывают чаще всего за месяц?">Топ за месяц</button><button data-ai="Какие столы сейчас свободны?">Свободные столы</button><button data-ai="Сколько бронирований сегодня?">Брони сегодня</button><button data-ai="Кто сейчас на смене?">Кто на смене</button></aside></div></section>
-</main>
-</section>
-
-<div id="modal" class="admin-modal" hidden><div class="admin-modal-card"><button id="modalClose" class="modal-x">×</button><div id="modalContent"></div></div></div>
-<div id="adminToast" class="admin-toast"></div>
-<script src="/js/site-language.js"></script><script src="/js/admin.js"></script>
-</body></html>
+    <div id="adminToast" class="admin-toast"></div>
+    <script src="/js/site-language.js"></script>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>
