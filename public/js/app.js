@@ -65,10 +65,26 @@ const categoryNames = {
   beer: "Пиво",
   sauces: "Соусы",
 };
-
 function categoryLabel(category) {
-  return appT(categoryNames[category] || category);
+  const original = categoryNames[category] || category;
+
+  const lang = window.noireGetLanguage
+    ? window.noireGetLanguage()
+    : "ru";
+
+  if (
+    lang !== "ru" &&
+    window.NoireTranslations &&
+    typeof window.NoireTranslations.has === "function" &&
+    typeof window.NoireTranslations.get === "function" &&
+    window.NoireTranslations.has(original, lang)
+  ) {
+    return window.NoireTranslations.get(original, lang);
+  }
+
+  return appT(original);
 }
+
 
 function menuItemText(item, field) {
   const lang = window.noireGetLanguage
@@ -114,7 +130,12 @@ async function loadMenu() {
 
     window.noireMenu = menuData;
 
-    renderFeatured();
+    if (
+  typeof renderFeatured === "function" &&
+  document.querySelector("#featuredMenu")
+) {
+  renderFeatured();
+}
 
     if (document.querySelector("#menuGrid")) {
       renderMenu();
@@ -454,7 +475,13 @@ function initNoireAI() {
       const r = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: q, history: history.slice(-10) }),
+        body: JSON.stringify({
+  message: q,
+  history: history.slice(-10),
+  language: window.noireGetLanguage
+    ? window.noireGetLanguage()
+    : "ru",
+}),
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.message || "AI error");
@@ -491,7 +518,29 @@ function initNoireAI() {
   };
   document
     .querySelectorAll("[data-aiq]")
-    .forEach((b) => (b.onclick = () => ask(b.dataset.aiq)));
+    .forEach((b) => {
+  b.onclick = () => {
+    const lang = window.noireGetLanguage
+      ? window.noireGetLanguage()
+      : "ru";
+
+    const original = b.dataset.aiq || "";
+
+    let message = original;
+
+    if (
+      lang !== "ru" &&
+      window.NoireTranslations &&
+      typeof window.NoireTranslations.has === "function" &&
+      typeof window.NoireTranslations.get === "function" &&
+      window.NoireTranslations.has(original, lang)
+    ) {
+      message = window.NoireTranslations.get(original, lang);
+    }
+
+    ask(message);
+  };
+});
 }
 document.addEventListener("DOMContentLoaded", initNoireAI);
 
@@ -655,6 +704,42 @@ document.addEventListener("DOMContentLoaded", initPublicAccountUI);
 document.addEventListener(
   "noire:languagechange",
   () => {
+    // Обновляем только отображаемый текст категорий.
+    // data-category не меняем — фильтрация продолжает
+    // работать на тех же технических значениях.
+  document
+  .querySelectorAll(".category[data-category]")
+  .forEach((button) => {
+    const category = button.dataset.category;
+
+    if (!category) return;
+
+    const icons = {
+      coffee: "☕",
+      tea: "🍵",
+      breakfast: "🍳",
+      snacks: "🥗",
+      food: "🍝",
+      desserts: "🍰",
+      drinks: "🥤",
+      beer: "🍺",
+      sauces: "🥫",
+    };
+
+    const label =
+      category === "all"
+        ? appT("Всё")
+        : categoryLabel(category);
+
+    const icon = icons[category] || "";
+
+    button.textContent =
+      category === "all"
+        ? label
+        : `${icon} ${label}`;
+  });
+
+    // Перерисовываем товары с текущим фильтром и поиском.
     if (
       typeof renderMenu === "function" &&
       document.querySelector("#menuGrid")
@@ -671,6 +756,7 @@ document.addEventListener(
       renderMenu(category, search);
     }
 
+    // Обновляем блок популярных товаров.
     if (
       typeof renderFeatured === "function" &&
       document.querySelector("#featuredMenu")

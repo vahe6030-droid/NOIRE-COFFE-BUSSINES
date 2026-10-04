@@ -1530,7 +1530,7 @@ textarea.form-control {
 @keyframes menuPageInNext{0%{opacity:.08;transform:perspective(1400px) rotateY(82deg) translateX(4%);transform-origin:right center}100%{opacity:1;transform:perspective(1400px) rotateY(0) translateX(0);transform-origin:right center}}
 @keyframes menuPageOutPrev{0%{opacity:1;transform:perspective(1400px) rotateY(0) translateX(0);transform-origin:right center}100%{opacity:.08;transform:perspective(1400px) rotateY(82deg) translateX(4%);transform-origin:right center}}
 @keyframes menuPageInPrev{0%{opacity:.08;transform:perspective(1400px) rotateY(-82deg) translateX(-4%);transform-origin:left center}100%{opacity:1;transform:perspective(1400px) rotateY(0) translateX(0);transform-origin:left center}}
-@media(prefers-reduced-motion:reduce){.menu-scene,.menu-scene *,.menu-grid{animation:none!important;transition:none!important}}
+
 
 /* Homepage entrance: coffee pours into the NOIRÉ wordmark. */
 .noire-intro{position:fixed;inset:0;z-index:3000;background:#050505;display:grid;place-items:center;overflow:hidden;opacity:1;visibility:visible;transition:opacity .8s ease,visibility .8s ease}

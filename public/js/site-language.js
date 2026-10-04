@@ -1886,6 +1886,33 @@
 
   window.noireT = t;
 
+  window.NoireSiteI18n = Object.freeze({
+  get(text, language = current) {
+    const key = String(text ?? "").trim();
+    const lang = valid.has(language) ? language : fallback;
+
+    if (!key) {
+      return String(text ?? "");
+    }
+
+    return I18N[lang]?.[key] || I18N.ru?.[key] || key;
+  },
+
+  has(text, language = current) {
+    const key = String(text ?? "").trim();
+    const lang = valid.has(language) ? language : fallback;
+
+    if (!key) {
+      return false;
+    }
+
+    return Object.prototype.hasOwnProperty.call(
+      I18N[lang] || {},
+      key
+    );
+  },
+});
+
   function getVisitorLanguage() {
     try {
       const value = localStorage.getItem(storageKey);
@@ -1907,64 +1934,148 @@
     } catch {}
   }
 
-  function translateString(text) {
-    const value = String(text || "").trim();
+const originalTextByNode = new WeakMap();
 
-    if (!value) return null;
+function normalizeTranslationText(value) {
+  return String(value ?? "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-    const ruDictionary = I18N.ru;
-    const dictionary = I18N[current] || ruDictionary;
+function translateString(text) {
+  const value = normalizeTranslationText(text);
 
-    /*
-     * Элемент уже мог быть переведён с русского на другой язык.
-     * Поэтому сначала ищем исходный русский ключ.
-     */
-    if (dictionary[value]) {
-      return dictionary[value];
+  if (!value) return null;
+
+  // ---------------------------------------------------------
+  // 1. Ищем исходный русский ключ в основном I18N.
+  // Сравнение не зависит от переносов строк и лишних пробелов.
+  // ---------------------------------------------------------
+
+  let originalKey = null;
+
+  for (const key of Object.keys(I18N.ru)) {
+    if (normalizeTranslationText(key) === value) {
+      originalKey = key;
+      break;
     }
-
-    for (const language of ["en", "hy"]) {
-      const entries = Object.entries(I18N[language]);
-
-      for (const [original, translated] of entries) {
-        if (translated === value) {
-          return dictionary[original] || original;
-        }
-      }
-    }
-
-    return null;
   }
 
-  function translateTextNode(node) {
-    if (!node || node.nodeType !== Node.TEXT_NODE) return;
+  if (originalKey) {
+    if (current === "ru") {
+      return originalKey;
+    }
 
-    const parent = node.parentElement;
-
-    if (!parent) return;
+    const dictionary = I18N[current] || I18N.ru;
 
     if (
-      parent.closest(
-        "script, style, code, pre, textarea, [data-noire-no-translate]",
+      Object.prototype.hasOwnProperty.call(
+        dictionary,
+        originalKey,
       )
     ) {
-      return;
+      return dictionary[originalKey];
     }
 
-    const raw = node.nodeValue;
-    const trimmed = raw.trim();
+    if (
+      window.NoireTranslations &&
+      typeof window.NoireTranslations.has === "function" &&
+      typeof window.NoireTranslations.get === "function" &&
+      window.NoireTranslations.has(originalKey, current)
+    ) {
+      return window.NoireTranslations.get(
+        originalKey,
+        current,
+      );
+    }
 
-    if (!trimmed) return;
-
-    const translated = translateString(trimmed);
-
-    if (!translated || translated === trimmed) return;
-
-    const start = raw.match(/^\s*/)?.[0] || "";
-    const end = raw.match(/\s*$/)?.[0] || "";
-
-    node.nodeValue = `${start}${translated}${end}`;
+    return originalKey;
   }
+
+  // ---------------------------------------------------------
+  // 2. Если строки нет в основном I18N,
+  // проверяем дополнительный translations.js.
+  // ---------------------------------------------------------
+
+  if (
+    current !== "ru" &&
+    window.NoireTranslations &&
+    typeof window.NoireTranslations.has === "function" &&
+    typeof window.NoireTranslations.get === "function" &&
+    window.NoireTranslations.has(value, current)
+  ) {
+    return window.NoireTranslations.get(
+      value,
+      current,
+    );
+  }
+
+  return null;
+}
+
+function translateTextNode(node) {
+  if (!node || node.nodeType !== Node.TEXT_NODE) return;
+
+  const parent = node.parentElement;
+  if (!parent) return;
+
+  if (
+    parent.closest(
+      "script, style, code, pre, textarea, [data-noire-no-translate]",
+    )
+  ) {
+    return;
+  }
+
+  const raw = node.nodeValue || "";
+  const trimmed = raw.trim();
+
+  if (!trimmed) return;
+
+  // Нормализуем переносы строк и лишние пробелы.
+  const source = trimmed
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  let translated = null;
+
+  // Сначала основной словарь site-language.js.
+  const dictionary = I18N[current] || I18N.ru;
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      dictionary,
+      source,
+    )
+  ) {
+    translated = dictionary[source];
+  }
+
+  // Затем дополнительный translations.js.
+  if (
+    !translated &&
+    current !== "ru" &&
+    window.NoireTranslations &&
+    typeof window.NoireTranslations.has === "function" &&
+    typeof window.NoireTranslations.get === "function" &&
+    window.NoireTranslations.has(source, current)
+  ) {
+    translated = window.NoireTranslations.get(
+      source,
+      current,
+    );
+  }
+
+  if (!translated) return;
+
+  const start = raw.match(/^\s*/)?.[0] || "";
+  const end = raw.match(/\s*$/)?.[0] || "";
+
+  node.nodeValue = `${start}${translated}${end}`;
+}
+ 
 
   function translateElementAttributes(element) {
     if (!(element instanceof Element)) return;

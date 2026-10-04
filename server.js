@@ -559,6 +559,68 @@ for (const name of [
   app.get(`/${name}.html`, (_, res) => res.sendFile(page(`${name}.html`)));
 }
 
+// =========================================================
+// NOIRÉ TRANSLATION API
+// Independent translation layer.
+// =========================================================
+
+app.post(
+  "/api/translate",
+  rateLimit("public-translate", 60 * 1000, 60),
+  async (req, res) => {
+    try {
+      const text = String(req.body?.text || "").trim();
+      const source = String(req.body?.source || "ru").toLowerCase();
+      const target = String(req.body?.target || "").toLowerCase();
+
+      if (!text) {
+        return res.status(400).json({
+          success: false,
+          message: "Text is required",
+        });
+      }
+
+      if (text.length > 2000) {
+        return res.status(400).json({
+          success: false,
+          message: "Text is too long",
+        });
+      }
+
+      if (source !== "ru") {
+        return res.status(400).json({
+          success: false,
+          message: "Unsupported source language",
+        });
+      }
+
+      if (!["en", "hy"].includes(target)) {
+        return res.status(400).json({
+          success: false,
+          message: "Unsupported target language",
+        });
+      }
+
+      // Translation engine will be connected here.
+      // Until then we safely return the original text.
+      return res.json({
+        success: true,
+        translatedText: text,
+        source,
+        target,
+        engine: "none",
+      });
+    } catch (error) {
+      console.error("NOIRÉ translation error:", error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Translation unavailable",
+      });
+    }
+  },
+);
+
 app.get("/api/menu", (_, res) => res.json(readMenu()));
 app.get("/api/gallery", (_, res) => res.json(readGallery()));
 app.get("/api/tables", (_, res) => res.json(readStore().tables));
@@ -3830,21 +3892,48 @@ function findMenuItemByText(menu, text) {
   );
 }
 
-function localClientAI(message) {
+function localClientAI(message, language = "ru") {
   const menu = readMenu();
   const q = String(message || "").trim();
   const low = q.toLowerCase().replace(/ё/g, "е");
+
+  const lang = ["ru", "en", "hy"].includes(language)
+    ? language
+    : "ru";
+
   const item = findMenuItemByText(menu, q);
+
+  const answerByLanguage = (ru, en, hy) => {
+    if (lang === "en") return en;
+    if (lang === "hy") return hy;
+    return ru;
+  };
+
   const actionMatch =
-    /(добав|полож|закаж).*(корзин|мне|нам)|добавь|add to cart/.test(low);
+    /(добав|полож|закаж).*(корзин|мне|нам)|добавь|add.*cart|add.*basket|ավելաց.*զամբյուղ/i.test(
+      low,
+    );
+
   if (actionMatch && item) {
     const qtyMatch = low.match(/(?:x|×|\b)(\d+)\s*(?:шт|раз|x)?/i);
-    const quantity = Math.max(1, Math.min(10, Number(qtyMatch?.[1] || 1)));
+    const quantity = Math.max(
+      1,
+      Math.min(10, Number(qtyMatch?.[1] || 1)),
+    );
+
     return {
-      answer: `Добавляю ${item.name}${quantity > 1 ? ` ×${quantity}` : ""} в корзину.`,
-      action: { type: "add_to_cart", item: { ...item, quantity } },
+      answer: answerByLanguage(
+        `Добавляю ${item.name}${quantity > 1 ? ` ×${quantity}` : ""} в корзину.`,
+        `Adding ${item.name}${quantity > 1 ? ` ×${quantity}` : ""} to your cart.`,
+        `Ավելացնում եմ ${item.name}${quantity > 1 ? ` ×${quantity}` : ""} զամբյուղում։`,
+      ),
+      action: {
+        type: "add_to_cart",
+        item: { ...item, quantity },
+      },
     };
   }
+
   if (
     /открой.*(меню|кофе|чай|завтрак|закуск|десерт|напит|пив|соус)|покажи.*(кофе|чай|завтрак|закуск|десерт|напит|пив|соус)/.test(
       low,
@@ -3860,44 +3949,92 @@ function localClientAI(message) {
       ["пив", "beer"],
       ["соус", "sauces"],
     ];
+
     const found = pairs.find(([needle]) => low.includes(needle));
+
     return {
-      answer: `Открываю ${found ? categoryName(found[1]) : "меню"}.`,
-      action: { type: "open_menu", category: found?.[1] || "all" },
+      answer: answerByLanguage(
+        `Открываю ${found ? categoryName(found[1]) : "меню"}.`,
+        "Opening the menu.",
+        "Բացում եմ մենյուն։",
+      ),
+      action: {
+        type: "open_menu",
+        category: found?.[1] || "all",
+      },
     };
   }
-  if (/брон|заброниру|столик/.test(low))
+
+  if (
+    /брон|заброниру|столик|reserve|reservation|book.*table|table.*reservation|ամրագր|սեղան/i.test(
+      low,
+    )
+  ) {
     return {
-      answer:
+      answer: answerByLanguage(
         "Конечно. Открываю форму бронирования — там можно выбрать дату, время и столик.",
+        "Of course. I'm opening the reservation form, where you can choose the date, time and table.",
+        "Իհարկե։ Բացում եմ ամրագրման ձևը, որտեղ կարող եք ընտրել ամսաթիվը, ժամը և սեղանը։",
+      ),
       action: { type: "open_reservation" },
     };
-  if (/корзин|оформить заказ|оплат/.test(low))
+  }
+
+  if (
+    /корзин|оформить заказ|оплат|cart|checkout|payment|զամբյուղ|պատվեր|վճար/i.test(
+      low,
+    )
+  ) {
     return {
-      answer: "Открываю корзину и оформление заказа.",
+      answer: answerByLanguage(
+        "Открываю корзину и оформление заказа.",
+        "I'm opening your cart and checkout.",
+        "Բացում եմ զամբյուղը և պատվերի ձևակերպումը։",
+      ),
       action: { type: "open_checkout" },
     };
-  if (/меню|что есть|что у вас|блюд/.test(low)) {
+  }
+
+  if (
+    /меню|что есть|что у вас|блюд|menu|what.*menu|what.*have|dessert|food|մենյու|ուտեստ|աղանդեր/i.test(
+      low,
+    )
+  ) {
     const popular = menu
       .filter((x) => x.popular)
       .slice(0, 5)
       .map((x) => x.name)
       .join(", ");
+
     return {
-      answer: `В NOIRÉ есть кофе, чай, завтраки, закуски, основные блюда, десерты, напитки, пиво и соусы. Из популярных сейчас: ${popular}.`,
+      answer: answerByLanguage(
+        `В NOIRÉ есть кофе, чай, завтраки, закуски, основные блюда, десерты, напитки, пиво и соусы. Из популярных сейчас: ${popular}.`,
+        `NOIRÉ offers coffee, tea, breakfast, snacks, main dishes, desserts, drinks, beer and sauces. Popular choices right now include: ${popular}.`,
+        `NOIRÉ-ում կան սուրճ, թեյ, նախաճաշեր, խորտիկներ, հիմնական ուտեստներ, աղանդեր, ըմպելիքներ, գարեջուր և սոուսներ։ Այժմ հայտնի ընտրություններից են՝ ${popular}։`,
+      ),
     };
   }
-  if (/привет|здравств|добрый|доброе/.test(low))
+
+  if (
+    /привет|здравств|добрый|доброе|hello|hi|hey|բարև/i.test(low)
+  ) {
     return {
-      answer:
+      answer: answerByLanguage(
         "Привет! 👋 Я AI-помощник NOIRÉ. Могу просто поговорить с тобой, ответить на вопросы, помочь с меню, заказом и бронированием.",
+        "Hello! 👋 I'm the NOIRÉ AI assistant. I can chat with you, answer questions, and help with the menu, orders and reservations.",
+        "Բարև։ 👋 Ես NOIRÉ-ի AI օգնականն եմ։ Կարող եմ զրուցել ձեզ հետ, պատասխանել հարցերին և օգնել մենյուի, պատվերի ու ամրագրման հարցերում։",
+      ),
     };
+  }
+
   return {
-    answer:
+    answer: answerByLanguage(
       "Я могу помочь с меню, заказом, бронированием и атмосферой NOIRÉ. А если подключён AI-движок, могу поддержать и обычный свободный разговор на любые темы.",
+      "I can help with the NOIRÉ menu, orders, reservations and atmosphere. If the AI engine is connected, I can also have a general conversation with you on other topics.",
+      "Կարող եմ օգնել NOIRÉ-ի մենյուի, պատվերի, ամրագրման և մթնոլորտի հարցերում։ Եթե AI համակարգը միացված է, կարող եմ նաև ազատ զրույց վարել այլ թեմաներով։",
+    ),
   };
 }
-
 function categoryName(category) {
   return (
     {
@@ -4017,7 +4154,10 @@ app.post(
     } catch (err) {
       console.error("NOIRÉ AI provider error:", err.message);
     }
-    const fallback = localClientAI(message);
+   const fallback = localClientAI(
+  message,
+  req.body.language || "ru",
+);
     res.json({ success: true, ...fallback, mode: "local" });
   },
 );

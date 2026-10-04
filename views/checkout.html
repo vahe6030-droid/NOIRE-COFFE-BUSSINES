@@ -272,6 +272,8 @@
 </main>
 
 <script src="/js/site-language.js"></script>
+<script src="/js/translations.js"></script>
+<script src="/js/translator.js"></script>
 <script src="/js/menu-translations.js"></script>
 <script src="/js/cart.js"></script>
 <script src="/js/app.js"></script>
@@ -504,14 +506,16 @@ try {
     return;
 }
 
-showToast(
-    result?.message ||
-    `${checkoutT("Не удалось оформить заказ")}${
-        response?.status
-            ? ` (${response.status})`
-            : ""
-    }.`
-);
+if (!response.ok || !result?.success || !result?.order) {
+    showToast(
+        result?.message ||
+        `${checkoutT("Не удалось оформить заказ")}${
+            response?.status
+                ? ` (${response.status})`
+                : ""
+        }.`
+    );
+
     if (submitButton) {
         submitButton.disabled = false;
         submitButton.textContent =
@@ -520,7 +524,7 @@ showToast(
     }
 
     return;
-});
+}
         localStorage.setItem(
             "noireLastOrder",
             JSON.stringify({
@@ -590,7 +594,8 @@ showToast(
             </div>
         `;
         
-
+    }
+);
 
 </script>
 
