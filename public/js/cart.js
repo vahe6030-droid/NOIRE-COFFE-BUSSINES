@@ -1,4 +1,10 @@
-const CART_KEY = "noireCart";
+function noireTenantSlug() {
+    if (window.NoireTenant) return window.NoireTenant.slug;
+    const m = document.cookie.match(/(?:^|;\s*)noire_restaurant=([^;]+)/);
+    return m ? decodeURIComponent(m[1]) : 'noire';
+}
+const CART_KEY = `noireCart:${noireTenantSlug()}`;
+const LAST_ORDER_KEY = `noireLastOrder:${noireTenantSlug()}`;
 
 const cartT = (key, vars = {}) =>
     window.noireT
@@ -240,7 +246,7 @@ function closeCart() {
 
 function repeatLastOrder() {
     let last = null;
-    try { last = JSON.parse(localStorage.getItem("noireLastOrder") || "null"); } catch { localStorage.removeItem("noireLastOrder"); }
+    try { last = JSON.parse(localStorage.getItem(LAST_ORDER_KEY) || "null"); } catch { localStorage.removeItem(LAST_ORDER_KEY); }
 
     if (!last || !last.items?.length) {
        showToast(
@@ -259,7 +265,7 @@ function repeatLastOrder() {
     cartT("Предыдущий заказ добавлен в корзину")
 );
     setTimeout(() => {
-        window.location.href = "/checkout.html";
+        window.location.href = window.NoireTenant?.publicUrl("/checkout.html") || "/checkout.html";
     }, 700);
 }
 

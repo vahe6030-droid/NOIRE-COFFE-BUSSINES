@@ -33,7 +33,7 @@ form?.addEventListener("submit", async (e) => {
       method: "POST",
       body: JSON.stringify(body),
     });
-    location.href = "/account.html";
+    location.href = window.NoireTenant?.publicUrl("/account.html") || "/account.html";
   } catch (err) {
     error.textContent = err.message;
   }

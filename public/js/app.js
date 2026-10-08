@@ -1,8 +1,15 @@
-const appT = (key, vars = {}) =>
-  window.noireT
-    ? window.noireT(key, vars)
-    : key.replace(/\{(\w+)\}/g, (_, name) => vars[name] ?? `{${name}}`);
-
+const appT = (key, vars = {}) => {
+  // Reuse both existing RU/EN/HY catalogs; never show source text when translated.
+  const source = String(key);
+  const lang = String(document.documentElement.lang || 'ru').toLowerCase();
+  const main = window.NoireSiteI18n;
+  const extra = window.NoireTranslations;
+  let value = source;
+  if (lang !== 'ru' && main?.has?.(source, lang)) value = main.get(source, lang);
+  else if (lang !== 'ru' && extra?.has?.(source, lang)) value = extra.get(source, lang);
+  else if (typeof window.noireT === 'function') return window.noireT(source, vars);
+  return value.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
+};
 document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.querySelector("#mobileToggle");
   const nav = document.querySelector(".nav-menu");
@@ -424,6 +431,16 @@ function initNoireAI() {
     </section>
 `;
   document.body.appendChild(wrap);
+  // This assistant is shared by tenants. Its visible name follows the active
+  // restaurant instead of keeping the NOIRÉ name on every new restaurant.
+  fetch('/api/site-settings', {cache:'no-store'}).then(r => r.ok ? r.json() : null).then(s => {
+    if (!s?.success) return;
+    const brand = s.restaurantSlug === 'noire' ? 'NOIRÉ' : (String(s.siteName||'Restaurant').trim() || 'Restaurant');
+    const head = wrap.querySelector('.noire-ai-head strong');
+    const launch = wrap.querySelector('#noireAiLaunch');
+    if (head) head.textContent = brand + ' AI';
+    if (launch) launch.setAttribute('aria-label', brand + ' AI');
+  }).catch(() => {});
   const panel = document.querySelector("#noireAiPanel");
   const messages = document.querySelector("#noireAiMessages");
   const history = [];
@@ -583,18 +600,45 @@ document.addEventListener("DOMContentLoaded", initNoireIntro);
     const s = await r.json();
     if (s.success) {
       document.title = s.siteName || document.title;
+      document.documentElement.dataset.restaurantSlug = s.restaurantSlug || 'noire';
+      try { sessionStorage.setItem('noireRestaurantSlug', s.restaurantSlug || 'noire'); } catch {}
+      const appearance = s.appearance || {};
+      if (/^#[0-9a-fA-F]{6}$/.test(appearance.primaryColor || '')) {
+        document.documentElement.style.setProperty('--gold', appearance.primaryColor);
+      }
+      if (/^#[0-9a-fA-F]{6}$/.test(appearance.backgroundColor || '')) {
+        document.documentElement.style.setProperty('--bg', appearance.backgroundColor);
+      }
+      if (/^#[0-9a-fA-F]{6}$/.test(appearance.textColor || '')) {
+        document.documentElement.style.setProperty('--text', appearance.textColor);
+      }
+      const publicTexts = s.publicTexts || {};
+      const heroTitle = document.querySelector('.hero-title');
+      const heroDescription = document.querySelector('.hero-description');
+      if (heroTitle && publicTexts.heroTitle) heroTitle.textContent = publicTexts.heroTitle;
+      if (heroDescription && publicTexts.heroDescription) heroDescription.textContent = publicTexts.heroDescription;
       document
         .querySelectorAll(".logo-main,.auth-brand b")
         .forEach(
           (x) =>
-            (x.textContent = (s.siteName || "NOIRÉ COFFEE").replace(
+            (x.textContent = (s.siteName || (s.restaurantSlug === 'noire' ? "NOIRÉ COFFEE" : 'Restaurant')).replace(
               /\s+COFFEE$/i,
               "",
             )),
         );
       document
         .querySelectorAll(".logo-sub,.auth-brand span")
-        .forEach((x) => (x.textContent = s.siteSubtitle || "COFFEE & KITCHEN"));
+        .forEach((x) => (x.textContent = s.siteSubtitle ?? (s.restaurantSlug === 'noire' ? 'COFFEE & KITCHEN' : '')));
+      if ((s.restaurantSlug || 'noire') !== 'noire') {
+        const brand = s.siteName || 'Restaurant';
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        nodes.forEach((node) => {
+          if (/NOIRÉ|NOIRE/.test(node.nodeValue || ''))
+            node.nodeValue = node.nodeValue.replace(/NOIRÉ|NOIRE/g, brand);
+        });
+      }
     }
   } catch {}
 })();

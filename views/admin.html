@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ru">
   <head>
+    <script src="/js/tenant-context.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>NOIRÉ — Management</title>
@@ -41,6 +42,7 @@
             </button></div
         ></label>
         <button class="admin-primary" type="submit">Войти в кабинет</button>
+        <a href="/restaurant-register" style="display:block;text-align:center;margin-top:14px;color:#c99a5b;text-decoration:none">Создать новый ресторан</a>
         <div id="loginError" class="admin-error"></div>
       </form>
     </section>
@@ -283,7 +285,7 @@
                   сервисные столы на выбранное время.
                 </p>
               </div>
-              <div class="table-filters">
+              <div style="display:flex;gap:12px;align-items:end"><button id="addTableBtn" class="admin-primary" type="button">+ Добавить стол</button><div class="table-filters">
                 <label>Дата<input id="tableDate" type="date" /></label
                 ><label
                   >Время<input
@@ -293,7 +295,7 @@
                     placeholder="19:30"
                     autocomplete="off"
                 /></label>
-              </div>
+              </div></div>
             </div>
             <div id="adminFloor" class="floor-plan"></div>
             <div class="legend">
@@ -312,7 +314,7 @@
                 <span class="admin-eyebrow">SPACE ONLY</span>
                 <h2>Галерея</h2>
                 <p>
-                  Интерьер, атмосфера, столики и само пространство NOIRÉ. Фото
+                  Интерьер, атмосфера, столики и пространство ресторана. Фото
                   можно загрузить прямо с устройства.
                 </p>
               </div>
@@ -425,7 +427,7 @@
         <section data-section="settings" class="admin-view">
           <div class="panel">
             <span class="admin-eyebrow">BRAND SETTINGS</span>
-            <h2>Настройки NOIRÉ COFFEE</h2>
+            <h2 id="brandSettingsTitle">Настройки сайта</h2>
             <p>
               Owner и Director могут менять название и подпись сайта без
               редактирования кода.
@@ -445,6 +447,17 @@
                   посетителей всего сайта.</small
                 ></label
               >
+              <label>Основной цвет<input name="primaryColor" id="primaryColor" type="color" value="#c99a5b" /></label>
+              <label>Цвет фона<input name="backgroundColor" id="backgroundColor" type="color" value="#090807" /></label>
+              <label>Цвет текста<input name="textColor" id="textColor" type="color" value="#eee5da" /></label>
+              <label class="full">Заголовок главной<input name="heroTitle" id="heroTitle" maxlength="120" /></label>
+              <label class="full">Описание главной<textarea name="heroDescription" id="heroDescription" maxlength="500" rows="4"></textarea></label>
+              <label>Адрес<input name="address" id="contact_address" maxlength="200" /></label>
+              <label>Телефон<input name="phone" id="contact_phone" maxlength="40" /></label>
+              <label>Email<input name="email" id="contact_email" type="email" maxlength="160" /></label>
+              <label>Website<input name="website" id="contact_website" maxlength="240" /></label>
+              <label>Instagram<input name="instagram" id="contact_instagram" maxlength="120" placeholder="@restaurant" /></label>
+              <label>Часы работы<input name="hours" id="contact_hours" maxlength="160" /></label>
               <div class="full">
                 <button class="admin-primary">Сохранить настройки</button>
               </div>
@@ -602,5 +615,6 @@
 <script src="/js/translations.js"></script>
 <script src="/js/translator.js"></script>
 <script src="/js/admin.js"></script>
-  </body>
+  <script src="/js/tenant-branding.js"></script>
+</body>
 </html>

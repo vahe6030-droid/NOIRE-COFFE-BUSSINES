@@ -1,10 +1,15 @@
-const adminT = (key, vars = {}) =>
-  window.noireT
-    ? window.noireT(key, vars)
-    : String(key).replace(
-        /\{(\w+)\}/g,
-        (_, name) => vars[name] ?? `{${name}}`
-      );
+const adminT = (key, vars = {}) => {
+  // Reuse both existing RU/EN/HY catalogs; never show source text when translated.
+  const source = String(key);
+  const lang = String(document.documentElement.lang || 'ru').toLowerCase();
+  const main = window.NoireSiteI18n;
+  const extra = window.NoireTranslations;
+  let value = source;
+  if (lang !== 'ru' && main?.has?.(source, lang)) value = main.get(source, lang);
+  else if (lang !== 'ru' && extra?.has?.(source, lang)) value = extra.get(source, lang);
+  else if (typeof window.noireT === 'function') return window.noireT(source, vars);
+  return value.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
+};
 let token = null;
 let state = {
   orders: [],
@@ -45,6 +50,24 @@ const dateNow = () =>
   new Intl.DateTimeFormat("en-CA", { timeZone: businessTimezone }).format(
     new Date(),
   );
+
+function tenantBrand() {
+  return String(state.settings?.siteName || "Restaurant").trim() || "Restaurant";
+}
+function applyTenantBranding() {
+  if (String(state.restaurantSlug || "noire") === "noire") return;
+  const name = tenantBrand();
+  document.documentElement.dataset.restaurantBrand = name;
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach((node) => {
+    if (node.parentElement?.closest("script,style,code,pre")) return;
+    if (/NOIRÉ|NOIRE/.test(node.nodeValue || ""))
+      node.nodeValue = node.nodeValue.replace(/NOIRÉ|NOIRE/g, name);
+  });
+}
+
 const SITE_LANGUAGES = [
   ["ru", "Русский"],
   ["en", "English"],
@@ -62,7 +85,7 @@ function fillLanguageSelect() {
 
 function toast(msg) {
   const t = $("#adminToast");
-  t.textContent = msg;
+  t.textContent = adminT(msg);
   t.classList.add("show");
   clearTimeout(window._t);
   window._t = setTimeout(() => t.classList.remove("show"), 2600);
@@ -76,7 +99,7 @@ async function api(url, opt = {}) {
     showLogin();
     throw new Error("Сессия завершена");
   }
-  if (!r.ok) throw new Error(d.message || "Ошибка");
+  if (!r.ok) throw new Error(adminT(d.message || "Ошибка"));
   return d;
 }
 function showLogin() {
@@ -112,7 +135,7 @@ async function login(e) {
       throw err;
     }
   } catch (err) {
-    $("#loginError").textContent = err.message;
+    $("#loginError").textContent = adminT(err.message);
   } finally {
     button.disabled = false;
   }
@@ -120,6 +143,8 @@ async function login(e) {
 async function load() {
   try {
     state = await api("/api/admin");
+    window.NoireTenant?.setAdminTenant(state.restaurantSlug || "noire");
+    document.dispatchEvent(new CustomEvent("noire:tenantsettings", {detail: state.settings || {}}));
     businessTimezone = state.timezone || "Asia/Yerevan";
     if (
       (state.permissions || []).includes("schedule") ||
@@ -140,15 +165,34 @@ async function load() {
   }
 }
 function periodText(x) {
-  return `${x?.orders || 0} заказов · средний чек ${money(x?.avgCheck)}`;
+  return adminT("{count} заказов · средний чек {amount}", {count:x?.orders || 0, amount:money(x?.avgCheck)});
 }
 function renderAll() {
   const s = state.stats || {};
   if (state.settings) {
+    const tenantName = state.settings.siteName || "Restaurant";
+    const tenantSubtitle = state.settings.siteSubtitle || "";
+    const brandMain = document.querySelector(".admin-brand span");
+    const brandSub = document.querySelector(".admin-brand small");
+    if (brandMain) { brandMain.textContent = tenantName.replace(/\s+COFFEE$/i, ""); brandMain.setAttribute("data-noire-no-translate", "true"); }
+    if (brandSub) brandSub.textContent = tenantSubtitle;
+    document.title = `${tenantName} — Management`;
+    const dashboardSubtitle = $("#viewSubtitle");
+    if (dashboardSubtitle && dashboardSubtitle.textContent.includes("NOIRÉ"))
+      dashboardSubtitle.textContent = adminT('Всё важное о {name} — на одном экране.',{name:tenantName});
     if ($("#siteName")) $("#siteName").value = state.settings.siteName || "";
     if ($("#siteSubtitle"))
       $("#siteSubtitle").value = state.settings.siteSubtitle || "";
+    if ($("#brandSettingsTitle")) $("#brandSettingsTitle").textContent = adminT('Настройки {name}', {name:state.settings.siteName || adminT('сайта')});
+    if ($("#primaryColor")) $("#primaryColor").value = state.settings.appearance?.primaryColor || '#c99a5b';
+    if ($("#backgroundColor")) $("#backgroundColor").value = state.settings.appearance?.backgroundColor || '#090807';
+    if ($("#textColor")) $("#textColor").value = state.settings.appearance?.textColor || '#eee5da';
+    if ($("#heroTitle")) $("#heroTitle").value = state.settings.publicTexts?.heroTitle || '';
+    if ($("#heroDescription")) $("#heroDescription").value = state.settings.publicTexts?.heroDescription || '';
+    const contacts = state.settings.contacts || {};
+    for (const key of ['address','phone','email','website','instagram','hours']) { const el=$(`#contact_${key}`); if(el) el.value=contacts[key]||''; }
     fillLanguageSelect();
+    applyTenantBranding();
   }
   ["day", "week", "month", "year"].forEach((k) => {
     const x = s.periods?.[k] || {};
@@ -671,22 +715,31 @@ function closeModal() {
   $("#modal").hidden = true;
   $("#modalContent").innerHTML = "";
 }
-function imageFieldData(form, name = "image") {
+function readImageFile(file) {
+  return new Promise((resolve,reject)=>{
+    if(!file) return resolve('');
+    const allowed=new Set(['image/jpeg','image/png','image/webp','image/gif','image/avif']);
+    if(!allowed.has(file.type)) return reject(new Error(adminT('Поддерживаются JPEG, PNG, WEBP, GIF и AVIF')));
+    if(file.size>3*1024*1024) return reject(new Error(adminT('Изображение больше 3 МБ')));
+    const reader=new FileReader(); reader.onload=()=>resolve(String(reader.result||'')); reader.onerror=()=>reject(new Error(adminT('Не удалось прочитать изображение'))); reader.readAsDataURL(file);
+  });
+}
+async function imageFieldData(form, name = "image") {
+  const file = form.querySelector(`[data-photo-input="${name}"]`)?.files?.[0];
+  if (file) return await readImageFile(file);
   return String(form.querySelector(`[name="${name}"]`)?.value || "").trim();
 }
 function photoFieldMarkup(value = "", name = "image") {
   return `
         <label class="full">
-            ${adminT("URL изображения")}
-            <input
-                name="${name}"
-                value="${esc(value || "")}"
-                placeholder="https://example.com/image.jpg"
-                autocomplete="url"
-            >
-            <small class="admin-muted">
-                ${adminT("Используйте прямую ссылку на изображение.")}
-            </small>
+            ${adminT("Загрузить изображение")}
+            <input type="file" data-photo-input="${name}" accept="image/jpeg,image/png,image/webp,image/gif,image/avif">
+            <div data-photo-preview="${name}" class="photo-preview" hidden></div>
+            <small class="admin-muted">${adminT("JPEG, PNG, WEBP, GIF или AVIF, до 3 МБ.")}</small>
+        </label>
+        <label class="full">
+            ${adminT("Или URL изображения")}
+            <input name="${name}" value="${esc(value || "")}" placeholder="https://example.com/image.jpg" autocomplete="url">
         </label>
     `;
 }
@@ -694,11 +747,11 @@ function photoFieldMarkup(value = "", name = "image") {
 function openMenu(id = null) {
   const i = id ? state.menu.find((x) => Number(x.id) === Number(id)) : {};
   openModal(
-    `<span class="admin-eyebrow">NOIRÉ · MENU</span><h2>${id ? adminT("Редактировать позицию") : adminT("Добавить позицию")}</h2><form id="menuForm" class="menu-form"><label>${adminT("Название")}<input name="name" value="${esc(i.name || "")}" required></label><label>${adminT("Цена")}<input name="price" type="number" value="${i.price || ""}" min="0" required></label><label>${adminT("Категория")}</label><select name="category">${["coffee", "tea", "breakfast", "snacks", "food", "desserts", "drinks", "beer", "sauces"].map((c) => `<option ${c === i.category ? "selected" : ""} value="${c}">${c}</option>`).join("")}</select></label>${photoFieldMarkup(i.image || "", "image")}<label class="full">${adminT("Описание")}<textarea name="description">${esc(i.description || "")}</textarea></label><label class="check full"><input type="checkbox" name="popular" ${i.popular ? "checked" : ""}> ${adminT("Показывать как популярное")}</label><div class="full"><button class="admin-primary">${adminT("Сохранить")}</button></div></form>`,
+    `<span class="admin-eyebrow">${esc(tenantBrand())} · MENU</span><h2>${id ? adminT("Редактировать позицию") : adminT("Добавить позицию")}</h2><form id="menuForm" class="menu-form"><label>${adminT("Название")}<input name="name" value="${esc(i.name || "")}" required></label><label>${adminT("Цена")}<input name="price" type="number" value="${i.price || ""}" min="0" required></label><label>${adminT("Категория")}<select name="category">${["coffee", "tea", "breakfast", "snacks", "food", "desserts", "drinks", "beer", "sauces"].map((c) => `<option ${c === i.category ? "selected" : ""} value="${c}">${c}</option>`).join("")}</select></label>${photoFieldMarkup(i.image || "", "image")}<label class="full">${adminT("Описание")}<textarea name="description">${esc(i.description || "")}</textarea></label><label class="check full"><input type="checkbox" name="popular" ${i.popular ? "checked" : ""}> ${adminT("Показывать как популярное")}</label><div class="full"><button class="admin-primary">${adminT("Сохранить")}</button></div></form>`,
   );
   const form = $("#menuForm");
-  const file = form.querySelector("[data-photo-input]");
-  const preview = form.querySelector("[data-photo-preview]");
+  const file = form.querySelector(`[data-photo-input="image"]`);
+  const preview = form.querySelector(`[data-photo-preview="image"]`);
   file?.addEventListener("change", async () => {
     try {
       const src = await readImageFile(file.files[0]);
@@ -745,13 +798,13 @@ async function deleteMenu(id) {
   }
 }
 function openGallery(id = null) {
-  const item = id ? state.gallery.find((x) => Number(x.id) === Number(id)) : {};
+  const item = (id ? state.gallery.find((x) => Number(x.id) === Number(id)) : null) || {};
   openModal(
-    `<span class="admin-eyebrow">SPACE ONLY</span><h2>${id ? adminT("Редактировать фото NOIRÉ") : adminT("Добавить фото NOIRÉ")}</h2><form id="galleryForm" class="menu-form"><label>${adminT("Название")}<input name="title" value="${esc(item.title || "")}" required></label><label>${adminT("Категория")}</label><select name="category">${["Interior", "Atmosphere", "Seating", "Details", "Facade"].map((c) => `<option ${c === (item.category || "Interior") ? "selected" : ""}>${c}</option>`).join("")}</select></label>${photoFieldMarkup(item.image || "", "image")}<div class="full"><button class="admin-primary">${id ? adminT("Сохранить") : adminT("Добавить")}</button></div></form>`,
+    `<span class="admin-eyebrow">SPACE ONLY</span><h2>${id ? `${adminT("Редактировать фото")} ${esc(tenantBrand())}` : `${adminT("Добавить фото")} ${esc(tenantBrand())}`}</h2><form id="galleryForm" class="menu-form"><label>${adminT("Название")}<input name="title" value="${esc(item.title || "")}" required></label><label>${adminT("Категория")}<select name="category">${["Interior", "Atmosphere", "Seating", "Details", "Facade"].map((c) => `<option value="${c}" ${c === (item.category || "Interior") ? "selected" : ""}>${adminT(c)}</option>`).join("")}</select></label>${photoFieldMarkup(item.image || "", "image")}<div class="full"><button class="admin-primary">${id ? adminT("Сохранить") : adminT("Добавить")}</button></div></form>`,
   );
   const form = $("#galleryForm");
-  const file = form.querySelector("[data-photo-input]");
-  const preview = form.querySelector("[data-photo-preview]");
+  const file = form.querySelector(`[data-photo-input="image"]`);
+  const preview = form.querySelector(`[data-photo-preview="image"]`);
   file?.addEventListener("change", async () => {
     try {
       const src = await readImageFile(file.files[0]);
@@ -857,13 +910,17 @@ async function loadTables() {
     toast(e.message);
   }
 }
+function openNewTable() {
+  openModal(`<span class="admin-eyebrow">${esc(tenantBrand())} FLOOR PLAN</span><h2>${adminT('Добавить стол')}</h2><form id="newTableForm" class="menu-form"><label>${adminT('Название')}<input name="name" placeholder="T01"></label><label>${adminT('Количество мест')}<input name="seats" type="number" min="1" max="30" value="2" required></label><label class="full">${adminT('Зона')}<input name="zone" maxlength="80"></label><div class="full"><button class="admin-primary">${adminT('Добавить')}</button></div></form>`);
+  $('#newTableForm').onsubmit=async e=>{e.preventDefault();try{const f=Object.fromEntries(new FormData(e.target));f.seats=Number(f.seats);await api('/api/admin/tables',{method:'POST',body:JSON.stringify(f)});closeModal();await loadTables();toast(adminT('Стол добавлен'));}catch(err){toast(adminT(err.message));}};
+}
 function openTable(id) {
   const t = state.tables.find((x) => Number(x.id) === Number(id));
   if (!t) return;
   const r = t.reservation,
     o = t.activeOrder;
   openModal(
-    `<span class="admin-eyebrow">NOIRÉ FLOOR PLAN</span><h2>${esc(t.name)}</h2><div class="detail-grid"><div<small>${adminT("Статус")}</small><b>${tableStatusLabel(t.computedStatus || t.status)}</b></div><div><small>${adminT("Мест")}</small><b>${t.seats}</b></div><div><small>${adminT("Зона")}</small><b>${esc(t.zone || "—")}</b></div><div><small>${adminT("Бронь")}</small><b>${r ? `#${r.number} · ${esc(r.name)} · ${esc(r.time)}` : adminT("Нет")}</b></div><div class="full"><small>${adminT("Заказ")}</small><b>${o ? `#${o.number} · ${money(o.total)} · ${statusLabel(o.status)}` : adminT("Нет")}</b></div></div><div class="modal-actions"><button class="small-btn" onclick="setTableStatus(${t.id},'occupied')">${adminT("Занять")}</button><button class="small-btn" onclick="setTableStatus(${t.id},'service')">${adminT("В сервис")}</button><button class="small-btn" onclick="setTableStatus(${t.id},'available')">${adminT("Освободить")}</button></div>`,
+    `<span class="admin-eyebrow">${esc(tenantBrand())} FLOOR PLAN</span><h2>${esc(t.name)}</h2><div class="detail-grid"><div<small>${adminT("Статус")}</small><b>${tableStatusLabel(t.computedStatus || t.status)}</b></div><div><small>${adminT("Мест")}</small><b>${t.seats}</b></div><div><small>${adminT("Зона")}</small><b>${esc(t.zone || "—")}</b></div><div><small>${adminT("Бронь")}</small><b>${r ? `#${r.number} · ${esc(r.name)} · ${esc(r.time)}` : adminT("Нет")}</b></div><div class="full"><small>${adminT("Заказ")}</small><b>${o ? `#${o.number} · ${money(o.total)} · ${statusLabel(o.status)}` : adminT("Нет")}</b></div></div><div class="modal-actions"><button class="small-btn" onclick="setTableStatus(${t.id},'occupied')">${adminT("Занять")}</button><button class="small-btn" onclick="setTableStatus(${t.id},'service')">${adminT("В сервис")}</button><button class="small-btn" onclick="setTableStatus(${t.id},'available')">${adminT("Освободить")}</button></div>`,
   );
 }
 async function setTableStatus(id, status) {
@@ -931,7 +988,7 @@ function openEmployee(id = null) {
     return;
   }
   openModal(
-    `<span class="admin-eyebrow">NOIRÉ TEAM</span><h2>${id ? adminT("Редактировать сотрудника") : adminT("Новый сотрудник")}</h2><form id="employeeForm" class="menu-form"><label>${adminT("Имя")}<input name="firstName" value="${esc(e.firstName || e.name || "")}" required></label><label>${adminT("Фамилия")}<input name="lastName" value="${esc(e.lastName || "")}" required></label><label>${adminT("Отчество")}<input name="middleName" value="${esc(e.middleName || "")}"></label><label>${adminT("Логин")}<input name="username" value="${esc(e.username || "")}" required></label><label>${adminT("Пароль")}<div class="password-field"><input name="password" type="password" minlength="8" placeholder="${id ? adminT("Оставьте пустым, если не меняете") : ""}" ${id ? "" : "required"}><button type="button" class="password-toggle" aria-label="${adminT("Показать пароль")}" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div></label><label>${adminT("Роль")}<select name="role">${["director", "administrator", "manager", "waiter", "cook", "delivery"].map((r) => `<option value="${r}" ${r === e.role ? "selected" : ""}>${window.noireRoleLabel ? noireRoleLabel(r) : r}</option>`).join("")}</select></label><label>${adminT("Email")}<input name="email" type="email" value="${esc(e.email || "")}"></label><label>${adminT("Телефон")}<input name="phone" value="${esc(e.phone || "")}"></label>${photoFieldMarkup(e.photo || "", "photo")}<label class="check full"><input type="checkbox" name="active" ${e.active !== false ? "checked" : ""}> ${adminT("Аккаунт активен")}</label><div class="full"><button class="admin-primary">${id ? adminT("Сохранить изменения") : adminT("Создать аккаунт")}</button></div></form>`,
+    `<span class="admin-eyebrow">${esc(tenantBrand())} TEAM</span><h2>${id ? adminT("Редактировать сотрудника") : adminT("Новый сотрудник")}</h2><form id="employeeForm" class="menu-form"><label>${adminT("Имя")}<input name="firstName" value="${esc(e.firstName || e.name || "")}" required></label><label>${adminT("Фамилия")}<input name="lastName" value="${esc(e.lastName || "")}" required></label><label>${adminT("Отчество")}<input name="middleName" value="${esc(e.middleName || "")}"></label><label>${adminT("Логин")}<input name="username" value="${esc(e.username || "")}" required></label><label>${adminT("Пароль")}<div class="password-field"><input name="password" type="password" minlength="8" placeholder="${id ? adminT("Оставьте пустым, если не меняете") : ""}" ${id ? "" : "required"}><button type="button" class="password-toggle" aria-label="${adminT("Показать пароль")}" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div></label><label>${adminT("Роль")}<select name="role">${["director", "administrator", "manager", "waiter", "cook", "delivery"].map((r) => `<option value="${r}" ${r === e.role ? "selected" : ""}>${window.noireRoleLabel ? noireRoleLabel(r) : r}</option>`).join("")}</select></label><label>${adminT("Email")}<input name="email" type="email" value="${esc(e.email || "")}"></label><label>${adminT("Телефон")}<input name="phone" value="${esc(e.phone || "")}"></label>${photoFieldMarkup(e.photo || "", "photo")}<label class="check full"><input type="checkbox" name="active" ${e.active !== false ? "checked" : ""}> ${adminT("Аккаунт активен")}</label><div class="full"><button class="admin-primary">${id ? adminT("Сохранить изменения") : adminT("Создать аккаунт")}</button></div></form>`,
   );
   initAdminPasswordToggle();
   $("#employeeForm").onsubmit = async (ev) => {
@@ -1795,7 +1852,7 @@ function applyRole() {
   if ($("#addEmployeeBtn")) $("#addEmployeeBtn").hidden = !canManage;
   if ($("#settingsForm"))
     $("#settingsForm")
-      .querySelectorAll("input,button")
+      .querySelectorAll("input,select,textarea,button")
       .forEach(
         (x) =>
           (x.disabled = !(
@@ -1841,19 +1898,19 @@ function nav() {
         $("#viewTitle").textContent = b.textContent;
         $("#viewSubtitle").textContent =
           {
-            dashboard: adminT("Всё важное о NOIRÉ — на одном экране."),
+            dashboard: adminT('Всё важное о {name} — на одном экране.',{name:tenantBrand()}),
             menu: adminT("Контроль позиций, цен и фотографий."),
             orders: adminT("Заказы гостей и ответственные сотрудники."),
             bookings: adminT("Брони, гости, столики, контакты и связанные заказы."),
             tables: adminT("Свободные, занятые и забронированные столы."),
-            gallery: adminT("Только пространство NOIRÉ."),
+            gallery: adminT('Только пространство {name}.',{name:tenantBrand()}),
             analytics: adminT("Выручка, динамика, топ-позиции и категории."),
             history: adminT("Архив закрытых месяцев и прошлых лет."),
             employees: adminT("Смены, роли, личная выручка и рабочие показатели."),
             schedule: adminT("Плановый календарь смен сотрудников."),
             customers: adminT("Зарегистрированные клиенты, их заказы и бронирования."),
             settings: adminT("Название и фирменные настройки сайта."),
-            ai: adminT("Живой помощник по данным и задачам NOIRÉ."),
+            ai: adminT('Живой помощник по данным и задачам {name}.',{name:tenantBrand()}),
           }[v] || "";
       }),
   );
@@ -1869,7 +1926,7 @@ async function askAI(q) {
         language: document.documentElement.lang || "ru",
       }),
     });
-    box.innerHTML += `<div class="ai-msg"><b>NOIRÉ AI</b><br>${esc(d.answer)}</div>`;
+    box.innerHTML += `<div class="ai-msg"><b>${esc(tenantBrand())} AI</b><br>${esc(d.answer)}</div>`;
     box.scrollTop = box.scrollHeight;
   } catch (e) {
     box.innerHTML += `<div class="ai-msg">${adminT("Не удалось выполнить запрос: {message}", {
@@ -1893,7 +1950,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.id === "modal") closeModal();
   };
   $("#addMenuBtn").onclick = () => openMenu();
-  $("#addGalleryBtn").onclick = openGallery;
+  $("#addGalleryBtn").onclick = () => openGallery();
+  $("#addTableBtn")?.addEventListener("click", openNewTable);
   $("#addEmployeeBtn")?.addEventListener("click", () => openEmployee());
   $("#addWaiterOrderBtn")?.addEventListener("click", openWaiterOrder);
   $("#addDeliveryOrderBtn")?.addEventListener("click", openDeliveryOrder);

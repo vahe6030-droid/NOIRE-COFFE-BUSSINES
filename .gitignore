@@ -6,3 +6,6 @@ node_modules/
 data/store.json
 data/history.json
 data/audit_logs.json
+public/uploads/
+.env.*
+!.env.example

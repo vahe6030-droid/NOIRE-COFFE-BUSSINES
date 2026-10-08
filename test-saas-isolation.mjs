@@ -1,0 +1,10 @@
+import { createRequire } from 'module';
+const require=createRequire(import.meta.url);
+const db=require('./tenant-db');
+await db.ready();
+const slug=`saas-test-${Date.now()}`;
+const restaurant=await db.createRestaurant({name:'SaaS Isolation Test',slug,owner:{username:`owner-${Date.now()}@example.com`,passwordHash:'test-only',name:'Test Owner'}});
+await db.runWithTenant(slug,async()=>{const s=db.getStore();s.orders.push({id:Date.now(),number:987654,total:1,status:'new'});await db.saveStore(s);});
+await db.runWithTenant('noire',async()=>{if(db.getStore().orders.some(x=>Number(x.number)===987654))throw new Error('Tenant isolation failed: test order leaked into NOIRÉ');});
+await db.runWithTenant(slug,async()=>{if(!db.getStore().orders.some(x=>Number(x.number)===987654))throw new Error('Tenant persistence failed');});
+console.log('SaaS tenant isolation smoke test passed:',restaurant.slug);

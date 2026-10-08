@@ -2,6 +2,7 @@
 <html lang="ru">
 
 <head>
+    <script src="/js/tenant-context.js"></script>
 
     <meta charset="UTF-8">
 
@@ -203,7 +204,7 @@
                             <input type="radio" name="payment" value="card" checked>
                             <span class="payment-card">
                                 <span class="payment-icon" aria-hidden="true">▣</span>
-                                <span><strong>Картой курьеру</strong><small>Оплата при получении</small></span>
+                                <span><strong>Оплата картой онлайн</strong><small>Visa · Mastercard · ArCa · AmEx · MIR (если поддерживается банком)</small></span>
                             </span>
                         </label>
                         <label class="payment-option">
@@ -214,6 +215,7 @@
                             </span>
                         </label>
                     </div>
+                    <p id="cardPaymentNotice" role="status" style="margin-top:12px;color:var(--muted,#9e9389)" hidden></p>
                 </div>
 
                 <div class="form-group">
@@ -407,6 +409,43 @@ document.addEventListener(
     }catch(e){}
 })();
 
+(function paymentReturnNotice(){
+  const q=new URLSearchParams(location.search); const state=q.get('payment'); if(!state)return;
+  const lang=(document.documentElement.lang||'ru').toLowerCase();
+  const t={
+    success:{ru:'Оплата прошла успешно. Заказ принят.',en:'Payment successful. Your order has been accepted.',hy:'Վճարումը հաջող է։ Ձեր պատվերն ընդունված է։'},
+    insufficient_funds:{ru:'На вашем счёте недостаточно средств.',en:'Insufficient funds on your card.',hy:'Ձեր քարտի հաշվին բավարար միջոցներ չկան։'},
+    declined:{ru:'Банк отклонил оплату. Попробуйте другую карту.',en:'The bank declined the payment. Try another card.',hy:'Բանկը մերժել է վճարումը։ Փորձեք այլ քարտ։'},
+    failed:{ru:'Не удалось подтвердить оплату. Попробуйте ещё раз.',en:'Payment could not be confirmed. Please try again.',hy:'Չհաջողվեց հաստատել վճարումը։ Փորձեք կրկին։'}
+  };
+  const msg=t[state]?.[lang]||t[state]?.ru; if(msg)setTimeout(()=>showToast(msg),200);
+  if(state==='success'){ try{localStorage.removeItem('noireCart');}catch{} }
+  history.replaceState({},'',location.pathname);
+})();
+
+// Card payment must never look active for restaurants without a merchant account.
+(async function checkCardPaymentConfiguration(){
+  try {
+    const response=await fetch('/api/payments/config',{cache:'no-store'});
+    if(!response.ok) return;
+    const config=await response.json();
+    if(config.cardPayment) return;
+    const card=document.querySelector('input[name="payment"][value="card"]');
+    const cash=document.querySelector('input[name="payment"][value="cash"]');
+    const notice=document.getElementById('cardPaymentNotice');
+    if(card) card.disabled=true;
+    if(cash) cash.checked=true;
+    if(notice){
+      notice.hidden=false;
+      notice.textContent={
+        ru:'Оплата картой пока не подключена для этого ресторана. Выберите оплату наличными.',
+        en:'Card payments are not yet connected for this restaurant. Please select cash.',
+        hy:'Այս ռեստորանի համար քարտով վճարումը դեռ միացված չէ։ Ընտրեք կանխիկ վճարում։'
+      }[document.documentElement.lang]||'Оплата картой пока не подключена для этого ресторана. Выберите оплату наличными.';
+    }
+  }catch(e){ /* The server still validates payment availability. */ }
+})();
+
 document.querySelector(
     "#checkoutForm"
 ).addEventListener(
@@ -506,6 +545,12 @@ try {
     return;
 }
 
+if (response.ok && result?.success && result?.paymentRequired && result?.paymentUrl) {
+    sessionStorage.setItem('noirePendingCardOrder', JSON.stringify(result.order||{}));
+    window.location.href = result.paymentUrl;
+    return;
+}
+
 if (!response.ok || !result?.success || !result?.order) {
     showToast(
         result?.message ||
@@ -525,8 +570,10 @@ if (!response.ok || !result?.success || !result?.order) {
 
     return;
 }
+        const tenantMatch = document.cookie.match(/(?:^|;\s*)noire_restaurant=([^;]+)/);
+        const tenantSlug = window.NoireTenant?.slug || (tenantMatch ? decodeURIComponent(tenantMatch[1]) : "noire");
         localStorage.setItem(
-            "noireLastOrder",
+            `noireLastOrder:${tenantSlug}`,
             JSON.stringify({
                 orderId:
                     result.order.id,
@@ -536,7 +583,7 @@ if (!response.ok || !result?.success || !result?.order) {
         );
 
         localStorage.removeItem(
-            "noireCart"
+            `noireCart:${tenantSlug}`
         );
 
         document.querySelector(
@@ -581,7 +628,7 @@ if (!response.ok || !result?.success || !result?.order) {
                 </p>
 
                 <a
-                    href="/"
+                    href="${window.NoireTenant?.publicUrl('/') || '/'}"
                     class="gold-button"
                     style="
                         display:inline-block;
@@ -600,5 +647,6 @@ if (!response.ok || !result?.success || !result?.order) {
 </script>
 
 
+<script src="/js/tenant-branding.js"></script>
 </body>
 </html>

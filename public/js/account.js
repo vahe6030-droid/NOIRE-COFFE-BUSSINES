@@ -58,14 +58,14 @@ document.querySelector("#hello").textContent =
 `<article class="order-card"><div class="order-top"><b>${accountT("Бронь #{number}", { number: r.number })}</b><strong>${esc(window.noireFormatDate ? noireFormatDate(r.date) : r.date)} ${esc(r.time)}</strong></div><div class="order-items">${accountT("{count} гостей", { count: r.guests })} · ${r.tableId ? accountT("Стол T{number}", { number: String(r.tableId).padStart(2, "0") }) : accountT("стол не указан")}</div><small>${esc(r.status)}</small></article>`,        )
         .join("") || `<p>${accountT("Бронирований пока нет.")}</p>`;
   } catch (e) {
-    location.href = "/login.html";
+    location.href = window.NoireTenant?.publicUrl("/login.html") || "/login.html";
   }
 }
 document.querySelector("#logout").onclick = async () => {
   try {
     await api("/api/auth/logout", { method: "POST" });
   } catch {}
-  location.href = "/";
+  location.href = window.NoireTenant?.publicUrl("/") || "/";
 };
 load();
 

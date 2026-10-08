@@ -1,7 +1,12 @@
 (function () {
   "use strict";
   const fallback = "ru";
-  const storageKey = "noireVisitorLanguage";
+  function tenantSlug() {
+    if (window.NoireTenant) return window.NoireTenant.slug;
+    const m = document.cookie.match(/(?:^|;\s*)noire_restaurant=([^;]+)/);
+    return m ? decodeURIComponent(m[1]) : 'noire';
+  }
+  let storageKey = `noireVisitorLanguage:${tenantSlug()}`;
   const languages = [
     ["ru", "Русский"],
     ["en", "English"],
@@ -1873,45 +1878,42 @@
 "Выбрано: {count}": "Ընտրված է՝ {count}",
 }
   };
-  function t(key, vars = {}) {
-    const dictionary = I18N[current] || I18N.ru;
-    let text = dictionary[key] || I18N.ru[key] || key;
+  const normalizeTranslationText = value => String(value ?? "")
+    .normalize("NFC").replace(/\uFE0F/g, "").replace(/\s+/g, " ").trim();
+  const mainIndex = new Map();
+  // Source keys take priority; translated output is indexed for dynamic t() markup.
+  for (const lang of ["ru", "en", "hy"])
+    for (const key of Object.keys(I18N[lang] || {}))
+      if (!mainIndex.has(normalizeTranslationText(key))) mainIndex.set(normalizeTranslationText(key), key);
+  for (const lang of ["ru", "en", "hy"])
+    for (const [key, value] of Object.entries(I18N[lang] || {}))
+      if (!mainIndex.has(normalizeTranslationText(value))) mainIndex.set(normalizeTranslationText(value), key);
 
+  function translateString(text, language = current) {
+    let value = normalizeTranslationText(text);
+    if (!value) return null;
+    const brand = document.documentElement.dataset.restaurantBrand;
+    if (brand && tenantSlug() !== "noire" && value !== brand)
+      value = value.split(brand).join("NOIRÉ");
+    const key = mainIndex.get(value);
+    let output = key ? I18N[language]?.[key] : null;
+    if (output == null) output = window.NoireTranslations?.resolve?.(key || value, language);
+    if (output == null && key) output = I18N.ru?.[key] || key;
+    if (output == null) return null;
+    return brand && tenantSlug() !== "noire" ? output.replace(/NOIRÉ|NOIRE/g, brand) : output;
+  }
+  function t(key, vars = {}) {
+    let text = translateString(key) ?? String(key);
     Object.entries(vars).forEach(([name, value]) => {
       text = text.replaceAll(`{${name}}`, String(value));
     });
-
     return text;
   }
-
   window.noireT = t;
-
   window.NoireSiteI18n = Object.freeze({
-  get(text, language = current) {
-    const key = String(text ?? "").trim();
-    const lang = valid.has(language) ? language : fallback;
-
-    if (!key) {
-      return String(text ?? "");
-    }
-
-    return I18N[lang]?.[key] || I18N.ru?.[key] || key;
-  },
-
-  has(text, language = current) {
-    const key = String(text ?? "").trim();
-    const lang = valid.has(language) ? language : fallback;
-
-    if (!key) {
-      return false;
-    }
-
-    return Object.prototype.hasOwnProperty.call(
-      I18N[lang] || {},
-      key
-    );
-  },
-});
+    get(text, language = current) { return translateString(text, valid.has(language) ? language : fallback) ?? String(text ?? ""); },
+    has(text, language = current) { return translateString(text, valid.has(language) ? language : fallback) != null; }
+  });
 
   function getVisitorLanguage() {
     try {
@@ -1934,209 +1936,47 @@
     } catch {}
   }
 
-const originalTextByNode = new WeakMap();
+  const originalTextByNode = new WeakMap();
+  const originalAttributes = new WeakMap();
+  const excluded = "script, style, noscript, code, pre, textarea, [data-noire-no-translate], [data-no-translate]";
 
-function normalizeTranslationText(value) {
-  return String(value ?? "")
-    .replace(/\u00A0/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function translateString(text) {
-  const value = normalizeTranslationText(text);
-
-  if (!value) return null;
-
-  // ---------------------------------------------------------
-  // 1. Ищем исходный русский ключ в основном I18N.
-  // Сравнение не зависит от переносов строк и лишних пробелов.
-  // ---------------------------------------------------------
-
-  let originalKey = null;
-
-  for (const key of Object.keys(I18N.ru)) {
-    if (normalizeTranslationText(key) === value) {
-      originalKey = key;
-      break;
-    }
+  function translateTextNode(node) {
+    const parent = node.parentElement;
+    if (!parent || parent.closest(excluded)) return;
+    const raw = node.nodeValue || "";
+    if (!raw.trim()) return;
+    let entry = originalTextByNode.get(node);
+    // Retain source across language changes, but accept fresh render/branding output.
+    if (!entry || raw !== entry.output) entry = {source:raw, output:raw};
+    const translated = translateString(entry.source);
+    const next = translated == null ? entry.source :
+      `${entry.source.match(/^\s*/)?.[0] || ""}${translated}${entry.source.match(/\s*$/)?.[0] || ""}`;
+    entry.output = next;
+    originalTextByNode.set(node, entry);
+    if (raw !== next) node.nodeValue = next;
   }
-
-  if (originalKey) {
-    if (current === "ru") {
-      return originalKey;
-    }
-
-    const dictionary = I18N[current] || I18N.ru;
-
-    if (
-      Object.prototype.hasOwnProperty.call(
-        dictionary,
-        originalKey,
-      )
-    ) {
-      return dictionary[originalKey];
-    }
-
-    if (
-      window.NoireTranslations &&
-      typeof window.NoireTranslations.has === "function" &&
-      typeof window.NoireTranslations.get === "function" &&
-      window.NoireTranslations.has(originalKey, current)
-    ) {
-      return window.NoireTranslations.get(
-        originalKey,
-        current,
-      );
-    }
-
-    return originalKey;
-  }
-
-  // ---------------------------------------------------------
-  // 2. Если строки нет в основном I18N,
-  // проверяем дополнительный translations.js.
-  // ---------------------------------------------------------
-
-  if (
-    current !== "ru" &&
-    window.NoireTranslations &&
-    typeof window.NoireTranslations.has === "function" &&
-    typeof window.NoireTranslations.get === "function" &&
-    window.NoireTranslations.has(value, current)
-  ) {
-    return window.NoireTranslations.get(
-      value,
-      current,
-    );
-  }
-
-  return null;
-}
-
-function translateTextNode(node) {
-  if (!node || node.nodeType !== Node.TEXT_NODE) return;
-
-  const parent = node.parentElement;
-  if (!parent) return;
-
-  if (
-    parent.closest(
-      "script, style, code, pre, textarea, [data-noire-no-translate]",
-    )
-  ) {
-    return;
-  }
-
-  const raw = node.nodeValue || "";
-  const trimmed = raw.trim();
-
-  if (!trimmed) return;
-
-  // Нормализуем переносы строк и лишние пробелы.
-  const source = trimmed
-    .replace(/\u00A0/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  let translated = null;
-
-  // Сначала основной словарь site-language.js.
-  const dictionary = I18N[current] || I18N.ru;
-
-  if (
-    Object.prototype.hasOwnProperty.call(
-      dictionary,
-      source,
-    )
-  ) {
-    translated = dictionary[source];
-  }
-
-  // Затем дополнительный translations.js.
-  if (
-    !translated &&
-    current !== "ru" &&
-    window.NoireTranslations &&
-    typeof window.NoireTranslations.has === "function" &&
-    typeof window.NoireTranslations.get === "function" &&
-    window.NoireTranslations.has(source, current)
-  ) {
-    translated = window.NoireTranslations.get(
-      source,
-      current,
-    );
-  }
-
-  if (!translated) return;
-
-  const start = raw.match(/^\s*/)?.[0] || "";
-  const end = raw.match(/\s*$/)?.[0] || "";
-
-  node.nodeValue = `${start}${translated}${end}`;
-}
- 
-
   function translateElementAttributes(element) {
-    if (!(element instanceof Element)) return;
-
-    if (element.matches("input[placeholder], textarea[placeholder]")) {
-      if (!element.dataset.noireOriginalPlaceholder) {
-        element.dataset.noireOriginalPlaceholder =
-          element.getAttribute("placeholder") || "";
-      }
-
-      const original = element.dataset.noireOriginalPlaceholder;
-
-      const dictionary = PLACEHOLDERS[current] || PLACEHOLDERS.ru;
-
-      element.setAttribute("placeholder", dictionary[original] || original);
-    }
-
-    if (element.hasAttribute("title")) {
-      if (!element.dataset.noireOriginalTitle) {
-        element.dataset.noireOriginalTitle =
-          element.getAttribute("title") || "";
-      }
-
-      const original = element.dataset.noireOriginalTitle;
-      const translated = translateString(original);
-
-      element.setAttribute("title", translated || original);
-    }
-
-    if (element.hasAttribute("aria-label")) {
-      if (!element.dataset.noireOriginalAria) {
-        element.dataset.noireOriginalAria =
-          element.getAttribute("aria-label") || "";
-      }
-
-      const original = element.dataset.noireOriginalAria;
-      const translated = translateString(original);
-
-      if (translated) {
-        element.setAttribute("aria-label", translated);
-      }
+    if (element.closest("[data-noire-no-translate], [data-no-translate], script, style")) return;
+    let entries = originalAttributes.get(element);
+    if (!entries) { entries = new Map(); originalAttributes.set(element, entries); }
+    for (const name of ["placeholder", "title", "aria-label", "alt"]) {
+      if (!element.hasAttribute(name)) continue;
+      const raw = element.getAttribute(name);
+      let entry = entries.get(name);
+      if (!entry || raw !== entry.output) entry = {source:raw, output:raw};
+      const next = translateString(entry.source) ?? entry.source;
+      entry.output = next;
+      entries.set(name, entry);
+      if (raw !== next) element.setAttribute(name, next);
     }
   }
-
   function translateElement(element) {
-    if (!(element instanceof Element)) return;
-
-    if (element.closest("[data-noire-no-translate]")) {
-      return;
-    }
-
+    if (!(element instanceof Element) || element.closest("[data-noire-no-translate], [data-no-translate]")) return;
     translateElementAttributes(element);
-
+    element.querySelectorAll("[placeholder], [title], [aria-label], [alt]").forEach(translateElementAttributes);
     const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-
     const nodes = [];
-
-    while (walker.nextNode()) {
-      nodes.push(walker.currentNode);
-    }
-
+    while (walker.nextNode()) nodes.push(walker.currentNode);
     nodes.forEach(translateTextNode);
   }
 
@@ -2154,6 +1994,7 @@ function translateTextNode(node) {
       document.documentElement.dir = "ltr";
 
       translateElement(document.body);
+      translateElement(document.querySelector("title"));
 
       updateSwitcher();
     });
@@ -2173,34 +2014,35 @@ function translateTextNode(node) {
     const defaultOption = select.querySelector('option[value="__default__"]');
 
     if (defaultOption) {
-      defaultOption.textContent =
+      const label =
         current === "en"
           ? "Default"
           : current === "hy"
             ? "Ըստ լռելյայնի"
             : "По умолчанию";
+      if (defaultOption.textContent !== label) defaultOption.textContent = label;
     }
 
-    select.setAttribute(
-      "aria-label",
-      current === "en" ? "Language" : current === "hy" ? "Լեզու" : "Язык",
-    );
+    const aria = current === "en" ? "Language" : current === "hy" ? "Լեզու" : "Язык";
+    if (select.getAttribute("aria-label") !== aria) select.setAttribute("aria-label", aria);
 
     if (hint) {
       if (personal) {
-        hint.textContent =
+        const label =
           current === "en"
             ? "Your language"
             : current === "hy"
               ? "Ձեր լեզուն"
               : "Ваш язык";
+        if (hint.textContent !== label) hint.textContent = label;
       } else {
-        hint.textContent =
+        const label =
           current === "en"
             ? "Site language"
             : current === "hy"
               ? "Կայքի լեզուն"
               : "Язык сайта";
+        if (hint.textContent !== label) hint.textContent = label;
       }
     }
   }
@@ -2331,7 +2173,10 @@ function translateTextNode(node) {
       let shouldTranslate = false;
 
       for (const mutation of mutations) {
-        if (mutation.type === "childList" && mutation.addedNodes.length) {
+        const element = mutation.target.nodeType === Node.TEXT_NODE ? mutation.target.parentElement : mutation.target;
+        if (element?.closest?.(excluded)) continue;
+        if (mutation.type === "characterData" || mutation.type === "attributes" ||
+            (mutation.type === "childList" && mutation.addedNodes.length)) {
           shouldTranslate = true;
           break;
         }
@@ -2344,6 +2189,9 @@ function translateTextNode(node) {
 
     observer.observe(document.body, {
       childList: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ["placeholder", "title", "aria-label", "alt"],
       subtree: true,
     });
   }
@@ -2373,7 +2221,8 @@ function translateTextNode(node) {
       ownerDefault = fallback;
     }
 
-    current = personal || ownerDefault;
+    storageKey = `noireVisitorLanguage:${tenantSlug()}`;
+    current = getVisitorLanguage() || ownerDefault;
 
     applyLanguage(current);
 
@@ -2386,6 +2235,16 @@ function translateTextNode(node) {
     }, 0);
   }
 
+  let languageTenant = tenantSlug();
+  document.addEventListener("noire:tenantsettings", event => {
+    const nextTenant = tenantSlug();
+    const nextDefault = valid.has(event.detail?.language) ? event.detail.language : fallback;
+    if (nextTenant === languageTenant && nextDefault === ownerDefault) return;
+    languageTenant = nextTenant;
+    storageKey = `noireVisitorLanguage:${nextTenant}`;
+    ownerDefault = nextDefault;
+    applyLanguage(getVisitorLanguage() || ownerDefault);
+  });
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initLanguage);
   } else {
